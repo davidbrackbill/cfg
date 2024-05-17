@@ -327,8 +327,7 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open float
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
 -- Moving around buffers and files
-vim.keymap.set('n', '<leader>b', ':b#<cr>', { desc = 'Get last-used [B]uffer' })
-vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = 'Find [F]iles' })
+vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = '[L]ast-used buffer' })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
@@ -411,7 +410,7 @@ local function telescope_live_grep_open_files()
   }
 end
 vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
-vim.keymap.set('n', '<leader>sb', require('telescope.builtin').buffers, { desc = '[S]earch existing buffers' })
+vim.keymap.set('n', '<leader>b', require('telescope.builtin').buffers, { desc = 'Search existing [B]uffers' })
 vim.keymap.set('n', '<leader>ss', require('telescope.builtin').builtin, { desc = '[S]earch [S]elect Telescope' })
 vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
