@@ -32,10 +32,6 @@ alias cd="z"
 alias cd.="z .."
 alias cd-="z -"
 alias cd~="z ~"
-alias c="z"
-alias c.="z .."
-alias c-="z -"
-alias c~="z ~"
 
 #   Git
 alias gitc="git commit -am"
@@ -45,19 +41,19 @@ alias lg="lazygit"
 alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 
 #   Programs
-alias pyp="sh /opt/pycharm-2023.2/bin/pycharm.sh"
-alias py="python3.10"
-alias py1="python3.11"
+alias pyc="sh /opt/pycharm-2023.2/bin/pycharm.sh"
 alias chr="google-chrome"
 alias idea="sh /opt/idea-IU-232.8660.185/bin/idea.sh"
 alias idea_="sh /opt/idea-IU-232.8660.185/bin/idea.sh >/dev/null 2>&1"
-alias neo4j_desk="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
+alias neo4j="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
 
 #   NPM
 alias npmdev="npm run dev -- --open" 
 alias prt="npx prettier --write ."
 
 #   Python
+alias py="python3.10"
+alias py1="python3.11"
 alias create_venv="python3.10 -m venv venv"
 alias venv=". /home/david/venv/venv__3_10/bin/activate"
 alias venv_local="source ./venv/bin/activate"
