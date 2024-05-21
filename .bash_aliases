@@ -8,28 +8,27 @@ shopt -s expand_aliases
 shopt -s nullglob
 
 # - ALIASES
-alias aliases="sudo nvim ~/.bash_aliases"
+alias aliases="nvim ~/.bash_aliases"
 alias bashup=". ~/.bashrc"
 alias bashrc="nvim ~/.bashrc" 
 
-#   Shell
+#   Shell utils
 alias r="rip"
 alias n="nvim"
 alias cl="clear"
 alias bat="batcat"
-alias cat="bat"
-alias f='nvim "$(fzf)"'
-alias fd="cd ~ && cd \$(find * -type d | fzf)"
+alias cat="batcat"
+alias b="batcat"
+alias fdf="fdfind"
 
 #   Directories
-alias d="z"
-alias d.="z .."
-alias d-="z -"
-alias d~="z ~"
-#alias cd="z"
-alias cd.="z .."
-alias cd-="z -"
-alias cd~="z ~"
+alias d="cd ~"
+alias d.="cd .."
+alias d-="cd -"
+alias d~="cd ~"
+alias cd.="cd .."
+alias cd-="cd -"
+alias cd~="cd ~"
 
 #   Git
 alias gitc="git commit -am"
@@ -58,5 +57,5 @@ alias venv_local="source ./venv/bin/activate"
 alias pipf="pip list --format=freeze > requirements.txt"
 alias pyt="py -m pytest"
 
-#   Reliant on `# User functions` in `~/.bashrc`
-
+# Reliant on `# User functions` in `~/.bashrc`
+alias l="yy"

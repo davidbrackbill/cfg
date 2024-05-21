@@ -254,6 +254,30 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  -- Open Yazi file manager in Vim
+  {
+    "mikavilpas/yazi.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    event = "VeryLazy",
+    keys = {
+      {"<leader>L", function() require("yazi").yazi() end, desc = "[L]ist files using Yazi"},
+      -- {
+      --   -- Open in the current working directory
+      --   "<leader>ff",
+      --   function()
+      --     require("yazi").yazi(nil, vim.fn.getcwd())
+      --   end,
+      --   desc = "Open the file manager in nvim's working directory" ,
+      -- },
+    },
+    ---@type YaziConfig
+    opts = {
+      open_for_directories = true,
+    },
+  },
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.

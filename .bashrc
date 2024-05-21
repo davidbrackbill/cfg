@@ -88,9 +88,9 @@ fi
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+# alias ll='ls -alF'
+# alias la='ls -A'
+# alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -125,6 +125,7 @@ export NVM_DIR="$HOME/.nvm"
 # User directives (David)
 PROMPT_DIRTRIM=1
 export GOPATH=$HOME/.go
+export EDITOR=nvim
 
 #   Set vim mode in bash
 set -o vi
@@ -144,18 +145,21 @@ source /usr/share/doc/fzf/examples/key-bindings.bash
 
 # User functions (David)
 
-# cdl() {
-#     # https://ostechnix.com/bash-tips-how-to-cd-and-ls-in-one-command/
-#     local arg="$1"
-#     local dir="${arg:=.}"
-#
-#     # "cd -" or valid "cd dir"
-#     if [[ "$dir" == "-" || -d "$dir" ]]; then
-#             cd "$dir" >/dev/null; ls --color=auto
-#     else
-#             echo "bash: cdl: $dir: Directory not found"
-#     fi
-# }
+find_d='fdfind . "${HOME}" --type d --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf --select-1 --query "${*}"'
+find_f='fdfind . "${HOME}" --type f --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf --select-1 --query "${*}"'
+
+function f {
+    nvim "$(eval "$find_f")"
+}
+
+function fd {
+    cd "$(eval "$find_d")"
+  }
+
+function fdl {
+    cd "$(eval "$find_d")"
+    yy
+}
 
 # Plugin functions
 
@@ -169,7 +173,6 @@ function yy() {
 }
 
 # Plugins
-eval "$(zoxide init bash)"
 
 [ -f "/home/david/.ghcup/env" ] && . "/home/david/.ghcup/env" # ghcup-env
 
@@ -180,3 +183,4 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
