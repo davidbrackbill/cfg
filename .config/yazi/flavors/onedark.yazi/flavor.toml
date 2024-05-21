@@ -3,7 +3,7 @@
 cwd = { fg = "#61AFEF" }  # Blue
 
 # Hovered
-hovered = { bg = "#282C34" }  # Darkened background
+hovered = { fg = "#ABB2BF", bg = "#24272e" }  # Darkened additionally to stand out against vim
 preview_hovered = { underline = true }
 
 # Find
