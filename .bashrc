@@ -146,17 +146,14 @@ source /usr/share/doc/fzf/examples/key-bindings.bash
 # User functions (David)
 
 find_d='fdfind . "${HOME}" --type d --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf --select-1 --query "${*}"'
-find_f='fdfind . "${HOME}" --type f --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf --select-1 --query "${*}"'
 
 function f {
-    nvim "$(eval "$find_f")"
-}
-
-function fd {
+    # Find
     cd "$(eval "$find_d")"
   }
 
-function fdl {
+function fl {
+    # Find & List
     cd "$(eval "$find_d")"
     yy
 }
@@ -164,6 +161,7 @@ function fdl {
 # Plugin functions
 
 function yy() {
+    # CD to last dir touched by Yazi
     local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
     yazi "$@" --cwd-file="$tmp"
     if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
