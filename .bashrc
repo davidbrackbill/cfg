@@ -145,7 +145,7 @@ source /usr/share/doc/fzf/examples/key-bindings.bash
 
 # User functions (David)
 
-find_d='fdfind . "${HOME}" --type d --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf --select-1 --query "${*}"'
+find_d='fdfind . "${HOME}" --type d --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" | fzf-tmux --select-1 --query "${*}"'
 
 function f {
     # Find
