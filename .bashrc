@@ -146,32 +146,33 @@ source /usr/share/doc/fzf/examples/key-bindings.bash
 # User functions (David)
 
 function fr {
-    # Find file (from root)
-    local glob="${1-"."}"
-    local dir="${2-"/"}"
-    local args=${@:3}
-    fdfind "$glob" "$dir" --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" |
+    # Find file (from [R]oot, by default)
+    local dir="${1-"/"}"
+    local args=${@:2}
+    fdfind "." "$dir" --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" |
         fzf-tmux --select-1 --query "${args-""}"
 }
 
 
 function f {
-    # Find and CD
+    # Find and open
 
-    local path=$(fr . "${HOME}" "${*}")
+    local path=$(fr "${HOME}" "${*}")
     
-    # Open parent if findee is not directory
+    # Open directory
     if [[ -d $path ]]; then
 	cd "$path"
+	return 1
+    # Open file using nvim
     else
 	cd "$(dirname "$path")"
+	nvim "$path"
     fi
 }
 
 function fl {
-    # Find then list
-    f "${*}"
-    yy
+    # Find then [L]ist, if applicable
+    f "${*}" || yy
 }
 
 # Plugin functions
