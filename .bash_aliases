@@ -53,13 +53,7 @@ alias npmdev="npm run dev -- --open"
 alias prt="npx prettier --write ."
 
 #   Python
-alias py="python3.10"
-alias py1="python3.11"
-alias create_venv="python3.10 -m venv venv"
-alias venv=". /home/david/.global_venv/venv__3_10/bin/activate"
-alias venv_local="source ./venv/bin/activate"
 alias pipf="pip list --format=freeze > requirements.txt"
-alias pyt="py -m pytest"
 
 # Reliant on `# User functions` in `~/.bashrc`
 alias l="yy"

@@ -183,6 +183,41 @@ function gitpre {
     echo "${*}" > ${message_file}
 }
 
+function py {
+    local usage="USAGE: py [minor_version=10] [command={'venv'|file}] [subcommand={local}]"
+    local minor_version="${1-"10"}"
+    local command="$2"
+    local subcommand="$3"
+
+    if ((minor_version < 10 || minor_version > 11)); then
+	echo "ERROR: Minor version $minor_version not allowed"
+	echo "$usage"
+
+    elif [[ -z $command ]]; then
+	eval "python3.$minor_version"
+
+    elif [[ -f $command ]]; then
+	eval "python3.$minor_version $command"
+
+    elif [[ "$command" = "venv" ]]; then
+	if [[ "$subcommand" = "local" ]]; then
+	    # Make local venv if needed
+	    if ! [[ -d "./venv__3_$minor_version" ]]; then
+		echo "Making venv at ./venv__3_$minor_version"
+		eval "python3.$minor_version -m venv venv__3_$minor_version"
+	    fi
+	    eval "source ./venv__3_$minor_version/bin/activate"
+	else
+	    eval ". /home/david/.global_venv/venv__3_$minor_version/bin/activate"
+	fi
+
+    else
+	echo "ERROR: Command $command not allowed"
+	echo "$usage"
+    fi
+
+}
+
 # Plugin functions
 
 function yy() {
