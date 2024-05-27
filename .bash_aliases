@@ -22,7 +22,6 @@ alias b="batcat"
 alias fdf="fdfind"
 
 #   Directories
-alias d="cd ~"
 alias d.="cd .."
 alias d-="cd -"
 alias d~="cd ~"
@@ -53,6 +52,8 @@ alias npmdev="npm run dev -- --open"
 alias prt="npx prettier --write ."
 
 #   Python
+alias py10="python3.10"
+alias py11="python3.11"
 alias pipf="pip list --format=freeze > requirements.txt"
 
 # Reliant on `# User functions` in `~/.bashrc`

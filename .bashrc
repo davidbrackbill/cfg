@@ -175,6 +175,14 @@ function fl {
     f "${*}" || yy
 }
 
+function d {
+    if [[ -n "${1}" ]]; then
+	cd "${1}"
+    else
+	cd ~
+    fi
+}
+
 function gitpre {
     local local_root=$(git rev-parse --show-toplevel)
     local message_file="${local_root}/.gitpre"
