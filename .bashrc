@@ -184,7 +184,7 @@ function gitpre {
 }
 
 function py {
-    local usage="USAGE: py [minor_version=10] [command={'venv'|file}] [subcommand={local}]"
+    local usage="USAGE: py [minor_version=10] [command={'venv'|'test'}] [subcommand={'local'}]"
     local minor_version="${1-"10"}"
     local command="$2"
     local subcommand="$3"
@@ -198,6 +198,9 @@ function py {
 
     elif [[ -f $command ]]; then
 	eval "python3.$minor_version $command"
+
+    elif [[ "$command" = "test" ]]; then
+	eval "python3.$minor_version -m pytest $subcommand"
 
     elif [[ "$command" = "venv" ]]; then
 	if [[ "$subcommand" = "local" ]]; then
