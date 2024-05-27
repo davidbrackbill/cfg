@@ -175,6 +175,14 @@ function fl {
     f "${*}" || yy
 }
 
+function gitpre {
+    local local_root=$(git rev-parse --show-toplevel)
+    local message_file="${local_root}/.gitpre"
+    echo "Overwriting last message:"
+    tail ${message_file}
+    echo "${*}" > ${message_file}
+}
+
 # Plugin functions
 
 function yy() {

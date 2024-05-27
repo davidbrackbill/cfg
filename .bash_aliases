@@ -32,7 +32,7 @@ alias cd~="cd ~"
 
 # Tmux
 alias tl="tmux ls"
-alias tj="tmux a -t"
+alias ta="tmux a -t"
 
 #   Git
 alias gitc="git commit -am"
