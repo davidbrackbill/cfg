@@ -29,10 +29,6 @@ alias cd.="cd .."
 alias cd-="cd -"
 alias cd~="cd ~"
 
-# Tmux
-alias tl="tmux ls"
-alias ta="tmux a -t"
-
 #   Git
 alias gitc="git commit -am"
 alias lg="lazygit"
