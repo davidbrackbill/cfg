@@ -44,7 +44,7 @@ alias idea_="sh /opt/idea-IU-232.8660.185/bin/idea.sh >/dev/null 2>&1"
 alias neo4j="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
 
 #   NPM
-alias npmdev="npm run dev -- --open" 
+alias dev="run dev -- --open" 
 alias prt="npx prettier --write ."
 
 #   Python
