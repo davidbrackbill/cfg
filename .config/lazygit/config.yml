@@ -9,3 +9,28 @@ customCommands:
     command: 'r=$(git rev-parse --show-toplevel) && f="${r}/.gitpre" && echo "Last message:" && tail ${f} && echo "{{.Form.CommitMessage}}" > ${f}'
     loadingText: 'Saving message in .gitpre'
     stream: true
+
+gui:
+ # Modified mocha catppuccin theme
+ theme:
+   activeBorderColor:
+     - '#84b3ff'
+     - bold
+   inactiveBorderColor:
+     - '#a6adc8'
+   optionsTextColor:
+     - '#89b4fa'
+   selectedLineBgColor:
+     - '#393a4f'
+   selectedRangeBgColor:
+     - '#393a4f'
+   cherryPickedCommitBgColor:
+     - '#45475a'
+   cherryPickedCommitFgColor:
+     - '#89b4fa'
+   unstagedChangesColor:
+     - '#ff0000'
+   defaultFgColor:
+     - '#cdd6f4'
+   searchingActiveBorderColor:
+     - '#f9e2af'
