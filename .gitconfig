@@ -1,0 +1,15 @@
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[user]
+	name = David Brackbill
+	email = dmbrackbill@gmail.com
+[core]
+	autocrlf = input
+	editor = nvim
+[credential]
+	useHttpPath = true
+[init]
+	defaultBranch = main
+[diff]
+	context = 0
