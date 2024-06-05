@@ -14,7 +14,7 @@ gui:
  # Modified mocha catppuccin theme
  theme:
    activeBorderColor:
-     - '#84b3ff'
+     - '#bd93f9'
      - bold
    inactiveBorderColor:
      - '#a6adc8'
