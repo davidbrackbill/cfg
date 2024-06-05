@@ -195,9 +195,12 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       require('onedark').setup  {
-        style = 'warm', -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
+        style = 'dark', -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
         code_style = {
             comments = 'none',
+        },
+        colors = {
+            bg0 = '#16181e',
         },
       }
       vim.cmd.colorscheme 'onedark'
