@@ -200,6 +200,7 @@ require('lazy').setup({
         },
         colors = {
             bg0 = '#16181e',
+            fg = '#b6bcc7',
         },
       }
       vim.cmd.colorscheme 'onedark'
