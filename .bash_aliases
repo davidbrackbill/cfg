@@ -36,6 +36,9 @@ alias lg="lazygit"
 # Config-tracking
 alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 
+# WSL Config
+alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
+
 #   Programs
 alias pyc="sh /opt/pycharm-2023.2/bin/pycharm.sh"
 alias chr="google-chrome"
