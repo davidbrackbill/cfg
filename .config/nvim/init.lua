@@ -208,13 +208,18 @@ require('lazy').setup({
   },
 
   {
+    'catppuccin/nvim',
+    priority = 1000,
+    name = 'catppuccin',
+  },
+
+  {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {
       options = {
         icons_enabled = true,
-        -- theme = 'onedark',
         component_separators = '|',
         section_separators = '',
       },
@@ -462,6 +467,7 @@ vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc
 vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
+vim.keymap.set('n', '<leader>T', require('telescope.builtin').colorscheme, { desc = '[T]hemes' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
