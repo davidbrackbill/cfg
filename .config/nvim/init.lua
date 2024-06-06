@@ -208,9 +208,8 @@ require('lazy').setup({
   },
 
   {
-    'catppuccin/nvim',
+    "EdenEast/nightfox.nvim",
     priority = 1000,
-    name = 'catppuccin',
   },
 
   {
