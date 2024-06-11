@@ -1,2 +1,3 @@
-BasedOnStyle:    Chromium
-IndentWidth:     4
+BasedOnStyle:     Chromium
+IndentWidth:      4
+PointerAlignment: Right
