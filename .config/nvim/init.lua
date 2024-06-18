@@ -76,6 +76,17 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
+  -- Allow repl behavior in nvim
+  {
+    "Olical/conjure",
+    ft = { "clojure", "fennel", "python" }, -- etc
+    lazy = true,
+    init = function()
+      -- Set configuration options here
+      vim.g["conjure#mapping#prefix"] = ','
+    end,
+  },
+
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -372,8 +383,13 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
 
+-- [[ User Keymaps ]]
+
 -- Moving around buffers and files
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = '[L]ast-used buffer' })
+
+-- Format JSON
+vim.keymap.set('n', '<leader>jf', ':%!jq -n -f /dev/stdin <cr>', { desc = '[j]q [f]ormat current buffer' })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
