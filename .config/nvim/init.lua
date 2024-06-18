@@ -388,8 +388,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- Moving around buffers and files
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = '[L]ast-used buffer' })
 
--- Format JSON
-vim.keymap.set('n', '<leader>jf', ':%!jq -n -f /dev/stdin <cr>', { desc = '[j]q [f]ormat current buffer' })
+-- Format stuff
+vim.keymap.set('n', '<leader>fj', ':%!jq -n -f /dev/stdin <cr>', { desc = '[f]ormat [j]son in current buffer' })
+vim.keymap.set('n', '<leader>fp', ':!black % <cr>', { desc = '[f]ormat [p]ython in current buffer' })
+vim.keymap.set('n', '<leader>ff', ':Format <cr>', { desc = '[f]ormat using LSP' })
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
