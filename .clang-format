@@ -1,4 +1,7 @@
-BasedOnStyle:     Chromium
-IndentWidth:      4
-PointerAlignment: Right
-IndentCaseLabels: False
+BasedOnStyle:      Chromium
+IndentWidth:       8
+PointerAlignment:  Right
+IndentCaseLabels:  False
+BraceWrapping:
+  AfterFunction:   true
+BreakBeforeBraces: Custom
