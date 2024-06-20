@@ -1,14 +1,5 @@
-customCommands:
-  - key: '|'
-    context: 'global'
-    prompts:
-      - type: 'input'
-        title: 'What changes are you working on?'
-        key: 'CommitMessage'
-        initialValue: ''
-    command: 'r=$(git rev-parse --show-toplevel) && f="${r}/.gitpre" && echo "Last message:" && tail ${f} && echo "{{.Form.CommitMessage}}" > ${f}'
-    loadingText: 'Saving message in .gitpre'
-    stream: true
+os:
+  editPreset: 'nvim'
 
 gui:
  # Modified mocha catppuccin theme
@@ -34,3 +25,4 @@ gui:
      - '#cdd6f4'
    searchingActiveBorderColor:
      - '#f9e2af'
+
