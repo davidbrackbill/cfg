@@ -76,6 +76,7 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
+  -- Move through indentation levels
   'jeetsukumaran/vim-indentwise',
 
   -- Allow repl behavior in nvim
