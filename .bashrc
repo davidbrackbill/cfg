@@ -183,14 +183,6 @@ function d {
     fi
 }
 
-function gitpre {
-    local local_root=$(git rev-parse --show-toplevel)
-    local message_file="${local_root}/.gitpre"
-    echo "Overwriting last message:"
-    tail ${message_file}
-    echo "${*}" > ${message_file}
-}
-
 function py {
     local usage="USAGE: py [minor_version=10] [command={'venv'|'test'}] [subcommand={'local'}]"
     local minor_version="${1-"10"}"
