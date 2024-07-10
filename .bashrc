@@ -229,6 +229,10 @@ function ta {
     fi
 }
 
+function ccpls {
+    cc "$1" && ./a.out
+}
+
 # Plugin functions
 
 function yy() {
