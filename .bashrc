@@ -230,7 +230,9 @@ function ta {
 }
 
 function ccpls {
-    cc "$1" && ./a.out
+    cc "$1.c" -o "./$1.out"
+
+    "./$1.out" "${@:2}"
 }
 
 # Plugin functions
