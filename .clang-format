@@ -5,3 +5,5 @@ IndentCaseLabels:  False
 BraceWrapping:
   AfterFunction:   true
 BreakBeforeBraces: Custom
+BinPackArguments: false
+BinPackParameters: false
