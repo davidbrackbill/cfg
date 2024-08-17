@@ -235,6 +235,12 @@ function ccpls {
     "./$1.out" "${@:2}"
 }
 
+function ccpp {
+    g++ "$1.cpp" -o "./$1.out"
+
+    "./$1.out" "${@:2}"
+}
+
 # Plugin functions
 
 function yy() {

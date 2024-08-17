@@ -20,6 +20,7 @@ alias bat="batcat"
 alias cat="batcat"
 alias b="batcat"
 alias fdf="fdfind"
+alias mk="mkdir"
 
 #   Directories
 alias d.="cd .."
@@ -41,9 +42,9 @@ alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.Windows
 
 #   Programs
 alias pyc="sh /opt/pycharm-2023.2/bin/pycharm.sh"
+alias clion="sh /opt/clion-2024.2/bin/clion.sh"
 alias chr="google-chrome"
 alias idea="sh /opt/idea-IU-232.8660.185/bin/idea.sh"
-alias idea_="sh /opt/idea-IU-232.8660.185/bin/idea.sh >/dev/null 2>&1"
 alias neo4j="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
 
 #   NPM
