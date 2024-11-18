@@ -672,7 +672,6 @@ local servers = {
   -- pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
-  svelte = { filetypes = { 'js', 'ts', 'svelte', 'html', 'css'} },
 
   lua_ls = {
     Lua = {
