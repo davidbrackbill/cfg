@@ -409,6 +409,9 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- [[ User Keymaps ]]
 
+-- Yanking, pasting stuff
+vim.keymap.set('n', '<leader>p', '"0p', { desc = '[P]aste from last yank' })
+
 -- Moving around buffers and files
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = '[L]ast-used buffer' })
 
