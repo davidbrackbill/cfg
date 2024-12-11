@@ -189,7 +189,7 @@ function py {
     local command="$2"
     local subcommand="$3"
 
-    if ((minor_version < 10 || minor_version > 11)); then
+    if ((minor_version < 10 || minor_version > 12)); then
 	echo "ERROR: Minor version $minor_version not allowed"
 	echo "$usage"
 
