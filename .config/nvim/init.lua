@@ -671,7 +671,6 @@ require('mason-lspconfig').setup()
 --  define the property 'filetypes' to the map in question.
 local servers = {
   clangd = {filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }}, -- exclude .proto
-  gopls = {},
   pyright = {},
   svelte = {},
 
