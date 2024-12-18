@@ -184,7 +184,10 @@ function d {
 }
 
 function td {
-    echo $@ >> todo && bat todo
+    if [ "$1" ] 
+        then echo $@ >> todo
+    fi
+    bat todo
 }
 
 function tdr {
