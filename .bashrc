@@ -183,6 +183,22 @@ function d {
     fi
 }
 
+function td {
+    echo $@ >> todo && bat todo
+}
+
+function tdr {
+    for del_line in "$@"
+    do
+	# Mark lines before removing,
+	# to ensure all lines are correctly marked
+	sed -i "${del_line}s/.*//" todo
+    done
+    # Remove empty lines
+    sed -i '/^$/d' todo
+    bat todo
+}
+
 function py {
     local usage="USAGE: py [minor_version=10] [command={'venv'|'test'}] [subcommand={'local'}]"
     local minor_version="${1-"10"}"
