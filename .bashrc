@@ -183,23 +183,30 @@ function d {
     fi
 }
 
+#todo
 function td {
     if [ "$1" ] 
         then echo $@ >> todo
     fi
-    bat todo
+    cl && bat todo
 }
 
+#todo remove
 function tdr {
     for del_line in "$@"
     do
-	# Mark lines before removing,
-	# to ensure all lines are correctly marked
-	sed -i "${del_line}s/.*//" todo
+	# Mark lines before removing
+	sed -i "${del_line}s/^/✓ /" todo
     done
-    # Remove empty lines
-    sed -i '/^$/d' todo
+    # Print and remove marked lines
+    grep "^✓" todo
+    sed -i '/^✓/d' todo
     bat todo
+}
+
+#todo head
+function tdh {
+    cl && head -1 todo
 }
 
 function py {
