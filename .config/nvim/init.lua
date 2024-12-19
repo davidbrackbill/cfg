@@ -672,7 +672,8 @@ require('mason-lspconfig').setup()
 local servers = {
   clangd = {filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }}, -- exclude .proto
   pyright = {},
-  svelte = {},
+  svelte = { filetypes = {"svelte"} },
+  tsserver = {},
 
   lua_ls = {
     Lua = {
