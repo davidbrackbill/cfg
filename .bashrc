@@ -193,12 +193,14 @@ function td {
 
 #todo remove
 function tdr {
-    for del_line in "$@"
+    # Delete first line if unspecified
+    for del_line in ${@:-1}
     do
 	# Mark lines before removing
 	sed -i "${del_line}s/^/✓ /" todo
     done
     # Print and remove marked lines
+    cl
     grep "^✓" todo
     sed -i '/^✓/d' todo
     bat todo
