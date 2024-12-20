@@ -215,7 +215,13 @@ function tdr {
 
 #todo head
 function tdh {
-    cl && head -1 todo
+    cl && head -${1:-1} todo
+}
+
+#todo last
+function tdl {
+    cl
+    tail -n ${1:-1} .todo | awk '{print $2}'
 }
 
 function py {
