@@ -193,7 +193,7 @@ function td {
 
 #todo insert
 function tdi {
-    sed -i "$1i ${@:2}" todo
+    sed -i "$1i ${*:2}" todo
     cl && bat todo
 }
 
@@ -221,7 +221,8 @@ function tdh {
 #todo last
 function tdl {
     cl
-    tail -n ${1:-1} .todo | awk '{print $2}'
+    # Print everything except the timestamp
+    tail -n ${1:-1} .todo | tac | awk '{print substr($0, index($0, $2))}'
 }
 
 function py {
