@@ -191,17 +191,24 @@ function td {
     cl && bat todo
 }
 
+#todo insert
+function tdi {
+    sed -i "$1i ${@:2}" todo
+    cl && bat todo
+}
+
 #todo remove
 function tdr {
     # Delete first line if unspecified
     for del_line in ${@:-1}
     do
 	# Mark lines before removing
-	sed -i "${del_line}s/^/✓ /" todo
+	sed -i "${del_line}s/^/✓/" todo
     done
-    # Print and remove marked lines
     cl
+    # Print, archive, and delete marked lines
     grep "^✓" todo
+    sed -n 's/^✓//p' todo | awk '{ print strftime("%Y-%m-%dT%H:%M:%SZ"), $0 }' >> .todo
     sed -i '/^✓/d' todo
     bat todo
 }
