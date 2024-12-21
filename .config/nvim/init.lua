@@ -80,15 +80,16 @@ require('lazy').setup({
   'jeetsukumaran/vim-indentwise',
 
   -- Allow repl behavior in nvim
-  {
-    "Olical/conjure",
-    ft = { "clojure", "fennel", "python" }, -- etc
-    lazy = true,
-    init = function()
-      -- Set configuration options here
-      vim.g["conjure#mapping#prefix"] = ','
-    end,
-  },
+  -- Commented out because it takes a long time to load
+  -- {
+  --   "Olical/conjure",
+  --   ft = { "clojure", "fennel", "python" }, -- etc
+  --   lazy = true,
+  --   init = function()
+  --     -- Set configuration options here
+  --     vim.g["conjure#mapping#prefix"] = ','
+  --   end,
+  -- },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -360,7 +361,7 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
+-- vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.o.breakindent = true
@@ -411,6 +412,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Yanking, pasting stuff
 vim.keymap.set('n', '<leader>p', '"0p', { desc = '[P]aste from last yank' })
+vim.cmd 'command! Clip set clipboard=unnamedplus'
 
 -- Moving around buffers and files
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = '[L]ast-used buffer' })
