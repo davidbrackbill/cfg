@@ -81,15 +81,15 @@ require('lazy').setup({
 
   -- Allow repl behavior in nvim
   -- Commented out because it takes a long time to load
-  -- {
-  --   "Olical/conjure",
-  --   ft = { "clojure", "fennel", "python" }, -- etc
-  --   lazy = true,
-  --   init = function()
-  --     -- Set configuration options here
-  --     vim.g["conjure#mapping#prefix"] = ','
-  --   end,
-  -- },
+  {
+    "Olical/conjure",
+    ft = { "clojure", "fennel", "python" }, -- etc
+    lazy = true,
+    init = function()
+      -- Set configuration options here
+      vim.g["conjure#mapping#prefix"] = ','
+    end,
+  },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
@@ -770,6 +770,15 @@ cmp.setup {
 -- vim: ts=2 sts=2 sw=2 et
 
 -- **User Directives**
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
+  -- nested = true, -- for format on save
+  callback = function()
+    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
+      vim.cmd "silent! w"
+    end
+  end,
+  desc = "Auto Save",
+})
 
 -- Set aliases path
 -- https://stackoverflow.com/a/19819036/19839971

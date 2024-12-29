@@ -58,3 +58,6 @@ alias pipf="pip list --format=freeze > requirements.txt"
 
 # Reliant on `# User functions` in `~/.bashrc`
 alias l="yy"
+
+# Semantically reliant on .bashrc functions
+alias ntd="nvim todo"
