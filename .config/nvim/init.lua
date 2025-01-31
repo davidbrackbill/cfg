@@ -103,7 +103,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      { 'j-hui/fidget.nvim',       opts = {} },
 
       -- Additional lua configuration, makes nvim stuff amazing!
       'folke/neodev.nvim',
@@ -128,7 +128,25 @@ require('lazy').setup({
   },
 
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim', opts = {} },
+  {
+    'folke/which-key.nvim',
+    opts = {
+      -- document existing key chains
+      spec = {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>h', group = 'Git [H]unk' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>w', group = '[W]orkspace' },
+        -- {'<leader>g', group = '[G]it' },
+        { '<leader>',  group = 'VISUAL <leader>', mode = { 'v' } },
+        { '<leader>h', group = 'Git [H]unk',      mode = { 'v' } },
+      }
+    }
+  },
+
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -226,14 +244,14 @@ require('lazy').setup({
     'navarasu/onedark.nvim',
     priority = 1000,
     config = function()
-      require('onedark').setup  {
+      require('onedark').setup {
         style = 'dark', -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
         code_style = {
-            comments = 'none',
+          comments = 'none',
         },
         colors = {
-            bg0 = '#16181e',
-            fg = '#b6bcc7',
+          bg0 = '#16181e',
+          fg = '#b6bcc7',
         },
       }
       vim.cmd.colorscheme 'onedark'
@@ -308,7 +326,7 @@ require('lazy').setup({
     },
     event = "VeryLazy",
     keys = {
-      {"<leader>L", function() require("yazi").yazi() end, desc = "[L]ist files using Yazi"},
+      { "<leader>L", function() require("yazi").yazi() end, desc = "[L]ist files using Yazi" },
       -- {
       --   -- Open in the current working directory
       --   "<leader>ff",
@@ -505,7 +523,7 @@ end
 local function telescope_find_from_home()
   require("telescope.builtin").find_files({
     search_dirs = { "~/" }
-})
+  })
 end
 vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = '[S]earch [/] in Open Files' })
 vim.keymap.set('n', '<leader>b', require('telescope.builtin').buffers, { desc = 'Search existing [B]uffers' })
@@ -640,24 +658,6 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  -- ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-}
--- register which-key VISUAL mode
--- required for visual <leader>hs (hunk stage) to work
-require('which-key').register({
-  ['<leader>'] = { name = 'VISUAL <leader>' },
-  ['<leader>h'] = { 'Git [H]unk' },
-}, { mode = 'v' })
-
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
@@ -672,11 +672,11 @@ require('mason-lspconfig').setup()
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  clangd = {filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }}, -- exclude .proto
+  clangd = { filetypes = { "c", "cpp", "objc", "objcpp", "cuda" } }, -- exclude .proto
   pyright = {},
-  svelte = { filetypes = {"svelte"} },
+  svelte = { filetypes = { "svelte" } },
   tsserver = {},
-  tinymist = { filetypes= {"typ"} },
+  tinymist = { filetypes = { "typ" } },
 
   lua_ls = {
     Lua = {
@@ -761,9 +761,9 @@ cmp.setup {
     end, { 'i', 's' }),
   },
   sources = {
-    { name = 'nvim_lsp', max_item_count = 2, priority_weight = 2},
-    { name = 'luasnip', max_item_count = 2, priority_weight = 1 },
-    { name = 'path', max_item_count = 2, priority_weight = 1},
+    { name = 'nvim_lsp', max_item_count = 2, priority_weight = 2 },
+    { name = 'luasnip',  max_item_count = 2, priority_weight = 1 },
+    { name = 'path',     max_item_count = 2, priority_weight = 1 },
   },
 }
 
@@ -783,7 +783,6 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLea
 
 -- Set aliases path
 -- https://stackoverflow.com/a/19819036/19839971
--- converted to init.lua using advice from 
+-- converted to init.lua using advice from
 -- https://vi.stackexchange.com/questions/39845/setting-path-in-init-lua
 vim.env.BASH_ENV = "~/.bash_aliases"
-
