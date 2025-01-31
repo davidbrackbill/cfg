@@ -676,6 +676,7 @@ local servers = {
   pyright = {},
   svelte = { filetypes = {"svelte"} },
   tsserver = {},
+  tinymist = { filetypes= {"typ"} },
 
   lua_ls = {
     Lua = {
