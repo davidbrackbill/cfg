@@ -125,7 +125,7 @@ require('lazy').setup({
         -- Navigation
         map({ 'n', 'v' }, ']]', function()
           if vim.wo.diff then
-            return ']c'
+            return ']]'
           end
           vim.schedule(function()
             gs.next_hunk()
