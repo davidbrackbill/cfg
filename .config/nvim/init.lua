@@ -78,6 +78,8 @@ require('lazy').setup({
   'tpope/vim-obsession',
   'jeetsukumaran/vim-indentwise',
 
+  'gelguy/wilder.nvim',
+
   -- Allow repl behavior in nvim
   -- Commented out because it takes a long time to load
   {
@@ -620,6 +622,22 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
+
+-- [[ Configure Wilder ]]
+local wilder = require('wilder')
+wilder.setup({modes = {':', '/', '?'}})
+
+wilder.set_option('pipeline', {
+  wilder.branch(
+    wilder.cmdline_pipeline(),
+    wilder.search_pipeline()
+  ),
+})
+
+wilder.set_option('renderer', wilder.wildmenu_renderer({
+  highlighter = wilder.basic_highlighter(),
+}))
+
 
 -- [[ Configure nvim-cmp completions ]]
 -- See `:help cmp`
