@@ -44,6 +44,18 @@ vim.o.cmdheight = 0
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.env.BASH_ENV = "~/.bash_aliases"
+
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
+  -- nested = true, -- for format on save
+  callback = function()
+    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
+      vim.cmd "silent! w"
+    end
+  end,
+  desc = "Auto Save",
+})
+
 -- [[ Configure plugins with lazy ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then
@@ -569,14 +581,6 @@ end
 require('mason').setup()
 require('mason-lspconfig').setup()
 
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property 'filetypes' to the map in question.
 local servers = {
   clangd = { filetypes = { "c", "cpp", "objc", "objcpp", "cuda" } }, -- exclude .proto
   pyright = {},
@@ -616,7 +620,7 @@ mason_lspconfig.setup_handlers {
   end,
 }
 
--- [[ Configure nvim-cmp completions ( ]]
+-- [[ Configure nvim-cmp completions ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
@@ -673,19 +677,3 @@ cmp.setup {
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 
--- **User Directives**
-vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
-  -- nested = true, -- for format on save
-  callback = function()
-    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
-      vim.cmd "silent! w"
-    end
-  end,
-  desc = "Auto Save",
-})
-
--- Set aliases path
--- https://stackoverflow.com/a/19819036/19839971
--- converted to init.lua using advice from
--- https://vi.stackexchange.com/questions/39845/setting-path-in-init-lua
-vim.env.BASH_ENV = "~/.bash_aliases"
