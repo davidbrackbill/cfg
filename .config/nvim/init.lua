@@ -122,13 +122,28 @@ require('lazy').setup({
       preset = "helix",
       delay = 0,
       spec = {
-        { '<leader>c', group = '[C]ode' },
-        { '<leader>h', group = '[G]it' },
-        { '<leader>r', group = '[R]ename' },
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>h', group = 'Git [H]unk',      mode = { 'v' } },
-      }
-    }
+        { '<leader>f', group = 'Format' },
+        { '<leader>h', group = 'Git hunks' },
+        { '<leader>r', group = 'Rename' },
+        { '<leader>s', group = 'Search' },
+        { '<leader>h', group = 'Git hunk',       mode = { 'v' } },
+      },
+      icons = {
+        breadcrumb = "",
+        separator = "",
+        group = "",
+        ellipsis = "",
+        mappings = false,
+        colors = false,
+        keys = {
+          Esc = "Esc",
+          BS = "BSpace",
+          Space = "Space",
+          Tab = "Tab",
+        },
+      },
+    },
+    layout = { spacing = 5 },
   },
 
   {
@@ -172,15 +187,13 @@ require('lazy').setup({
           return '<Ignore>'
         end, { expr = true, desc = 'Jump to previous hunk' })
 
-        -- Actions
-        -- visual mode
         map('v', '<leader>hs', function()
           gs.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'stage git hunk' })
         map('v', '<leader>hr', function()
           gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'reset git hunk' })
-        -- normal mode
+
         map('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
         map('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
         map('n', '<leader>hS', gs.stage_buffer, { desc = 'git Stage buffer' })
@@ -194,12 +207,9 @@ require('lazy').setup({
         map('n', '<leader>hD', function()
           gs.diffthis '~'
         end, { desc = 'git diff against last commit' })
+        map('n', '<leader>ht', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
+        map('n', '<leader>hT', gs.toggle_deleted, { desc = 'toggle git show deleted' })
 
-        -- Toggles
-        map('n', '<leader>tb', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
-        map('n', '<leader>td', gs.toggle_deleted, { desc = 'toggle git show deleted' })
-
-        -- Text object
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
       end,
     },
@@ -214,7 +224,7 @@ require('lazy').setup({
       "LazyGitFilter",
       "LazyGitFilterCurrentFile",
     },
-    dependencies = { "nvim-lua/plenary.nvim",},
+    dependencies = { "nvim-lua/plenary.nvim", },
     keys = {
       { "<leader>g", "<cmd>LazyGit<cr>", desc = "LazyGit" }
     }
@@ -312,13 +322,13 @@ require('lazy').setup({
     },
   },
 
-{
+  {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
     config = true
     -- use opts = {} for passing setup options
     -- this is equivalent to setup({}) function
-}
+  }
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -378,11 +388,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
-    defaults = require('telescope.themes').get_dropdown {
+  defaults = require('telescope.themes').get_dropdown {
     mappings = {
       i = {
-        ['<C-u>'] = false,
-        ['<C-d>'] = false,
         ['J'] = "results_scrolling_up", -- Up/down is swapped from normal vim keys because using "dropdown" theme
         ['K'] = "results_scrolling_down",
         ['<C-j>'] = "preview_scrolling_down",
