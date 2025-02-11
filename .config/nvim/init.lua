@@ -332,7 +332,6 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 -- Diagnostic messages
 vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '\\|', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
 
 -- Yanking, pasting stuff
 vim.keymap.set('n', '<leader>p', '"0p', { desc = '[P]aste from last yank' })
