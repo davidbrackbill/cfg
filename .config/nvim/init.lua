@@ -126,7 +126,7 @@ require('lazy').setup({
         { '<leader>h', group = 'Git hunks' },
         { '<leader>r', group = 'Rename' },
         { '<leader>s', group = 'Search' },
-        { '<leader>h', group = 'Git hunk',       mode = { 'v' } },
+        { '<leader>h', group = 'Git hunk', mode = { 'v' } },
       },
       icons = {
         breadcrumb = "",
@@ -143,7 +143,6 @@ require('lazy').setup({
         },
       },
     },
-    layout = { spacing = 5 },
   },
 
   {
@@ -351,6 +350,9 @@ require('lazy').setup({
 
 -- Enter command mode with ;
 vim.keymap.set("", ";", ":")
+
+-- Ignore gx
+vim.api.nvim_del_keymap("", "gx")
 
 -- Ignore leader
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
