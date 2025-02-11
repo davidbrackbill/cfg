@@ -348,7 +348,6 @@ vim.keymap.set('n', '<leader>fp', ':!black % <cr>', { desc = '[f]ormat [p]ython 
 vim.keymap.set('n', '<leader>ff', ':Format <cr>', { desc = '[f]ormat using LSP' })
 
 -- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
   callback = function()
@@ -366,6 +365,10 @@ require('telescope').setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ['J'] = "results_scrolling_up", -- Up/down is swapped from normal vim keys because using "dropdown" theme
+        ['K'] = "results_scrolling_down",
+        ['<C-j>'] = "preview_scrolling_down",
+        ['<C-k>'] = "preview_scrolling_up",
       },
     },
   },
@@ -520,10 +523,10 @@ vim.defer_fn(function()
   }
 end, 0)
 
--- [[ Configure LSP ]]
+-- [[ Configure LSPs ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
-  -- NOTE: Remember that lua is a real programming language, and as such it is possible
+  -- NOTE: Remember that lua is a real programming language, and as such it is possible -- Up/down is swapped from normal vim keys because using "dropdown" theme
   -- to define small helper and utility functions so you don't have to repeat yourself
   -- many times.
   --
@@ -589,22 +592,19 @@ local servers = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
-      -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-      -- diagnostics = { disable = { 'missing-fields' } },
+      diagnostics = { disable = { 'missing-fields' } },
     },
   },
 }
 
--- Setup neovim lua configuration
+-- Neodev handles neovim lua-ls (LSP) configuration
 require('neodev').setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
--- Ensure the servers above are installed
 local mason_lspconfig = require 'mason-lspconfig'
-
 mason_lspconfig.setup {
   ensure_installed = vim.tbl_keys(servers),
 }
@@ -620,7 +620,7 @@ mason_lspconfig.setup_handlers {
   end,
 }
 
--- [[ Configure nvim-cmp ]]
+-- [[ Configure nvim-cmp completions ( ]]
 -- See `:help cmp`
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
