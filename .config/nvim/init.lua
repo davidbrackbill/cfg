@@ -334,6 +334,10 @@ require('lazy').setup({
 -- [[ Keymaps ]]
 -- See `:help vim.keymap.set()`
 
+-- Enter command mode with ;
+vim.keymap.set("", ":", ";")
+vim.keymap.set("", ";", ":")
+
 -- Ignore leader
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
@@ -673,7 +677,3 @@ cmp.setup {
     { name = 'path',     max_item_count = 2, priority_weight = 1 },
   },
 }
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
-
