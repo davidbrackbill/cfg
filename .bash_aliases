@@ -14,7 +14,6 @@ alias cl="clear"
 alias bat="batcat"
 alias cat="batcat"
 alias fdf="fdfind"
-alias mk="mkdir"
 
 # [[Directories]]
 alias cd.="cd .."

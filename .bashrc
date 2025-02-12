@@ -130,7 +130,7 @@ safe_source "$HOME/.cargo/env"
 export GOPATH=$HOME/.go
 
 
-# [[Functions]]
+# [[Functions.directory]]
 
 function fr {
     # Find file (from [R]oot, by default)
@@ -170,6 +170,10 @@ function yy() {
 function fl {
     # Find then [L]ist, if applicable
     f "${*}" || yy
+}
+
+function mkgo {
+    [ "$1" ] && mkdir -p "$1" && cd "$1" 
 }
 
 # [[Functions.todo]]]]
