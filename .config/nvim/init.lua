@@ -44,6 +44,8 @@ vim.o.cmdheight = 0
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Environment files
+vim.g.python3_host_prog = '/usr/bin/python3'
 vim.env.BASH_ENV = "~/.bash_aliases"
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
@@ -692,3 +694,11 @@ cmp.setup {
     { name = 'path',     max_item_count = 2, priority_weight = 1 },
   },
 }
+
+
+-- [[ Custom colors \ themes ]]
+local WKGroups = {'WhichKey', 'WhichKeyTitle', 'WhichKeyNormal', 'WhichKeyDesc', 'WhichKeyGroup', 'WhichKeyBorder'}
+for _, group in ipairs(WKGroups) do
+  -- FG: Onedark, BG: transparent
+  vim.api.nvim_set_hl(0, group, { fg = "#abb2bf", bg = "NONE" })
+end
