@@ -1,18 +1,11 @@
-# - SETTINGS
-#  Always expand aliases
-#  https://stackoverflow.com/a/19819036/19839971
-shopt -s expand_aliases
-
-#  Include hidden `.` folders in glob
-#  https://stackoverflow.com/questions/14352290/listing-only-directories-using-ls-in-bash#comment62049196_14352330
-shopt -s nullglob
-
-# - ALIASES
+# [[Config]]
 alias aliases="nvim ~/.bash_aliases"
-alias bashup=". ~/.bashrc"
+alias bashup="source ~/.bashrc"
 alias bashrc="nvim ~/.bashrc" 
+alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
+alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
 
-#   Shell utils
+# [[Utils]]
 alias r="rip"
 alias n="nvim"
 alias cl="clear"
@@ -22,7 +15,7 @@ alias b="batcat"
 alias fdf="fdfind"
 alias mk="mkdir"
 
-#   Directories
+# [[Directories]]
 alias d.="cd .."
 alias d-="cd -"
 alias d~="cd ~"
@@ -30,34 +23,26 @@ alias cd.="cd .."
 alias cd-="cd -"
 alias cd~="cd ~"
 
-#   Git
+# [[Git]]
 alias gitc="git commit -am"
+alias gitst="git status"
+alias gitl="git log"
 alias lg="lazygit"
 
-# Config-tracking
-alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
-
-# WSL Config
-alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
-
-#   Programs
+# [[GUIs]]
 alias pyc="sh /opt/pycharm-2023.2/bin/pycharm.sh"
 alias clion="sh /opt/clion-2024.2/bin/clion.sh"
 alias chr="google-chrome"
 alias idea="sh /opt/idea-IU-232.8660.185/bin/idea.sh"
 alias neo4j="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
 
-#   NPM
+# [[Language runtimes]]
 alias dev="run dev -- --open" 
 alias prt="npx prettier --write ."
-
-#   Python
 alias py10="python3.10"
 alias py11="python3.11"
 alias pipf="pip list --format=freeze > requirements.txt"
 
-# Reliant on `# User functions` in `~/.bashrc`
+# [[~/.bashrc function aliases]]
 alias l="yy"
-
-# Semantically reliant on .bashrc functions
 alias ntd="nvim todo"

@@ -1,6 +1,4 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+# [[Options]]
 
 # If not running interactively, don't do anything
 case $- in
@@ -8,24 +6,30 @@ case $- in
       *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
 shopt -s histappend
+HISTSIZE=100000
+HISTFILESIZE=1000000
+# don't put duplicate lines or lines starting with space in the history.
+HISTCONTROL=ignoreboth
+HISTIGNORE='ls:bg:fg:history'
+HISTTIMEFORMAT='%F %T '
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+PROMPT_DIRTRIM=1
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+# Expand **
+shopt -s globstar
+
+shopt -s nullglob
+
+shopt -s expand_aliases
+
+shopt -s autocd
+
+set -o vi
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
@@ -72,37 +76,47 @@ xterm*|rxvt*)
     ;;
 esac
 
+
+# [[Aliases]]
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
 
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-# alias ll='ls -alF'
-# alias la='ls -A'
-# alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+alias la='ls -A'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
+fi
+
+# [[Exports]]
+
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+. "$HOME/.cargo/env"
+
+export GOPATH=$HOME/.go
+export EDITOR=nvim
+
+export PNPM_HOME="/home/david/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+# [[Sources]]
+
+#   Reverse i search using fzf
+if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.bash
 fi
 
 # enable programmable completion features (you don't need to enable
@@ -110,40 +124,17 @@ fi
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
+    source /usr/share/bash-completion/bash_completion
   elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
+    source /etc/bash_completion
   fi
 fi
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-. "$HOME/.cargo/env"
+# Haskell
+# [ -f "/home/david/.ghcup/env" ] && source "/home/david/.ghcup/env" 
 
+# [[Functions]]
 
-# User directives (David)
-PROMPT_DIRTRIM=1
-export GOPATH=$HOME/.go
-export EDITOR=nvim
-
-#   Set vim mode in bash
-set -o vi
-
-#   If your first arg has no binary, assumes it is a
-#    directory and attempts to CD into it
-shopt -s autocd
-
-#   Reverse i search using fzf
-source /usr/share/doc/fzf/examples/key-bindings.bash
-
-#   Start the bash shell in tmux
-#    https://unix.stackexchange.com/a/113768
-# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-#   tmux
-# fi
-
-# User functions (David)
 
 function fr {
     # Find file (from [R]oot, by default)
@@ -163,6 +154,7 @@ function f {
     if [[ -d $path ]]; then
 	cd "$path"
 	return 1
+
     # Open file using nvim
     else
 	cd "$(dirname "$path")"
@@ -170,31 +162,37 @@ function f {
     fi
 }
 
+# CD to the dir Yazi exited from
+function yy() {
+    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+    yazi "$@" --cwd-file="$tmp"
+    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+	    cd -- "$cwd"
+    fi
+    rm -f -- "$tmp"
+}
+
 function fl {
     # Find then [L]ist, if applicable
     f "${*}" || yy
 }
 
-function d {
-    if [[ -n "${1}" ]]; then
-	cd "${1}"
-    else
-	cd ~
-    fi
-}
+# [[Functions.todo]]]]
 
 #todo
 function td {
     if [ "$1" ] 
         then echo $@ >> todo
     fi
-    cl && bat todo
+    cl
+    bat todo
 }
 
 #todo insert
 function tdi {
     sed -i "$1i ${*:2}" todo
-    cl && bat todo
+    cl
+    bat todo
 }
 
 #todo remove
@@ -224,6 +222,8 @@ function tdl {
     # Print everything except the timestamp
     tail -n ${1:-1} .todo | tac | awk '{print substr($0, index($0, $2))}'
 }
+
+# [[Functions.python]]
 
 function py {
     local usage="USAGE: py [minor_version=10] [command={'venv'|'test'}] [subcommand={'local'}]"
@@ -264,7 +264,7 @@ function py {
 }
 
 function ta {
-    if [[ -n "${1}" ]]; then
+    if [ -n "${1}" ]]; then
 	tmux a -t "${1}"
     else
 	tmux ls
@@ -272,38 +272,10 @@ function ta {
 }
 
 function ccpls {
-    cc "$1.c" -o "./$1.out"
-
-    "./$1.out" "${@:2}"
+    cc "$1.c" -o "./$1.out" && "./$1.out" "${@:2}"
 }
 
 function ccpp {
-    g++ "$1.cpp" -o "./$1.out"
-
-    "./$1.out" "${@:2}"
+    g++ "$1.cpp" -o "./$1.out" && "./$1.out" "${@:2}"
 }
-
-# Plugin functions
-
-function yy() {
-    # CD to the dir Yazi exited from
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-    yazi "$@" --cwd-file="$tmp"
-    if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-	    cd -- "$cwd"
-    fi
-    rm -f -- "$tmp"
-}
-
-# Plugins
-
-[ -f "/home/david/.ghcup/env" ] && . "/home/david/.ghcup/env" # ghcup-env
-
-# pnpm
-export PNPM_HOME="/home/david/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
 
