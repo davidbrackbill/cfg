@@ -2,7 +2,6 @@
 alias aliases="nvim ~/.bash_aliases"
 alias bashup="source ~/.bashrc"
 alias bashrc="nvim ~/.bashrc" 
-alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
 
 # [[Utils]]
@@ -24,9 +23,15 @@ alias cd-="cd -"
 alias cd~="cd ~"
 
 # [[Git]]
+# Creates a git directory over the entire $HOME, while hiding the directory
+# elsewhere, allowing a hidden `cfg` alias to access the shadow work tree
+alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 alias gitc="git commit -am"
 alias gitst="git status"
 alias gitl="git log"
+alias cfgc="cfg commit -am"
+alias cfgst="cfg status"
+alias cfgl="cfg log"
 alias lg="lazygit"
 
 # [[GUIs]]
