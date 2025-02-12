@@ -4,6 +4,9 @@ alias bashup="source ~/.bashrc"
 alias bashrc="nvim ~/.bashrc" 
 alias wsl_json="nvim /mnt/c/Users/dmbra/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
 
+# [[Shell]]
+alias shwap="fish"
+
 # [[Utils]]
 alias r="rip"
 alias n="nvim"

@@ -281,4 +281,3 @@ function ccpls {
 function ccpp {
     g++ "$1.cpp" -o "./$1.out" && "./$1.out" "${@:2}"
 }
-
