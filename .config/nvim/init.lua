@@ -605,7 +605,7 @@ local servers = {
   clangd = { filetypes = { "c", "cpp", "objc", "objcpp", "cuda" } }, -- exclude .proto
   pyright = {},
   svelte = { filetypes = { "svelte" } },
-  tsserver = {},
+  ts_ls = {},
   tinymist = { filetypes = { "typ" } },
 
   lua_ls = {
