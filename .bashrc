@@ -32,7 +32,7 @@ shopt -s autocd
 set -o vi
 
 # Remove <alt-Num> in bash and any other readline program
-bind -f .inputrc
+bind -f ~/.inputrc
 
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
