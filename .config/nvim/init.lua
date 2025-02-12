@@ -322,7 +322,7 @@ require('lazy').setup({
     },
     event = "VeryLazy",
     keys = {
-      { "<leader>L", function() require("yazi").yazi() end, desc = "Yazi" },
+      { "<leader>l", function() require("yazi").yazi() end, desc = "Yazi" },
       -- {
       --   -- Open in the current working directory
       --   "<leader>ff",
@@ -362,13 +362,13 @@ require('lazy').setup({
 }, {})
 
 
--- [[ Keymaps ]]
+-- [[ Keymaps (Keychains/key-chains) ]]
 -- See `:help vim.keymap.set()`
 
 -- Enter command mode with ;
 vim.keymap.set("", ";", ":")
 
--- Ignore gx
+-- Ignore gx (really long description in which-key)
 vim.api.nvim_del_keymap("", "gx")
 
 -- Ignore leader
@@ -387,12 +387,14 @@ vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste from yank' })
 vim.cmd 'command! Clip set clipboard=unnamedplus'
 
 -- Moving around buffers and files
-vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Last buffer' })
+vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Last buffer' })
 
 -- Format stuff
 vim.keymap.set('n', '<leader>fj', ':%!jq -n -f /dev/stdin <cr>', { desc = 'Format json in buffer' })
 vim.keymap.set('n', '<leader>fp', ':!black % <cr>', { desc = 'Format python in buffer' })
 vim.keymap.set('n', '<leader>ff', ':Format <cr>', { desc = ':Format' })
+
+vim.keymap.set('n', '<leader>r', ':%s/', { desc = 'Replace' })
 
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -481,7 +483,7 @@ local function telescope_find_from_home()
   })
 end
 vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = 'Open files' })
-vim.keymap.set('n', '<leader>b', require('telescope.builtin').buffers, { desc = 'Open buffers' })
+vim.keymap.set('n', '<leader>J', require('telescope.builtin').buffers, { desc = 'Open buffers' })
 vim.keymap.set('n', '<leader>ss', require('telescope.builtin').builtin, { desc = '[S]earch [S]elect Telescope' })
 -- vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
