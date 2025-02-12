@@ -79,35 +79,44 @@ xterm*|rxvt*)
     ;;
 esac
 
+# [[Sources]]
 
-# [[Aliases]]
+function safe_source {
+    if [ "$#" -eq 1 ] && [ -s "$1" ]; then
+	source "$1"
+    fi
+}
 
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
+#   Reverse i search using fzf
+safe_source /usr/share/doc/fzf/examples/key-bindings.bash
+
+# enable completion if non-posix is ok
+if ! shopt -oq posix; then
+  safe_source /usr/share/bash-completion/bash_completion
+  safe_source /etc/bash_completion 
 fi
 
-alias la='ls -A'
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
+# Haskell
+safe_source /home/david/.ghcup/env
 
 # [[Exports]]
 
+if [ -x /usr/bin/dircolors ]; then
+    if [ -r ~/.dircolors ]; then
+	eval "$(dircolors -b ~/.dircolors)" 
+    else
+	eval "$(dircolors -b)"
+    fi
+    export DIRCOLORS=true
+fi
+
+export EDITOR=nvim
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# Load node version manager
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-. "$HOME/.cargo/env"
-
-export GOPATH=$HOME/.go
-export EDITOR=nvim
+safe_source "$NVM_DIR/nvm.sh"
+safe_source "$NVM_DIR/bash_completion"
 
 export PNPM_HOME="/home/david/.local/share/pnpm"
 case ":$PATH:" in
@@ -115,29 +124,13 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
-# [[Sources]]
+# Load cargo
+safe_source "$HOME/.cargo/env"
 
-#   Reverse i search using fzf
-if [ -f /usr/share/doc/fzf/examples/key-bindings.bash ]; then
-    source /usr/share/doc/fzf/examples/key-bindings.bash
-fi
+export GOPATH=$HOME/.go
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    source /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    source /etc/bash_completion
-  fi
-fi
-
-# Haskell
-# [ -f "/home/david/.ghcup/env" ] && source "/home/david/.ghcup/env" 
 
 # [[Functions]]
-
 
 function fr {
     # Find file (from [R]oot, by default)
@@ -146,7 +139,6 @@ function fr {
     fdfind "." "$dir" --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" |
         fzf-tmux --select-1 --query "${args-""}"
 }
-
 
 function f {
     # Find and open
@@ -281,3 +273,8 @@ function ccpls {
 function ccpp {
     g++ "$1.cpp" -o "./$1.out" && "./$1.out" "${@:2}"
 }
+
+# [[Aliases]]
+# Should come after other sources to override any sourced aliases
+
+safe_source ~/.bash_aliases

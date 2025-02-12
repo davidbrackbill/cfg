@@ -13,17 +13,14 @@ alias n="nvim"
 alias cl="clear"
 alias bat="batcat"
 alias cat="batcat"
-alias b="batcat"
 alias fdf="fdfind"
 alias mk="mkdir"
 
 # [[Directories]]
-alias d.="cd .."
-alias d-="cd -"
-alias d~="cd ~"
 alias cd.="cd .."
 alias cd-="cd -"
 alias cd~="cd ~"
+alias la='ls -A'
 
 # [[Git]]
 # Creates a git directory over the entire $HOME, while hiding the directory
@@ -54,3 +51,9 @@ alias pipf="pip list --format=freeze > requirements.txt"
 # [[~/.bashrc function aliases]]
 alias l="yy"
 alias ntd="nvim todo"
+
+# [[Conditionals]]
+if [ RC_DIRCOLORS ]; then
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+fi
