@@ -86,11 +86,24 @@ require('lazy').setup({
   -- Commented out because it takes a long time to load
   {
     "Olical/conjure",
-    ft = { "clojure", "fennel", "python" }, -- etc
+    ft = { "python", "fennel", "python" }, -- etc
     lazy = true,
     init = function()
-      -- Set configuration options here
+      -- Conjure config [:help conjure]
+      vim.g["conjure#mapping#enable_defaults"] = false
       vim.g["conjure#mapping#prefix"] = ','
+      vim.g["conjure#mapping#log_vsplit"] = 'L'
+      vim.g["conjure#mapping#log_toggle"] = 'l'
+      vim.g["conjure#mapping#log_reset_soft"] = 'r'
+      vim.g["conjure#mapping#log_reset_hard"] = 'R'
+      vim.g["conjure#mapping#eval_buf"] = 'b'
+      vim.g["conjure#mapping#eval_visual"] = 'v'
+      vim.g["conjure#mapping#eval_motion"] = 'm'
+      vim.g["conjure#mapping#eval_current_form"] = 'c'
+      vim.g["conjure#mapping#eval_comment_current_form"] = 'C'
+      -- Client config [:help conjure-client-python-stdio]
+      vim.g["conjure#client#python#stdio#mapping#start"] = 's'
+      vim.g["conjure#client#python#stdio#mapping#stop"] = 'S'
     end,
   },
 
