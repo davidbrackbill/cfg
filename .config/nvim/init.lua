@@ -139,11 +139,15 @@ require('lazy').setup({
       preset = "helix",
       delay = 0,
       spec = {
+        -- Names
         { '<leader>f', group = 'Format' },
-        { '<leader>h', group = 'Git hunk' },
-        { '<leader>r', group = 'Rename' },
+        { '<leader>d', group = 'Git diffs' },
+        { '<leader>H', group = 'Help' },
+        { '<leader>d', group = 'Git diffs', mode = { 'v' } },
+        { '<leader>', group = 'Commands' },
         { '?', group = 'Search' },
-        { '<leader>h', group = 'Git hunk', mode = { 'v' } },
+        { 'g', group = 'Goto' },
+        { ',', group = 'Conjure' },
       },
       icons = {
         breadcrumb = "",
@@ -478,18 +482,17 @@ vim.keymap.set('n', '<leader>?', telebuilt.oldfiles, { desc = 'Recent files' })
 vim.keymap.set('n', '<leader>/', search_buffer, { desc = 'Search buffer' })
 vim.keymap.set('n', '<leader>J', telebuilt.buffers, { desc = 'Open buffers' })
 vim.keymap.set('n', '<leader>t', telebuilt.colorscheme, { desc = 'Themes' })
+vim.keymap.set('n', '<leader>HH', telebuilt.help_tags, { desc = 'Help tags' })
+vim.keymap.set('n', '<leader>Ht', telebuilt.builtin, { desc = 'Telescope help' })
 
-vim.keymap.set('n', '?/', live_grep_open_files, { desc = 'Open files' })
-vim.keymap.set('n', '?H', telebuilt.builtin, { desc = 'Telescope help' })
-vim.keymap.set('n', '?r', telebuilt.git_files, { desc = 'Repo' })
-vim.keymap.set('n', '?f', telebuilt.find_files, { desc = 'Files' })
-vim.keymap.set('n', '?h', find_from_home, { desc = 'Home files' })
-vim.keymap.set('n', '?h', telebuilt.help_tags, { desc = 'Help tags' })
-vim.keymap.set('n', '?w', telebuilt.grep_string, { desc = 'Grep *' })
-vim.keymap.set('n', '?g', telebuilt.live_grep, { desc = 'Grep' })
+vim.keymap.set('n', '??', telebuilt.live_grep, { desc = 'Grep' })
+vim.keymap.set('n', '?/', live_grep_open_files, { desc = 'Grep open files' })
+vim.keymap.set('n', '?g', telebuilt.git_files, { desc = 'Repo' })
 vim.keymap.set('n', '?G', live_grep_git_root, { desc = 'Grep git repo' })
-vim.keymap.set('n', '?R', telebuilt.resume, { desc = 'Resume search' })
+vim.keymap.set('n', '?h', find_from_home, { desc = 'Home' })
+vim.keymap.set('n', '?w', telebuilt.grep_string, { desc = 'Grep *' })
 vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics' })
+vim.keymap.set('n', '?.', telebuilt.resume, { desc = 'Resume search' })
 
 
 -- [[ Configure Treesitter ]]
