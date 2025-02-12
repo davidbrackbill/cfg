@@ -140,9 +140,9 @@ require('lazy').setup({
       delay = 0,
       spec = {
         { '<leader>f', group = 'Format' },
-        { '<leader>h', group = 'Git hunks' },
+        { '<leader>h', group = 'Git hunk' },
         { '<leader>r', group = 'Rename' },
-        { '<leader>s', group = 'Search' },
+        { '?', group = 'Search' },
         { '<leader>h', group = 'Git hunk', mode = { 'v' } },
       },
       icons = {
@@ -412,7 +412,8 @@ require('telescope').setup {
   defaults = require('telescope.themes').get_dropdown {
     mappings = {
       i = {
-        ['J'] = "results_scrolling_up", -- Up/down is swapped from normal vim keys because using "dropdown" theme
+        -- Up/down is swapped from normal vim keys because using "dropdown" theme
+        ['J'] = "results_scrolling_up",
         ['K'] = "results_scrolling_down",
         ['<C-j>'] = "preview_scrolling_down",
         ['<C-k>'] = "preview_scrolling_up",
@@ -424,18 +425,14 @@ require('telescope').setup {
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
 
--- Telescope live_grep in git root
--- Function to find the git root directory based on the current buffer's path
+local telebuilt = require('telescope.builtin')
+
 local function find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
-  local current_dir
   local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == '' then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
+  local current_dir = cwd
+  if current_file ~= '' then
     current_dir = vim.fn.fnamemodify(current_file, ':h')
   end
 
@@ -448,53 +445,52 @@ local function find_git_root()
   return git_root
 end
 
--- Custom live_grep function to search in git root
 local function live_grep_git_root()
-  local git_root = find_git_root()
-  if git_root then
-    require('telescope.builtin').live_grep {
-      search_dirs = { git_root },
-    }
-  end
+  telebuilt.live_grep {
+    search_dirs = { find_git_root() },
+  }
 end
 
-vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
-
--- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>?', require('telescope.builtin').oldfiles, { desc = 'Recent files' })
-vim.keymap.set('n', '<leader><space>', require('telescope.builtin').find_files, { desc = 'Telescope' })
-vim.keymap.set('n', '<leader>/', function()
-  -- You can pass additional configuration to telescope to change theme, layout, etc.
-  require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
-end, { desc = 'Search buffer' })
-
-local function telescope_live_grep_open_files()
-  require('telescope.builtin').live_grep {
+local function live_grep_open_files()
+  telebuilt.live_grep {
     grep_open_files = true,
     prompt_title = 'Live Grep in Open Files',
   }
 end
-local function telescope_find_from_home()
-  require("telescope.builtin").find_files({
+
+local function find_from_home()
+  telebuilt.find_files({
     search_dirs = { "~/" }
   })
 end
-vim.keymap.set('n', '<leader>s/', telescope_live_grep_open_files, { desc = 'Open files' })
-vim.keymap.set('n', '<leader>J', require('telescope.builtin').buffers, { desc = 'Open buffers' })
-vim.keymap.set('n', '<leader>ss', require('telescope.builtin').builtin, { desc = '[S]earch [S]elect Telescope' })
--- vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc = 'Search [G]it [F]iles' })
-vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
-vim.keymap.set('n', '<leader>sh', telescope_find_from_home, { desc = '[S]earch from [H]ome' })
-vim.keymap.set('n', '<leader>sH', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
-vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
-vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
-vim.keymap.set('n', '<leader>\\', require('telescope.builtin').diagnostics, { desc = 'Diagnostics' })
-vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set('n', '<leader>t', require('telescope.builtin').colorscheme, { desc = 'Themes' })
+
+local function search_buffer()
+  telebuilt.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+    winblend = 10,
+    previewer = false,
+  })
+end
+
+vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics' })
+
+vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'All files' })
+vim.keymap.set('n', '<leader>?', telebuilt.oldfiles, { desc = 'Recent files' })
+vim.keymap.set('n', '<leader>/', search_buffer, { desc = 'Search buffer' })
+vim.keymap.set('n', '<leader>J', telebuilt.buffers, { desc = 'Open buffers' })
+vim.keymap.set('n', '<leader>t', telebuilt.colorscheme, { desc = 'Themes' })
+
+vim.keymap.set('n', '?/', live_grep_open_files, { desc = 'Open files' })
+vim.keymap.set('n', '?H', telebuilt.builtin, { desc = 'Telescope help' })
+vim.keymap.set('n', '?r', telebuilt.git_files, { desc = 'Repo' })
+vim.keymap.set('n', '?f', telebuilt.find_files, { desc = 'Files' })
+vim.keymap.set('n', '?h', find_from_home, { desc = 'Home files' })
+vim.keymap.set('n', '?h', telebuilt.help_tags, { desc = 'Help tags' })
+vim.keymap.set('n', '?w', telebuilt.grep_string, { desc = 'Grep *' })
+vim.keymap.set('n', '?g', telebuilt.live_grep, { desc = 'Grep' })
+vim.keymap.set('n', '?G', live_grep_git_root, { desc = 'Grep git repo' })
+vim.keymap.set('n', '?R', telebuilt.resume, { desc = 'Resume search' })
+vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics' })
+
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -580,10 +576,10 @@ local on_attach = function(_, bufnr)
   nmap('<leader>n', vim.lsp.buf.rename, 'Rename')
   nmap('\\!', vim.lsp.buf.code_action, 'Code action')
 
-  nmap('gd', require('telescope.builtin').lsp_definitions, 'Definition')
-  nmap('gr', require('telescope.builtin').lsp_references, 'References')
-  nmap('gI', require('telescope.builtin').lsp_implementations, 'Implementation')
-  nmap('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type definition')
+  nmap('gd', telebuilt.lsp_definitions, 'Definition')
+  nmap('gr', telebuilt.lsp_references, 'References')
+  nmap('gI', telebuilt.lsp_implementations, 'Implementation')
+  nmap('<leader>D', telebuilt.lsp_type_definitions, 'Type definition')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -642,7 +638,7 @@ mason_lspconfig.setup_handlers {
 
 -- [[ Configure Wilder ]]
 local wilder = require('wilder')
-wilder.setup({modes = {':', '/', '?'}})
+wilder.setup({ modes = { ':', '/', '?' } })
 
 wilder.set_option('pipeline', {
   wilder.branch(
@@ -712,7 +708,7 @@ cmp.setup {
 
 
 -- [[ Custom colors \ themes ]]
-local WKGroups = {'WhichKey', 'WhichKeyTitle', 'WhichKeyNormal', 'WhichKeyDesc', 'WhichKeyGroup', 'WhichKeyBorder'}
+local WKGroups = { 'WhichKey', 'WhichKeyTitle', 'WhichKeyNormal', 'WhichKeyDesc', 'WhichKeyGroup', 'WhichKeyBorder' }
 for _, group in ipairs(WKGroups) do
   -- FG: Onedark, BG: transparent
   vim.api.nvim_set_hl(0, group, { fg = "#abb2bf", bg = "NONE" })
