@@ -138,16 +138,18 @@ require('lazy').setup({
     opts = {
       preset = "helix",
       delay = 0,
+      sort = { "alphanum" },
       spec = {
         -- Names
         { '<leader>f', group = 'Format' },
         { '<leader>d', group = 'Git diffs' },
         { '<leader>H', group = 'Help' },
-        { '<leader>d', group = 'Git diffs', mode = { 'v' } },
-        { '<leader>', group = 'Commands' },
-        { '?', group = 'Search' },
-        { 'g', group = 'Goto' },
-        { ',', group = 'Conjure' },
+        { '<leader>d', group = 'Git diffs',  mode = { 'v' } },
+        { '<leader>',  group = 'Commands' },
+        { '\\',        group = 'Diagnostics' },
+        { '?',         group = 'Search' },
+        { 'g',         group = 'Goto' },
+        { ',',         group = 'Conjure' },
       },
       icons = {
         breadcrumb = "",
@@ -157,10 +159,10 @@ require('lazy').setup({
         mappings = false,
         colors = false,
         keys = {
-          Esc = "Esc",
-          BS = "BSpace",
-          Space = "Space",
-          Tab = "Tab",
+          Esc = "<Esc>",
+          BS = "<BSpace>",
+          Space = "⌴ ",
+          Tab = "<Tab>",
         },
       },
     },
@@ -326,15 +328,16 @@ require('lazy').setup({
     },
     event = "VeryLazy",
     keys = {
-      { "<leader>l", function() require("yazi").yazi() end, desc = "Yazi" },
-      -- {
-      --   -- Open in the current working directory
-      --   "<leader>ff",
-      --   function()
-      --     require("yazi").yazi(nil, vim.fn.getcwd())
-      --   end,
-      --   desc = "Open the file manager in nvim's working directory" ,
-      -- },
+      {
+        "<leader>l",
+        function() require("yazi").yazi() end,
+        desc = "LS buffer"
+      },
+      {
+        "<leader>L",
+        function() require("yazi").yazi(nil, vim.fn.getcwd()) end,
+        desc = "LS cwd",
+      },
     },
     ---@type YaziConfig
     opts = {
@@ -421,6 +424,7 @@ require('telescope').setup {
         ['K'] = "results_scrolling_down",
         ['<C-j>'] = "preview_scrolling_down",
         ['<C-k>'] = "preview_scrolling_up",
+        ['<Esc>'] = "close",
       },
     },
   },
@@ -431,7 +435,7 @@ pcall(require('telescope').load_extension, 'fzf')
 
 local telebuilt = require('telescope.builtin')
 
-local function find_git_root()
+local function _find_git_root()
   -- Use the current buffer's path as the starting point for the git search
   local current_file = vim.api.nvim_buf_get_name(0)
   local cwd = vim.fn.getcwd()
@@ -449,49 +453,77 @@ local function find_git_root()
   return git_root
 end
 
-local function live_grep_git_root()
+local function grep_git_root()
   telebuilt.live_grep {
-    search_dirs = { find_git_root() },
+    search_dirs = { _find_git_root() },
+    prompt_title = 'Grep from Git Root',
   }
 end
 
-local function live_grep_open_files()
+local function grep_buffer()
+  telebuilt.current_buffer_fuzzy_find {
+    previewer = false,
+    prompt_title = 'Grep Buffer',
+  }
+end
+
+local function grep_buffers()
   telebuilt.live_grep {
     grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
+    prompt_title = 'Grep Buffers',
   }
 end
 
-local function find_from_home()
-  telebuilt.find_files({
-    search_dirs = { "~/" }
-  })
+local function grep_files()
+  telebuilt.live_grep {
+    prompt_title = 'Grep Files',
+  }
 end
 
-local function search_buffer()
-  telebuilt.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-    winblend = 10,
-    previewer = false,
-  })
+local function search_home()
+  telebuilt.find_files {
+    search_dirs = { "~/" },
+    prompt_title = 'Find Files from Home',
+  }
 end
 
+local function search_root()
+  telebuilt.find_files {
+    search_dirs = { "/" },
+    prompt_title = 'Find Files from Root',
+  }
+end
+
+-- Config
+vim.keymap.set('n', '<leader>t', telebuilt.colorscheme, { desc = 'Themes' })
+vim.keymap.set('n', '<leader>h', telebuilt.builtin, { desc = 'Help' })
+
+-- Diagnostic group
 vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics' })
 
-vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'All files' })
-vim.keymap.set('n', '<leader>?', telebuilt.oldfiles, { desc = 'Recent files' })
-vim.keymap.set('n', '<leader>/', search_buffer, { desc = 'Search buffer' })
-vim.keymap.set('n', '<leader>J', telebuilt.buffers, { desc = 'Open buffers' })
-vim.keymap.set('n', '<leader>t', telebuilt.colorscheme, { desc = 'Themes' })
-vim.keymap.set('n', '<leader>HH', telebuilt.help_tags, { desc = 'Help tags' })
-vim.keymap.set('n', '<leader>Ht', telebuilt.builtin, { desc = 'Telescope help' })
+-- Leaders
+vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'Search folder' })
+vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Search buffers' })
+vim.keymap.set('n', '<leader>?', telebuilt.oldfiles, { desc = 'Search recents' })
 
-vim.keymap.set('n', '??', telebuilt.live_grep, { desc = 'Grep' })
-vim.keymap.set('n', '?/', live_grep_open_files, { desc = 'Grep open files' })
-vim.keymap.set('n', '?g', telebuilt.git_files, { desc = 'Repo' })
-vim.keymap.set('n', '?G', live_grep_git_root, { desc = 'Grep git repo' })
-vim.keymap.set('n', '?h', find_from_home, { desc = 'Home' })
-vim.keymap.set('n', '?w', telebuilt.grep_string, { desc = 'Grep *' })
-vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics' })
+-- Search group
+-- Dupes
+vim.keymap.set('n', '?f', telebuilt.find_files, { desc = 'Folder search' })
+vim.keymap.set('n', '?b', telebuilt.buffers, { desc = 'Buffers search' })
+vim.keymap.set('n', '?r', telebuilt.oldfiles, { desc = 'Recents search' })
+-- Dupe pairings
+vim.keymap.set('n', '?F', grep_files, { desc = 'Folder grep' })
+vim.keymap.set('n', '?B', grep_buffers, { desc = 'Buffers grep' })
+-- Grep recent TODO
+--
+-- Unique
+vim.keymap.set('n', '??', grep_buffer, { desc = 'Grep buffer' })
+vim.keymap.set('n', '?h', search_home, { desc = 'Home search' })
+vim.keymap.set('n', '?r', search_root, { desc = 'Root search' })
+vim.keymap.set('n', '?g', telebuilt.git_files, { desc = 'Git search' })
+vim.keymap.set('n', '?G', grep_git_root, { desc = 'Git grep' })
+vim.keymap.set('n', '?*', telebuilt.grep_string, { desc = 'Grep current word' })
+vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics search' })
 vim.keymap.set('n', '?.', telebuilt.resume, { desc = 'Resume search' })
 
 
@@ -582,7 +614,7 @@ local on_attach = function(_, bufnr)
   nmap('gd', telebuilt.lsp_definitions, 'Definition')
   nmap('gr', telebuilt.lsp_references, 'References')
   nmap('gI', telebuilt.lsp_implementations, 'Implementation')
-  nmap('<leader>D', telebuilt.lsp_type_definitions, 'Type definition')
+  nmap('gy', telebuilt.lsp_type_definitions, 'Type definition')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
