@@ -263,7 +263,7 @@ function py {
 }
 
 function ta {
-    if [ -n "${1}" ]]; then
+    if [ -n "${1}" ]; then
 	tmux a -t "${1}"
     else
 	tmux ls
