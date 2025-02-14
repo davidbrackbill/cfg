@@ -28,9 +28,11 @@ alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 alias gitc="git commit -am"
 alias gitst="git status"
 alias gitl="git log"
+alias gitd="git diff"
 alias cfgc="cfg commit -am"
 alias cfgst="cfg status"
 alias cfgl="cfg log"
+alias cfgd="cfg diff"
 alias lg="lazygit"
 
 # [[GUIs]]

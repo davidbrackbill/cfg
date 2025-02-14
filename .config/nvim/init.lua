@@ -48,6 +48,11 @@ vim.g.maplocalleader = ' '
 vim.g.python3_host_prog = '/usr/bin/python3'
 vim.env.BASH_ENV = "~/.bash_aliases"
 
+-- Defer clipbboard until after load (long startup)
+vim.schedule(function()
+  vim.opt.clipboard = 'unnamedplus'
+end)
+
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
   -- nested = true, -- for format on save
   callback = function()
@@ -394,20 +399,12 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- Diagnostic messages
 vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 
--- Yanking, pasting stuff
-vim.keymap.set('n', '<C-p>', '"0p', { desc = 'Paste from yank buffer' })
-vim.cmd 'command! Clip set clipboard=unnamedplus'
-
--- Moving around buffers and files
+vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump buffer' })
-
--- Format stuff
 vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
-
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
 
 -- [[ Highlight on yank ]]
