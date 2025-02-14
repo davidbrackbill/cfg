@@ -150,6 +150,8 @@ require('lazy').setup({
         { '?',         group = 'Search' },
         { 'g',         group = 'Goto' },
         { ',',         group = 'Conjure' },
+        { ']',         group = 'Treesitter->' },
+        { '[',         group = '<-Treesitter' },
       },
       icons = {
         breadcrumb = "",
@@ -420,8 +422,8 @@ require('telescope').setup {
     mappings = {
       i = {
         -- Up/down is swapped from normal vim keys because using "dropdown" theme
-        ['J'] = "results_scrolling_up",
-        ['K'] = "results_scrolling_down",
+        ['J'] = "move_selection_next",
+        ['K'] = "move_selection_previous",
         ['<C-j>'] = "preview_scrolling_down",
         ['<C-k>'] = "preview_scrolling_up",
         ['<Esc>'] = "close",
@@ -532,16 +534,10 @@ vim.keymap.set('n', '?.', telebuilt.resume, { desc = 'Resume search' })
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
-    -- Add languages to be installed here that you want installed for treesitter
     ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'javascript', 'typescript', 'svelte', 'css', 'html', 'vimdoc', 'vim', 'bash' },
-
-    -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = true,
-    -- Install languages synchronously (only applied to `ensure_installed`)
     sync_install = false,
-    -- List of parsers to ignore installing
     ignore_install = {},
-    -- You can specify additional Treesitter modules here: -- For example: -- playground = {--enable = true,-- },
     modules = {},
     highlight = { enable = true },
     indent = { enable = false },
@@ -560,8 +556,6 @@ vim.defer_fn(function()
         lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
         keymaps = {
           -- You can use the capture groups defined in textobjects.scm
-          ['aa'] = '@parameter.outer',
-          ['ia'] = '@parameter.inner',
           ['af'] = '@function.outer',
           ['if'] = '@function.inner',
           ['ac'] = '@class.outer',
@@ -572,29 +566,20 @@ vim.defer_fn(function()
         enable = true,
         set_jumps = true, -- whether to set jumps in the jumplist
         goto_next_start = {
-          [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
+          [']f'] = '@function.outer',
+          [']c'] = '@class.outer',
         },
         goto_next_end = {
-          [']M'] = '@function.outer',
-          [']['] = '@class.outer',
+          [']F'] = '@function.outer',
+          [']C'] = '@class.outer',
         },
         goto_previous_start = {
-          ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
+          ['[f'] = '@function.outer',
+          ['[c'] = '@class.outer',
         },
         goto_previous_end = {
-          ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
-      swap = {
-        enable = true,
-        swap_next = {
-          ['<leader>a'] = '@parameter.inner',
-        },
-        swap_previous = {
-          ['<leader>A'] = '@parameter.inner',
+          ['[F'] = '@function.outer',
+          ['[C'] = '@class.outer',
         },
       },
     },
@@ -604,6 +589,7 @@ end, 0)
 -- [[ Configure LSPs ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
+
   local nmap = function(keys, func, desc)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
