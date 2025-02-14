@@ -141,10 +141,9 @@ require('lazy').setup({
       sort = { "alphanum" },
       spec = {
         -- Names
-        { '<leader>f', group = 'Format' },
         { '<leader>d', group = 'Git diffs' },
         { '<leader>H', group = 'Help' },
-        { '<leader>d', group = 'Git diffs',  mode = { 'v' } },
+        { '<leader>d', group = 'Git diffs',   mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
         { '?',         group = 'Search' },
@@ -324,6 +323,19 @@ require('lazy').setup({
   },
 
   {
+    "jay-babu/mason-null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "nvimtools/none-ls.nvim",
+    },
+    opts = {
+      ensure_installed = { "black" },
+    }
+
+  },
+
+  {
     "mikavilpas/yazi.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -333,12 +345,7 @@ require('lazy').setup({
       {
         "<leader>l",
         function() require("yazi").yazi() end,
-        desc = "LS buffer"
-      },
-      {
-        "<leader>L",
-        function() require("yazi").yazi(nil, vim.fn.getcwd()) end,
-        desc = "LS cwd",
+        desc = "LS"
       },
     },
     ---@type YaziConfig
@@ -392,18 +399,16 @@ vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous dia
 vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 
 -- Yanking, pasting stuff
-vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste from yank' })
+vim.keymap.set('n', '<C-p>', '"0p', { desc = 'Paste from yank buffer' })
 vim.cmd 'command! Clip set clipboard=unnamedplus'
 
 -- Moving around buffers and files
-vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Last buffer' })
+vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump to last buffer' })
 
 -- Format stuff
-vim.keymap.set('n', '<leader>fj', ':%!jq -n -f /dev/stdin <cr>', { desc = 'Format json in buffer' })
-vim.keymap.set('n', '<leader>fp', ':!black % <cr>', { desc = 'Format python in buffer' })
-vim.keymap.set('n', '<leader>ff', ':Format <cr>', { desc = ':Format' })
+vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
 
-vim.keymap.set('n', '<leader>r', ':%s/', { desc = 'Replace' })
+vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
 
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -589,7 +594,6 @@ end, 0)
 -- [[ Configure LSPs ]]
 --  This function gets run when an LSP connects to a particular buffer.
 local on_attach = function(_, bufnr)
-
   local nmap = function(keys, func, desc)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
@@ -601,13 +605,10 @@ local on_attach = function(_, bufnr)
   nmap('gr', telebuilt.lsp_references, 'References')
   nmap('gI', telebuilt.lsp_implementations, 'Implementation')
   nmap('gy', telebuilt.lsp_type_definitions, 'Type definition')
-
-  -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('gh', vim.lsp.buf.hover, 'Hover Documentation')
+  nmap('gH', vim.lsp.buf.signature_help, 'Signature Documentation')
   nmap('gD', vim.lsp.buf.declaration, 'Declaration')
 
-  -- Create a command `:Format` local to the LSP buffer
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
@@ -633,6 +634,18 @@ local servers = {
     },
   },
 }
+
+-- Null-ls pretends it's an LSP
+-- Enables Python to format with "LSP" but actually using black
+require("mason-null-ls").setup({
+  ensure_installed = { "black" }
+})
+local null_ls = require("null-ls")
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.black,
+  },
+})
 
 -- Neodev handles neovim lua-ls (LSP) configuration
 require('neodev').setup()
