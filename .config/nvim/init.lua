@@ -141,9 +141,9 @@ require('lazy').setup({
       sort = { "alphanum" },
       spec = {
         -- Names
-        { '<leader>d', group = 'Git diffs' },
+        { '<leader>G', group = 'Git' },
         { '<leader>H', group = 'Help' },
-        { '<leader>d', group = 'Git diffs',   mode = { 'v' } },
+        { '<leader>G', group = 'Git',   mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
         { '?',         group = 'Search' },
@@ -217,21 +217,21 @@ require('lazy').setup({
           gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'reset git hunk' })
 
-        map('n', '<leader>hs', gs.stage_hunk, { desc = 'git stage hunk' })
-        map('n', '<leader>hr', gs.reset_hunk, { desc = 'git reset hunk' })
-        map('n', '<leader>hS', gs.stage_buffer, { desc = 'git Stage buffer' })
-        map('n', '<leader>hu', gs.undo_stage_hunk, { desc = 'undo stage hunk' })
-        map('n', '<leader>hR', gs.reset_buffer, { desc = 'git Reset buffer' })
-        map('n', '<leader>hp', gs.preview_hunk, { desc = 'preview git hunk' })
-        map('n', '<leader>hb', function()
+        map('n', '<leader>Gs', gs.stage_hunk, { desc = 'Stage hunk' })
+        map('n', '<leader>Gr', gs.reset_hunk, { desc = 'Reset hunk' })
+        map('n', '<leader>GS', gs.stage_buffer, { desc = 'Stage buffer' })
+        map('n', '<leader>Gu', gs.undo_stage_hunk, { desc = 'Stage hunk' })
+        map('n', '<leader>GR', gs.reset_buffer, { desc = 'Reset buffer' })
+        map('n', '<leader>Gp', gs.preview_hunk, { desc = 'Preview hunk' })
+        map('n', '<leader>Gb', function()
           gs.blame_line { full = false }
-        end, { desc = 'git blame line' })
-        map('n', '<leader>hd', gs.diffthis, { desc = 'git diff against index' })
-        map('n', '<leader>hD', function()
+        end, { desc = 'Blame line' })
+        map('n', '<leader>Gd', gs.diffthis, { desc = 'Diff against index' })
+        map('n', '<leader>GD', function()
           gs.diffthis '~'
-        end, { desc = 'git diff against last commit' })
-        map('n', '<leader>ht', gs.toggle_current_line_blame, { desc = 'toggle git blame line' })
-        map('n', '<leader>hT', gs.toggle_deleted, { desc = 'toggle git show deleted' })
+        end, { desc = 'Diff against last commit' })
+        map('n', '<leader>GB', gs.toggle_current_line_blame, { desc = 'Toggle blame' })
+        map('n', '<leader>Gt', gs.toggle_deleted, { desc = 'Toggle deleted' })
 
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
       end,
@@ -426,7 +426,6 @@ require('telescope').setup {
   defaults = require('telescope.themes').get_dropdown {
     mappings = {
       i = {
-        -- Up/down is swapped from normal vim keys because using "dropdown" theme
         ['J'] = "move_selection_next",
         ['K'] = "move_selection_previous",
         ['<C-j>'] = "preview_scrolling_down",
