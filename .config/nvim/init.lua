@@ -345,7 +345,7 @@ require('lazy').setup({
       {
         "<leader>l",
         function() require("yazi").yazi() end,
-        desc = "LS"
+        desc = "List files"
       },
     },
     ---@type YaziConfig
@@ -403,7 +403,7 @@ vim.keymap.set('n', '<C-p>', '"0p', { desc = 'Paste from yank buffer' })
 vim.cmd 'command! Clip set clipboard=unnamedplus'
 
 -- Moving around buffers and files
-vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump to last buffer' })
+vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump buffer' })
 
 -- Format stuff
 vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
@@ -508,29 +508,30 @@ vim.keymap.set('n', '<leader>h', telebuilt.builtin, { desc = 'Help' })
 vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics' })
 
 -- Leaders
-vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'Search folder' })
-vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Search buffers' })
-vim.keymap.set('n', '<leader>?', telebuilt.oldfiles, { desc = 'Search recents' })
+vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'Search' })
+vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Buffers' })
+vim.keymap.set('n', '<leader>r', telebuilt.oldfiles, { desc = 'Recents' })
+vim.keymap.set('n', '<leader>.', telebuilt.resume, { desc = 'Last search' })
 
 -- Search group
 -- Dupes
-vim.keymap.set('n', '?f', telebuilt.find_files, { desc = 'Folder search' })
-vim.keymap.set('n', '?b', telebuilt.buffers, { desc = 'Buffers search' })
-vim.keymap.set('n', '?r', telebuilt.oldfiles, { desc = 'Recents search' })
+vim.keymap.set('n', '?f', telebuilt.find_files, { desc = 'Folder' })
+vim.keymap.set('n', '?b', telebuilt.buffers, { desc = 'Buffers' })
+vim.keymap.set('n', '?r', telebuilt.oldfiles, { desc = 'Recents' })
+vim.keymap.set('n', '?.', telebuilt.resume, { desc = 'Last search' })
 -- Dupe pairings
-vim.keymap.set('n', '?F', grep_files, { desc = 'Folder grep' })
-vim.keymap.set('n', '?B', grep_buffers, { desc = 'Buffers grep' })
+vim.keymap.set('n', '?F', grep_files, { desc = 'Folder 🔍' })
+vim.keymap.set('n', '?B', grep_buffers, { desc = 'Buffers 🔍' })
 -- Grep recent TODO
 --
 -- Unique
-vim.keymap.set('n', '??', grep_buffer, { desc = 'Grep buffer' })
-vim.keymap.set('n', '?h', search_home, { desc = 'Home search' })
-vim.keymap.set('n', '?r', search_root, { desc = 'Root search' })
-vim.keymap.set('n', '?g', telebuilt.git_files, { desc = 'Git search' })
-vim.keymap.set('n', '?G', grep_git_root, { desc = 'Git grep' })
-vim.keymap.set('n', '?*', telebuilt.grep_string, { desc = 'Grep current word' })
-vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics search' })
-vim.keymap.set('n', '?.', telebuilt.resume, { desc = 'Resume search' })
+vim.keymap.set('n', '??', grep_buffer, { desc = 'Buffer 🔍' })
+vim.keymap.set('n', '?h', search_home, { desc = 'Home' })
+vim.keymap.set('n', '?r', search_root, { desc = 'Root' })
+vim.keymap.set('n', '?g', telebuilt.git_files, { desc = 'Git' })
+vim.keymap.set('n', '?G', grep_git_root, { desc = 'Git 🔍' })
+vim.keymap.set('n', '?*', telebuilt.grep_string, { desc = 'Cursor 🔍' })
+vim.keymap.set('n', '?d', telebuilt.diagnostics, { desc = 'Diagnostics' })
 
 
 -- [[ Configure Treesitter ]]
