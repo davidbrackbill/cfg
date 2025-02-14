@@ -9,11 +9,6 @@ vim.wo.number = true
 -- Enable mouse mode
 vim.o.mouse = 'a'
 
--- Sync clipboard between OS and Neovim.
---  Remove this option if you want your OS clipboard to remain independent.
---  See `:help 'clipboard'`
--- vim.o.clipboard = 'unnamedplus'
-
 vim.o.breakindent = true
 vim.o.undofile = true
 
@@ -49,9 +44,9 @@ vim.g.python3_host_prog = '/usr/bin/python3'
 vim.env.BASH_ENV = "~/.bash_aliases"
 
 -- Defer clipbboard until after load (long startup)
-vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
-end)
+-- vim.schedule(function()
+--   vim.opt.clipboard = 'unnamedplus'
+-- end)
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
   -- nested = true, -- for format on save
@@ -165,10 +160,10 @@ require('lazy').setup({
         mappings = false,
         colors = false,
         keys = {
-          Esc = "<Esc>",
-          BS = "<BSpace>",
+          Esc = "Esc",
+          BS = "B⌴",
           Space = "⌴ ",
-          Tab = "<Tab>",
+          Tab = "Tab",
         },
       },
     },
@@ -386,13 +381,8 @@ require('lazy').setup({
 -- [[ Keymaps (Keychains/key-chains) ]]
 -- See `:help vim.keymap.set()`
 
--- Enter command mode with ;
-vim.keymap.set("", ";", ":")
-
--- Ignore gx (really long description in which-key)
-vim.api.nvim_del_keymap("", "gx")
-
--- Ignore leader
+-- Ignores
+vim.api.nvim_del_keymap("", "gx") -- long which-key description
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 -- Remap for dealing with word wrap
@@ -402,10 +392,18 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 
+-- Registers, marks
 vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
+
+-- Commands
+vim.keymap.set("", ";", ":")
 vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump buffer' })
 vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
+vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Command -> tab' })
+vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Tab' })
+
+vim.keymap.set('n', 'QQ', ':q! <cr>', { desc = 'Quit, no save' })
 
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -486,6 +484,7 @@ end
 local function search_home()
   telebuilt.find_files {
     search_dirs = { "~/" },
+    hidden = { true },
     prompt_title = 'Find Files from Home',
   }
 end
