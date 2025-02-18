@@ -338,7 +338,7 @@ require('lazy').setup({
     event = "VeryLazy",
     keys = {
       {
-        "<leader>f",
+        "<leader>F",
         function() require("yazi").yazi() end,
         desc = "Files"
       },
@@ -393,10 +393,10 @@ vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 -- Commands
 vim.keymap.set("", ";", ":")
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Jump buffer' })
-vim.keymap.set('n', '<leader>F', ':Format <cr>', { desc = 'Format' })
+vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
-vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Command -> tab' })
-vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Tab' })
+vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Cmd->tab' })
+vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Next tab' })
 
 vim.keymap.set('n', 'QQ', ':q! <cr>', { desc = 'Quit, no save' })
 vim.keymap.set('n', 'qq', ':q <cr>', { desc = 'Quit' })
@@ -506,10 +506,11 @@ vim.keymap.set('n', '<leader>t', telebuilt.colorscheme, { desc = 'Themes' })
 vim.keymap.set('n', '<leader>h', telebuilt.builtin, { desc = 'Help' })
 
 -- Diagnostic group
-vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics' })
+vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics list' })
 
 -- Leaders
-vim.keymap.set('n', '<leader><leader>', telebuilt.find_files, { desc = 'Search' })
+vim.keymap.set('n', '<leader><space>', telebuilt.find_files, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>/', grep_files, { desc = 'Search files' })
 vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>r', telebuilt.oldfiles, { desc = 'Recents' })
 vim.keymap.set('n', '<leader>.', telebuilt.resume, { desc = 'Last search' })
