@@ -397,7 +397,7 @@ vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 
 -- Commands
 vim.keymap.set("", ";", ":")
-vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump buffer' })
+vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Jump buffer' })
 vim.keymap.set('n', '<leader>F', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
 vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Command -> tab' })
