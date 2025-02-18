@@ -43,11 +43,6 @@ vim.g.maplocalleader = ' '
 vim.g.python3_host_prog = '/usr/bin/python3'
 vim.env.BASH_ENV = "~/.bash_aliases"
 
--- Defer clipbboard until after load (long startup)
--- vim.schedule(function()
---   vim.opt.clipboard = 'unnamedplus'
--- end)
-
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
   -- nested = true, -- for format on save
   callback = function()
@@ -143,7 +138,7 @@ require('lazy').setup({
         -- Names
         { '<leader>G', group = 'Git' },
         { '<leader>H', group = 'Help' },
-        { '<leader>G', group = 'Git',   mode = { 'v' } },
+        { '<leader>G', group = 'Git',         mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
         { '?',         group = 'Search' },
@@ -405,6 +400,15 @@ vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Tab' })
 
 vim.keymap.set('n', 'QQ', ':q! <cr>', { desc = 'Quit, no save' })
 vim.keymap.set('n', 'qq', ':q <cr>', { desc = 'Quit' })
+
+local function clip()
+  vim.opt.clipboard = 'unnamedplus'
+  vim.cmd('normal! "+y')
+end
+
+vim.keymap.set('v', '<c-c>', clip, { desc = 'Clip to system' })
+vim.keymap.set('v', 'Y', clip, { desc = 'Clip to system' })
+
 
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
