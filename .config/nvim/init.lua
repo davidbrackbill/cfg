@@ -343,9 +343,9 @@ require('lazy').setup({
     event = "VeryLazy",
     keys = {
       {
-        "<leader>l",
+        "<leader>f",
         function() require("yazi").yazi() end,
-        desc = "List files"
+        desc = "Files"
       },
     },
     ---@type YaziConfig
@@ -398,12 +398,13 @@ vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 -- Commands
 vim.keymap.set("", ";", ":")
 vim.keymap.set('n', '<leader>j', ':b#<cr>', { desc = 'Jump buffer' })
-vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
+vim.keymap.set('n', '<leader>F', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
 vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Command -> tab' })
 vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Tab' })
 
 vim.keymap.set('n', 'QQ', ':q! <cr>', { desc = 'Quit, no save' })
+vim.keymap.set('n', 'qq', ':q <cr>', { desc = 'Quit' })
 
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
