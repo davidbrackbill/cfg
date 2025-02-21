@@ -133,14 +133,13 @@ require('lazy').setup({
     opts = {
       preset = "helix",
       delay = 0,
-      sort = { "alphanum" },
+      sort = { "manual" },
       spec = {
         -- Names
         { '<leader>G', group = 'Git' },
         { '<leader>G', group = 'Git',         mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
-        { '?',         group = 'Search' },
         { 'g',         group = 'Goto' },
         { ',',         group = 'Conjure' },
         { ']',         group = 'Treesitter->' },
@@ -155,7 +154,7 @@ require('lazy').setup({
         colors = false,
         keys = {
           Esc = "Esc",
-          BS = "B⌴",
+          BS = "<==",
           Space = "⌴ ",
           Tab = "Tab",
         },
@@ -396,7 +395,7 @@ vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Last buffer' })
 vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Sub text' })
-vim.keymap.set('n', '<leader>c', ':tabnew | r ! ', { desc = 'Cmd->tab' })
+vim.keymap.set('n', '<leader>;', ':tabnew | r ! ', { desc = 'Tab!' })
 vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Next tab' })
 
 vim.keymap.set('n', 'QQ', ':q! <cr>', { desc = 'Quit, no save' })
@@ -510,19 +509,19 @@ vim.keymap.set('n', '<leader>`', telebuilt.builtin, { desc = 'Help' })
 vim.keymap.set('n', '\\a', telebuilt.diagnostics, { desc = 'Diagnostics list' })
 
 -- Leaders
-vim.keymap.set('n', '<leader><space>', telebuilt.find_files, { desc = 'Files' })
-vim.keymap.set('n', '<leader>/', grep_files, { desc = 'Files 🔍' })
-vim.keymap.set('n', '<leader>?', grep_buffer, { desc = 'Buffer 🔍' })
-vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Buffers' })
-vim.keymap.set('n', '<leader>B', grep_buffers, { desc = 'Buffers 🔍' })
-vim.keymap.set('n', '<leader>r', telebuilt.git_files, { desc = 'Repo' })
-vim.keymap.set('n', '<leader>R', grep_git_root, { desc = 'Repo 🔍' })
-vim.keymap.set('n', '<leader>o', telebuilt.oldfiles, { desc = 'Oldfiles' })
-vim.keymap.set('n', '<leader>h', search_home, { desc = 'Home' })
-vim.keymap.set('n', '<leader>\\', search_root, { desc = 'Root' })
+vim.keymap.set('n', '<leader><space>', telebuilt.find_files, { desc = 'Files📜' })
+vim.keymap.set('n', '<leader>/', grep_files, { desc = 'Files🔍' })
+vim.keymap.set('n', '<leader>?', grep_buffer, { desc = 'Page🔍' })
+vim.keymap.set('n', '<leader>b', telebuilt.buffers, { desc = 'Buf📜' })
+vim.keymap.set('n', '<leader>B', grep_buffers, { desc = 'Buf🔍' })
+vim.keymap.set('n', '<leader>r', telebuilt.git_files, { desc = 'Repo📜' })
+vim.keymap.set('n', '<leader>R', grep_git_root, { desc = 'Repo🔍' })
+vim.keymap.set('n', '<leader>o', telebuilt.oldfiles, { desc = 'Old📜' })
+vim.keymap.set('n', '<leader>h', search_home, { desc = 'Home📜' })
+vim.keymap.set('n', '<leader>\\', search_root, { desc = 'Root📜' })
 -- Grep oldfiles, home, root?
-vim.keymap.set('n', '<leader>*', telebuilt.grep_string, { desc = 'Cursor 🔍' })
-vim.keymap.set('n', '<leader>.', telebuilt.resume, { desc = 'Last search' })
+vim.keymap.set('n', '<leader>*', telebuilt.grep_string, { desc = 'Cursor🔍' })
+vim.keymap.set('n', '<leader>.', telebuilt.resume, { desc = '↩️Search' })
 vim.keymap.set('n', '<leader>d', telebuilt.diagnostics, { desc = 'Diagnostics' })
 
 
