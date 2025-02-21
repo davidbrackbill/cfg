@@ -387,11 +387,13 @@ vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = tr
 vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 
--- Registers, marks
-vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
-
 -- Commands
 vim.keymap.set("", ";", ":")
+vim.keymap.set('c', '<c-k>', '<up>')
+vim.keymap.set('c', '<c-j>', '<down>')
+
+-- Leaders
+vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Jump buffer' })
 vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Replace' })
