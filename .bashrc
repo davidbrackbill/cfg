@@ -175,6 +175,7 @@ function fl {
 function mkgo {
     [ "$1" ] && mkdir -p "$1" && cd "$1" 
 }
+alias mkcd="mkgo"
 
 # [[Functions.todo]]]]
 
