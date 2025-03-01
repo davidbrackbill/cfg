@@ -315,6 +315,8 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  'windwp/nvim-ts-autotag',
+
   {
     "jay-babu/mason-null-ls.nvim",
     event = { "BufReadPre", "BufNewFile" },
@@ -636,6 +638,24 @@ null_ls.setup({
   sources = {
     null_ls.builtins.formatting.black,
   },
+})
+
+-- Closes html tags for you
+require('nvim-ts-autotag').setup({
+  opts = {
+    -- Defaults
+    enable_close = true, -- Auto close tags
+    enable_rename = true, -- Auto rename pairs of tags
+    enable_close_on_slash = false -- Auto close on trailing </
+  },
+  -- Also override individual filetype configs, these take priority.
+  -- Empty by default, useful if one of the "opts" global settings
+  -- doesn't work well in a specific filetype
+  per_filetype = {
+    ["html"] = {
+      enable_close = false
+    }
+  }
 })
 
 -- Neodev handles neovim lua-ls (LSP) configuration
