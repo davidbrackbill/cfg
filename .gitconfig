@@ -9,6 +9,7 @@
 	editor = nvim
 [credential]
 	useHttpPath = true
+	helper = store
 [init]
 	defaultBranch = main
 [diff]
