@@ -338,9 +338,9 @@ require('lazy').setup({
     event = "VeryLazy",
     keys = {
       {
-        "<leader>F",
+        "<leader>L",
         function() require("yazi").yazi() end,
-        desc = "File manager"
+        desc = "List files (yazi)"
       },
     },
     ---@type YaziConfig
