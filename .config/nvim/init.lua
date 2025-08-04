@@ -318,6 +318,18 @@ require('lazy').setup({
   'windwp/nvim-ts-autotag',
 
   {
+    "luckasRanarison/tailwind-tools.nvim",
+    name = "tailwind-tools",
+    build = ":UpdateRemotePlugins",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      "nvim-telescope/telescope.nvim", -- optional
+      "neovim/nvim-lspconfig", -- optional
+    },
+    opts = {} -- your configuration
+  },
+
+  {
     "jay-babu/mason-null-ls.nvim",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
@@ -628,6 +640,27 @@ local servers = {
   },
 }
 
+require('lspconfig').rust_analyzer.setup {
+  settings = {
+    ["rust-analyzer"] = {
+      diagnostics = {
+        enable = true,
+        disabled = { "inactive-code", "unlinked-file" },
+      },
+    } } }
+
+-- https://github.com/neovim/neovim/issues/30985
+-- Fix by upgrading from v10.2->10.3
+for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) do
+    local default_diagnostic_handler = vim.lsp.handlers[method]
+    vim.lsp.handlers[method] = function(err, result, context, config)
+        if err ~= nil and err.code == -32802 then
+            return
+        end
+        return default_diagnostic_handler(err, result, context, config)
+    end
+end
+
 -- Null-ls pretends it's an LSP
 -- Enables Python to format with "LSP" but actually using black
 require("mason-null-ls").setup({
@@ -680,6 +713,7 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
+
 
 -- [[ Configure Wilder ]]
 local wilder = require('wilder')
