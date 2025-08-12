@@ -79,6 +79,8 @@ xterm*|rxvt*)
     ;;
 esac
 
+export BROWSER='/mnt/c/Users/dmbra/AppData/Local/Vivaldi/Application/vivaldi.exe'
+
 # [[Sources]]
 
 function safe_source {
