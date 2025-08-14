@@ -130,7 +130,7 @@ esac
 safe_source "$HOME/.cargo/env"
 
 export GOPATH=$HOME/.go
-
+export PATH=$PATH:/home/david/.go/bin
 
 # [[Functions.directory]]
 
