@@ -1,0 +1,10 @@
+[snapshot]
+auto-track = "none()"
+
+[user]
+name = "davidbrackbill"
+email = "dmbrackbill@gmail.com"
+
+[ui]
+editor = "nvim"
+default-command = "status"
