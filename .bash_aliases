@@ -25,25 +25,9 @@ alias la='ls -A'
 # Creates a git directory over the entire $HOME, while hiding the directory
 # elsewhere, allowing a hidden `cfg` alias to access the shadow work tree
 alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
-alias gitc="git commit -am"
-alias gitst="git status"
-alias gitl="git log"
-alias gitd="git diff"
-alias cfgc="cfg commit -am"
-alias cfgst="cfg status"
-alias cfgl="cfg log"
-alias cfgd="cfg diff"
 alias lg="lazygit"
 
-# [[GUIs]]
-alias pyc="sh /opt/pycharm-2023.2/bin/pycharm.sh"
-alias clion="sh /opt/clion-2024.2/bin/clion.sh"
-alias chr="google-chrome"
-alias idea="sh /opt/idea-IU-232.8660.185/bin/idea.sh"
-alias neo4j="/home/david/Programs/neo4j-desktop-1.5.8-x86_64.AppImage"
-
 # [[Language runtimes]]
-alias dev="run dev -- --open" 
 alias prt="npx prettier --write ."
 alias py10="python3.10"
 alias py11="python3.11"
@@ -51,7 +35,6 @@ alias pipf="pip list --format=freeze > requirements.txt"
 
 # [[~/.bashrc function aliases]]
 alias l="yy"
-alias ntd="nvim todo"
 
 # [[Conditionals]]
 if [ RC_DIRCOLORS ]; then
