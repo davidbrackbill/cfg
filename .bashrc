@@ -282,26 +282,14 @@ function ccpp {
     g++ "$1.cpp" -o "./$1.out" && "./$1.out" "${@:2}"
 }
 
+function pdf {
+    nohup "/mnt/c/Program Files/sioyek-release-windows/sioyek.exe" $1 &
+}
+
 # [[Aliases]]
 # Should come after other sources to override any sourced aliases
 
 safe_source ~/.bash_aliases
-
-# >>> conda initialize >>>
-# # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/share/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "/share/miniconda3/etc/profile.d/conda.sh" ]; then
-#         . "/share/miniconda3/etc/profile.d/conda.sh"
-#     else
-#         export PATH="/share/miniconda3/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
-# <<< conda initialize <<<
-
 
 . "$HOME/.atuin/bin/env"
 
