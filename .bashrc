@@ -6,6 +6,11 @@ case $- in
       *) return;;
 esac
 
+# # Startup profiling
+# exec 3>&2 2> >(tee /tmp/bash_profile_$$.log >&2)
+# PS4='+ $(date "+%s.%N") [${BASH_SOURCE}:${LINENO}] '
+# set -x
+
 shopt -s histappend
 HISTSIZE=100000
 HISTFILESIZE=1000000
@@ -95,7 +100,6 @@ safe_source /usr/share/doc/fzf/examples/key-bindings.bash
 # enable completion if non-posix is ok
 if ! shopt -oq posix; then
   safe_source /usr/share/bash-completion/bash_completion
-  safe_source /etc/bash_completion 
 fi
 
 # Haskell
@@ -115,10 +119,14 @@ fi
 export EDITOR=nvim
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Load node version manager
-export NVM_DIR="$HOME/.nvm"
-safe_source "$NVM_DIR/nvm.sh"
-safe_source "$NVM_DIR/bash_completion"
+# Lazy load NVM
+export NVM_DIR=/home/david/.nvm
+nvm() {
+    unset -f nvm
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
 
 export PNPM_HOME="/home/david/.local/share/pnpm"
 case ":$PATH:" in
@@ -295,3 +303,8 @@ safe_source ~/.bash_aliases
 
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(atuin init bash)"
+
+# # Print startup profiling
+# set +x
+# exec 2>&3 3>&-
+# echo "Startup profile saved to: /tmp/bash_profile_$$.log"
