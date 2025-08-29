@@ -120,7 +120,7 @@ export EDITOR=nvim
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # Lazy load NVM
-export NVM_DIR=/home/david/.nvm
+export NVM_DIR=~/.nvm
 nvm() {
     unset -f nvm
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
