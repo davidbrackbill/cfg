@@ -22,31 +22,6 @@ require('lazy').setup({
 
   'gelguy/wilder.nvim',
 
-  -- Allow repl behavior in nvim
-  -- Commented out because it takes a long time to load
-  {
-    "Olical/conjure",
-    ft = { "python", "fennel", "python" }, -- etc
-    lazy = true,
-    init = function()
-      -- Conjure config [:help conjure]
-      vim.g["conjure#mapping#enable_defaults"] = false
-      vim.g["conjure#mapping#prefix"] = ','
-      vim.g["conjure#mapping#log_vsplit"] = 'L'
-      vim.g["conjure#mapping#log_toggle"] = 'l'
-      vim.g["conjure#mapping#log_reset_soft"] = 'r'
-      vim.g["conjure#mapping#log_reset_hard"] = 'R'
-      vim.g["conjure#mapping#eval_buf"] = 'b'
-      vim.g["conjure#mapping#eval_visual"] = 'v'
-      vim.g["conjure#mapping#eval_motion"] = 'm'
-      vim.g["conjure#mapping#eval_current_form"] = 'c'
-      vim.g["conjure#mapping#eval_comment_current_form"] = 'C'
-      -- Client config [:help conjure-client-python-stdio]
-      vim.g["conjure#client#python#stdio#mapping#start"] = 's'
-      vim.g["conjure#client#python#stdio#mapping#stop"] = 'S'
-    end,
-  },
-
   {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -314,17 +289,4 @@ require('lazy').setup({
     -- this is equivalent to setup({}) function
   }
 
-  -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
-  --       These are some example plugins that I've included in the kickstart repository.
-  --       Uncomment any of the lines below to enable them.
-  -- require 'kickstart.plugins.autoformat',
-  -- require 'kickstart.plugins.debug',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    You can use this folder to prevent any conflicts with this init.lua if you're interested in keeping
-  --    up-to-date with whatever is in the kickstart repo.
-  --    Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --
-  --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
-  -- { import = 'custom.plugins' },
 }, {})
