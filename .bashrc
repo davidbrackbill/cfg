@@ -29,6 +29,7 @@ safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
 safe_source /opt/homebrew/etc/profile.d/bash_completion.sh
 safe_source "$HOME/.ghcup/env"
 safe_source "$HOME/.cargo/env"
+safe_source ~/.git.env
 safe_source ~/.ld.env
 safe_source ~/.bash_aliases
 

@@ -50,6 +50,27 @@ if [ ! -f "$HOME/.ld.env" ]; then
 EOF
 fi
 
+if [ ! -f "$HOME/.git.env" ]; then
+    echo "==> Setting up git identity (~/.git.env)..."
+    while true; do
+        read -rp "  Git name:  " git_name
+        read -rp "  Git email: " git_email
+        echo ""
+        echo "  Name:  $git_name"
+        echo "  Email: $git_email"
+        read -rp "  Look good? [y/n] " confirm
+        [[ "$confirm" == "y" ]] && break
+    done
+    cat > "$HOME/.git.env" <<EOF
+# Git identity — do not commit
+export GIT_AUTHOR_NAME="$git_name"
+export GIT_AUTHOR_EMAIL="$git_email"
+export GIT_COMMITTER_NAME="\$GIT_AUTHOR_NAME"
+export GIT_COMMITTER_EMAIL="\$GIT_AUTHOR_EMAIL"
+EOF
+    echo "  Saved to ~/.git.env"
+fi
+
 # ── Homebrew bash ──────────────────────────────────────────────────────────────
 BREW_BASH=/opt/homebrew/bin/bash
 if ! grep -qF "$BREW_BASH" /etc/shells 2>/dev/null; then
