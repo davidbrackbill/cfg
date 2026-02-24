@@ -3,7 +3,7 @@
 	helper = !gh auth git-credential
 [user]
 	name = David Brackbill
-	email = dmbrackbill@gmail.com
+	email = dbrackbill@launchdarkly.com
 [core]
 	autocrlf = input
 	editor = nvim

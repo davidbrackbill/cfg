@@ -185,11 +185,6 @@ require('lazy').setup({
   },
 
   {
-    "EdenEast/nightfox.nvim",
-    priority = 1000,
-  },
-
-  {
     'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {

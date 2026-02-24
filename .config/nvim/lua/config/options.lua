@@ -40,5 +40,5 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Environment files
-vim.g.python3_host_prog = '/usr/bin/python3'
+vim.g.python3_host_prog = vim.fn.exepath('python3')
 vim.env.BASH_ENV = "~/.bash_aliases"

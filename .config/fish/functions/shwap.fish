@@ -1,3 +1,0 @@
-function shwap
-    exit
-end
