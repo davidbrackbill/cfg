@@ -1,310 +1,82 @@
-# [[Options]]
-
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
       *) return;;
 esac
 
-# # Startup profiling
-# exec 3>&2 2> >(tee /tmp/bash_profile_$$.log >&2)
-# PS4='+ $(date "+%s.%N") [${BASH_SOURCE}:${LINENO}] '
-# set -x
+# [[Options]]
+shopt -s histappend checkwinsize globstar nullglob expand_aliases autocd
 
-shopt -s histappend
 HISTSIZE=100000
 HISTFILESIZE=1000000
-# don't put duplicate lines or lines starting with space in the history.
 HISTCONTROL=ignoreboth
 HISTIGNORE='ls:bg:fg:history'
 HISTTIMEFORMAT='%F %T '
-
 PROMPT_DIRTRIM=1
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# Expand **
-shopt -s globstar
-
-shopt -s nullglob
-
-shopt -s expand_aliases
-
-shopt -s autocd
-
 set -o vi
-
-# Remove <alt-Num> in bash and any other readline program
 bind -f ~/.inputrc
 
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
-case "$TERM" in
-    xterm-color|*-256color) color_prompt=yes;;
-esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-#force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
-    else
-	color_prompt=
-    fi
-fi
-
-if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-unset color_prompt force_color_prompt
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
-export BROWSER='/mnt/c/Users/dmbra/AppData/Local/Vivaldi/Application/vivaldi.exe'
-
 # [[Sources]]
+safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
 
-function safe_source {
-    if [ "$#" -eq 1 ] && [ -s "$1" ]; then
-	source "$1"
-    fi
-}
+[[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
-#   Reverse i search using fzf
-safe_source /usr/share/doc/fzf/examples/key-bindings.bash
-
-# enable completion if non-posix is ok
-if ! shopt -oq posix; then
-  safe_source /usr/share/bash-completion/bash_completion
-fi
-
-# Haskell
-safe_source /home/david/.ghcup/env
+safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
+safe_source /opt/homebrew/etc/profile.d/bash_completion.sh
+safe_source "$HOME/.ghcup/env"
+safe_source "$HOME/.cargo/env"
+safe_source ~/.ld.env
+safe_source ~/.bash_aliases
 
 # [[Exports]]
-
-if [ -x /usr/bin/dircolors ]; then
-    if [ -r ~/.dircolors ]; then
-	eval "$(dircolors -b ~/.dircolors)" 
-    else
-	eval "$(dircolors -b)"
-    fi
-    export DIRCOLORS=true
-fi
-
 export EDITOR=nvim
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Lazy load NVM
-export NVM_DIR=~/.nvm
-nvm() {
-    unset -f nvm
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    nvm "$@"
-}
-
-export PNPM_HOME="/home/david/.local/share/pnpm"
+# PNPM
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+    *":$PNPM_HOME:"*) ;;
+    *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
-# Load cargo
-safe_source "$HOME/.cargo/env"
+# Go tools
+export PATH="$PATH:$HOME/go/bin"
 
-export GOPATH=$HOME/.go
-export PATH=$PATH:/home/david/.go/bin
+# [[Functions]]
 
-# [[Functions.directory]]
-
-function fr {
-    # Find file (from [R]oot, by default)
-    local dir="${1-"/"}"
-    local args=${@:2}
-    fdfind "." "$dir" --hidden --exclude "{.git, node_modules, __pycache,.npm,.cache}" |
-        fzf-tmux --select-1 --query "${args-""}"
+# Fuzzy-find a file/dir under $dir
+fr() {
+    local dir="${1:-/}"
+    fd . "$dir" --hidden --exclude .git --exclude node_modules --exclude __pycache__ |
+        fzf-tmux --select-1 --query "${*:2}"
 }
 
-function f {
-    # Find and open
-
-    local path=$(fr "${HOME}" "${*}")
-    
-    # Open directory
-    if [[ -d $path ]]; then
-	cd "$path"
-	return 1
-
-    # Open file using nvim
-    else
-	cd "$(dirname "$path")"
-	nvim "$path"
-    fi
+# Find and cd-to / open in nvim
+f() {
+    local path
+    path=$(fr "$HOME" "$*")
+    [[ -d $path ]] && cd "$path" || { cd "$(dirname "$path")" && nvim "$path"; }
 }
 
-# CD to the dir Yazi exited from
-function yy() {
-    local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+# Yazi file manager, cd to exit dir
+yy() {
+    local tmp
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
     yazi "$@" --cwd-file="$tmp"
     if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-	    cd -- "$cwd"
+        cd -- "$cwd"
     fi
     rm -f -- "$tmp"
 }
 
-function fl {
-    # Find then [L]ist, if applicable
-    f "${*}" || yy
-}
-
-function mkgo {
-    [ "$1" ] && mkdir -p "$1" && cd "$1" 
-}
-alias mkcd="mkgo"
-
-# [[Functions.todo]]]]
-
-#todo
-function td {
-    if [ "$1" ] 
-        then echo $@ >> todo
-    fi
-    cl
-    bat todo
-}
-
-#todo insert
-function tdi {
-    sed -i "$1i ${*:2}" todo
-    cl
-    bat todo
-}
-
-#todo remove
-function tdr {
-    # Delete first line if unspecified
-    for del_line in ${@:-1}
-    do
-	# Mark lines before removing
-	sed -i "${del_line}s/^/✓/" todo
-    done
-    cl
-    # Print, archive, and delete marked lines
-    grep "^✓" todo
-    sed -n 's/^✓//p' todo | awk '{ print strftime("%Y-%m-%dT%H:%M:%SZ"), $0 }' >> .todo
-    sed -i '/^✓/d' todo
-    bat todo
-}
-
-#todo head
-function tdh {
-    cl && head -${1:-1} todo
-}
-
-#todo last
-function tdl {
-    cl
-    # Print everything except the timestamp
-    tail -n ${1:-1} .todo | tac | awk '{print substr($0, index($0, $2))}'
-}
-
-# [[Functions.python]]
-
-function py {
-    local usage="USAGE: py [minor_version=10] [command={'venv'|'test'}] [subcommand={'local'}]"
-    local minor_version="${1-"10"}"
-    local command="$2"
-    local subcommand="$3"
-
-    if ((minor_version < 10 || minor_version > 12)); then
-	echo "ERROR: Minor version $minor_version not allowed"
-	echo "$usage"
-
-    elif [[ -z $command ]]; then
-	eval "python3.$minor_version"
-
-    elif [[ -f $command ]]; then
-	eval "python3.$minor_version $command"
-
-    elif [[ "$command" = "test" ]]; then
-	eval "python3.$minor_version -m pytest $subcommand"
-
-    elif [[ "$command" = "venv" ]]; then
-	if [[ "$subcommand" = "local" ]]; then
-	    # Make local venv if needed
-	    if ! [[ -d "./venv__3_$minor_version" ]]; then
-		echo "Making venv at ./venv__3_$minor_version"
-		eval "python3.$minor_version -m venv venv__3_$minor_version"
-	    fi
-	    eval "source ./venv__3_$minor_version/bin/activate"
-	else
-	    eval ". /home/david/.global_venv/venv__3_$minor_version/bin/activate"
-	fi
-
-    else
-	echo "ERROR: Command $command not allowed"
-	echo "$usage"
-    fi
-
-}
-
-function ta {
-    if [ -n "${1}" ]; then
-	tmux a -t "${1}"
-    else
-	# Show listing or open if not yet open
-	tmux ls || tmux
-    fi
-}
-
-function ccpls {
-    cc "$1.c" -o "./$1.out" && "./$1.out" "${@:2}"
-}
-
-function ccpp {
-    g++ "$1.cpp" -o "./$1.out" && "./$1.out" "${@:2}"
-}
-
-function pdf {
-    nohup "/mnt/c/Program Files/sioyek-release-windows/sioyek.exe" $1 &
-}
-
-# [[Aliases]]
-# Should come after other sources to override any sourced aliases
-
-safe_source ~/.bash_aliases
-
-. "$HOME/.atuin/bin/env"
-
+# [[Atuin]]
+safe_source "$HOME/.atuin/bin/env"
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
-eval "$(atuin init bash)"
+command -v atuin &>/dev/null && eval "$(atuin init bash)"
 
-# # Print startup profiling
-# set +x
-# exec 2>&3 3>&-
-# echo "Startup profile saved to: /tmp/bash_profile_$$.log"
+# [[Mise]] — runtime version manager (python, node, go, etc.)
+command -v mise &>/dev/null && eval "$(mise activate bash)"
+
+# [[Starship prompt]]
+command -v starship &>/dev/null && eval "$(starship init bash)"
