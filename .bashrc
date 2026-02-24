@@ -1,3 +1,6 @@
+# Available in all shells
+cfg() { git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"; }
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -20,7 +23,7 @@ bind -f ~/.inputrc
 # [[Sources]]
 safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
 
-[[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
 
 safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
 safe_source /opt/homebrew/etc/profile.d/bash_completion.sh
@@ -84,8 +87,8 @@ safe_source "$HOME/.atuin/bin/env"
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 command -v atuin &>/dev/null && eval "$(atuin init bash)"
 
-# [[Mise]] — runtime version manager (python, node, go, etc.)
-command -v mise &>/dev/null && eval "$(mise activate bash)"
+# [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
+export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # [[Starship prompt]]
 command -v starship &>/dev/null && eval "$(starship init bash)"

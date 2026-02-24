@@ -25,7 +25,6 @@ alias grep="grep --color=auto"
 alias l="yy"
 
 # [[Git]]
-alias cfg="/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME"
 alias lg="lazygit"
 
 # [[Language runtimes]]

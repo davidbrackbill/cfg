@@ -1,0 +1,10 @@
+format = "$directory$character"
+
+[directory]
+style = "blue bold"
+truncation_length = 4
+truncate_to_repo = false
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"

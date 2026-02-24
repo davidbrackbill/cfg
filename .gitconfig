@@ -2,8 +2,7 @@
 	helper = 
 	helper = !gh auth git-credential
 [user]
-	name = David Brackbill
-	email = dbrackbill@launchdarkly.com
+	# name and email loaded from ~/.git.env via GIT_AUTHOR_*/GIT_COMMITTER_* env vars
 [core]
 	autocrlf = input
 	editor = nvim
