@@ -70,6 +70,15 @@ yy() {
     rm -f -- "$tmp"
 }
 
+# Tmux attach (by name), or list sessions / open new
+ta() {
+    if [ -n "${1}" ]; then
+        tmux a -t "${1}"
+    else
+        tmux ls || tmux
+    fi
+}
+
 # [[Atuin]]
 safe_source "$HOME/.atuin/bin/env"
 [[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
