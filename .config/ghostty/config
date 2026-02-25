@@ -11,6 +11,7 @@ confirm-close-surface = false
 
 # Send ESC sequences for Option key so alt+f, alt+b, etc. work in tmux/bash vi-mode
 macos-option-as-alt = true
+macos-secure-input-indication = false
 macos-titlebar-style = hidden
 window-padding-y = 0
 window-padding-balance = true
