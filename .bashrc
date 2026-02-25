@@ -89,9 +89,5 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 # [[Starship prompt]]
 command -v starship &>/dev/null && eval "$(starship init bash)"
 
-# [[Atuin]]
-safe_source "$HOME/.atuin/bin/env"
-[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
-command -v atuin &>/dev/null && eval "$(atuin init bash)"
-source ~/.launchdarklyrc
+safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
