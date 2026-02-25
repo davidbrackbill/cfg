@@ -83,13 +83,15 @@ ta() {
     fi
 }
 
-# [[Atuin]]
-safe_source "$HOME/.atuin/bin/env"
-[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
-command -v atuin &>/dev/null && eval "$(atuin init bash)"
-
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # [[Starship prompt]]
 command -v starship &>/dev/null && eval "$(starship init bash)"
+
+# [[Atuin]]
+safe_source "$HOME/.atuin/bin/env"
+[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
+command -v atuin &>/dev/null && eval "$(atuin init bash)"
+source ~/.launchdarklyrc
+export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
