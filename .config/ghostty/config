@@ -11,7 +11,9 @@ confirm-close-surface = false
 
 # Send ESC sequences for Option key so alt+f, alt+b, etc. work in tmux/bash vi-mode
 macos-option-as-alt = true
-window-decoration = none
+macos-titlebar-style = hidden
+window-padding-y = 0
+window-padding-balance = true
 
 # [[Keybindings]]
 # Make cmd+t/cmd+w send ctrl+t/ctrl+w (e.g. for tmux window/pane management)
