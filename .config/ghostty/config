@@ -1,0 +1,19 @@
+# [[Shell]]
+# Force homebrew bash (avoids macOS GUI session inheriting old $SHELL=/bin/bash 3.2)
+# command = /opt/homebrew/bin/bash
+
+# [[Appearance]]
+font-size = 16
+
+# [[Behavior]]
+# No confirmation prompt when closing a tab/window
+confirm-close-surface = false
+
+# Send ESC sequences for Option key so alt+f, alt+b, etc. work in tmux/bash vi-mode
+macos-option-as-alt = true
+window-decoration = none
+
+# [[Keybindings]]
+# Make cmd+t/cmd+w send ctrl+t/ctrl+w (e.g. for tmux window/pane management)
+keybind = super+t=text:\x14
+keybind = super+w=text:\x17
