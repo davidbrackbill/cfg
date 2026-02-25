@@ -83,6 +83,9 @@ ta() {
     fi
 }
 
+# Lazygit for dotfiles bare repo
+cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
+
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 

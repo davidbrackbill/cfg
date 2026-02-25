@@ -3,7 +3,7 @@
 # command = /opt/homebrew/bin/bash
 
 # [[Appearance]]
-font-size = 16
+font-size = 18
 
 # [[Behavior]]
 # No confirmation prompt when closing a tab/window
