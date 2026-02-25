@@ -23,35 +23,69 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 end
 
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
+-- mason-lspconfig requires mason to be set up first
 require('mason').setup()
-require('mason-lspconfig').setup()
 
-local servers = {
-  clangd = { filetypes = { "c", "cpp", "objc", "objcpp", "cuda" } }, -- exclude .proto
-  pyright = {},
-  svelte = { filetypes = { "svelte" } },
-  ts_ls = {},
-  tinymist = { filetypes = { "typ" } },
+-- nvim-cmp supports additional completion capabilities, so broadcast that to servers
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-  lua_ls = {
+-- Neodev handles neovim lua-ls (LSP) configuration, must come before lua_ls config
+require('neodev').setup()
+
+-- Global defaults applied to all servers (replaces setup_handlers default function)
+vim.lsp.config('*', {
+  on_attach = on_attach,
+  capabilities = capabilities,
+})
+
+-- Per-server settings
+vim.lsp.config('clangd', {
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda" }, -- exclude .proto
+})
+
+vim.lsp.config('svelte', {
+  filetypes = { "svelte" },
+})
+
+vim.lsp.config('tinymist', {
+  filetypes = { "typ" },
+})
+
+vim.lsp.config('lua_ls', {
+  settings = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
       diagnostics = { disable = { 'missing-fields' } },
     },
   },
-}
+})
 
-require('lspconfig').rust_analyzer.setup {
+vim.lsp.config('tailwindcss', {
+  capabilities = {
+    textDocument = {
+      colorProvider = { dynamicRegistration = true },
+    },
+  },
+})
+
+vim.lsp.config('rust_analyzer', {
   settings = {
     ["rust-analyzer"] = {
       diagnostics = {
         enable = true,
         disabled = { "inactive-code", "unlinked-file" },
       },
-    } } }
+    },
+  },
+})
+
+-- mason-lspconfig: ensure servers installed, automatic_enable = true by default
+-- which calls vim.lsp.enable() for installed servers, picking up config above
+require('mason-lspconfig').setup({
+  ensure_installed = { 'clangd', 'pyright', 'svelte', 'ts_ls', 'tinymist', 'lua_ls' },
+})
 
 -- https://github.com/neovim/neovim/issues/30985
 -- Fix by upgrading from v10.2->10.3
@@ -80,40 +114,13 @@ null_ls.setup({
 -- Closes html tags for you
 require('nvim-ts-autotag').setup({
   opts = {
-    -- Defaults
-    enable_close = true,          -- Auto close tags
-    enable_rename = true,         -- Auto rename pairs of tags
-    enable_close_on_slash = false -- Auto close on trailing </
+    enable_close = true,
+    enable_rename = true,
+    enable_close_on_slash = false,
   },
-  -- Also override individual filetype configs, these take priority.
-  -- Empty by default, useful if one of the "opts" global settings
-  -- doesn't work well in a specific filetype
   per_filetype = {
     ["html"] = {
       enable_close = false
     }
   }
 })
-
--- Neodev handles neovim lua-ls (LSP) configuration
-require('neodev').setup()
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
-local mason_lspconfig = require 'mason-lspconfig'
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require('lspconfig')[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end,
-}

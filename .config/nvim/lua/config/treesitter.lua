@@ -1,56 +1,43 @@
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
--- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
+-- New nvim-treesitter API: install parsers, highlight is automatic once installed
 vim.defer_fn(function()
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'javascript', 'typescript', 'svelte', 'css', 'html', 'vimdoc', 'vim', 'bash' },
-    auto_install = true,
-    sync_install = false,
-    ignore_install = {},
-    modules = {},
-    highlight = { enable = true },
-    indent = { enable = false },
-    incremental_selection = {
+  require('nvim-treesitter').install({
+    'c', 'cpp', 'go', 'lua', 'python', 'rust',
+    'javascript', 'typescript', 'svelte', 'css', 'html',
+    'vimdoc', 'vim', 'bash',
+  })
+
+  require('nvim-treesitter-textobjects').setup({
+    select = {
       enable = true,
+      lookahead = true,
       keymaps = {
-        init_selection = '<c-space>',
-        node_incremental = '<c-space>',
-        scope_incremental = '<c-s>',
-        node_decremental = '<M-space>',
+        ['af'] = '@function.outer',
+        ['if'] = '@function.inner',
+        ['ac'] = '@class.outer',
+        ['ic'] = '@class.inner',
       },
     },
-    textobjects = {
-      select = {
-        enable = true,
-        lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-        keymaps = {
-          -- You can use the capture groups defined in textobjects.scm
-          ['af'] = '@function.outer',
-          ['if'] = '@function.inner',
-          ['ac'] = '@class.outer',
-          ['ic'] = '@class.inner',
-        },
+    move = {
+      enable = true,
+      set_jumps = true,
+      goto_next_start = {
+        [']f'] = '@function.outer',
+        [']c'] = '@class.outer',
       },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']f'] = '@function.outer',
-          [']c'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']F'] = '@function.outer',
-          [']C'] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[f'] = '@function.outer',
-          ['[c'] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[F'] = '@function.outer',
-          ['[C'] = '@class.outer',
-        },
+      goto_next_end = {
+        [']F'] = '@function.outer',
+        [']C'] = '@class.outer',
+      },
+      goto_previous_start = {
+        ['[f'] = '@function.outer',
+        ['[c'] = '@class.outer',
+      },
+      goto_previous_end = {
+        ['[F'] = '@function.outer',
+        ['[C'] = '@class.outer',
       },
     },
-  }
+  })
 end, 0)

@@ -241,7 +241,9 @@ require('lazy').setup({
       "nvim-telescope/telescope.nvim", -- optional
       "neovim/nvim-lspconfig", -- optional
     },
-    opts = {} -- your configuration
+    opts = {
+      server = { override = false }, -- use vim.lsp.config / mason-lspconfig instead of lspconfig
+    }
   },
 
   {
@@ -284,4 +286,8 @@ require('lazy').setup({
     -- this is equivalent to setup({}) function
   }
 
-}, {})
+}, {
+  git = {
+    filter = false,
+  },
+})
