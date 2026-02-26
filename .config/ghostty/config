@@ -3,7 +3,10 @@
 # command = /opt/homebrew/bin/bash
 
 # [[Appearance]]
+theme=Dracula
 font-size = 18
+minimum-contrast = 3
+window-save-state = always
 
 # [[Behavior]]
 # No confirmation prompt when closing a tab/window
@@ -20,3 +23,4 @@ window-padding-balance = true
 # Make cmd+t/cmd+w send ctrl+t/ctrl+w (e.g. for tmux window/pane management)
 keybind = super+t=text:\x14
 keybind = super+w=text:\x17
+keybind = super+enter=unbind
