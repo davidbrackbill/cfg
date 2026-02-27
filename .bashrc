@@ -97,3 +97,4 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 
 safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
+. "$HOME/.cargo/env"
