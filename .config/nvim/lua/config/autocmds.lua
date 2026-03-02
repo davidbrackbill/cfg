@@ -11,6 +11,16 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLea
   desc = "Auto Save",
 })
 
+-- Disable hard line wrapping in git commit messages
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "gitcommit",
+  callback = function()
+    vim.opt_local.textwidth = 0
+    vim.opt_local.formatoptions:remove("t")
+  end,
+  desc = "No hard wrap in git commits",
+})
+
 -- [[ Highlight on yank ]]
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
