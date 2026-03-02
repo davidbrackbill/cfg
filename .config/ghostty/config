@@ -24,3 +24,39 @@ window-padding-balance = true
 keybind = super+t=text:\x14
 keybind = super+w=text:\x17
 keybind = super+enter=unbind
+
+# Cmd+f = tmux prefix (sends Alt+f)
+keybind = super+f=text:\x1bf
+
+# Cmd+key for tmux global shortcuts (sends Alt+key)
+keybind = super+l=text:\x1bl
+keybind = super+s=text:\x1bs
+keybind = super+j=text:\x1bj
+keybind = super+k=text:\x1bk
+keybind = super+slash=text:\x1b/
+keybind = super+period=text:\x1b.
+keybind = super+comma=text:\x1b,
+
+# Cmd+Num = select window
+keybind = super+1=text:\x1b1
+keybind = super+2=text:\x1b2
+keybind = super+3=text:\x1b3
+keybind = super+4=text:\x1b4
+keybind = super+5=text:\x1b5
+keybind = super+6=text:\x1b6
+keybind = super+7=text:\x1b7
+keybind = super+8=text:\x1b8
+keybind = super+9=text:\x1b9
+keybind = super+0=text:\x1b0
+
+# Cmd+Shift+Num = move window to position
+keybind = super+shift+1=text:\x1b!
+keybind = super+shift+2=text:\x1b@
+keybind = super+shift+3=text:\x1b#
+keybind = super+shift+4=text:\x1b$
+keybind = super+shift+5=text:\x1b%
+keybind = super+shift+6=text:\x1b^
+keybind = super+shift+7=text:\x1b&
+keybind = super+shift+8=text:\x1b*
+keybind = super+shift+9=text:\x1b(
+keybind = super+shift+0=text:\x1b)
