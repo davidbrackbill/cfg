@@ -88,6 +88,8 @@ cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
 # Claude Code with a sensible tmux window name
 clod() { tmux rename-window "clod" 2>/dev/null; claude "$@"; tmux rename-window "bash" 2>/dev/null; }
+alias claude=clod
+lazygit() { tmux rename-window "git" 2>/dev/null; command lazygit "$@"; tmux rename-window "bash" 2>/dev/null; }
 
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
