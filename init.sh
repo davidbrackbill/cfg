@@ -16,7 +16,7 @@ echo "==> Installing tools..."
 brew install \
     bash neovim fd bat eza fzf atuin yazi lazygit \
     fish tmux jujutsu rm-improved mise starship \
-    tree-sitter-cli
+    tree-sitter-cli vjeantet/tap/alerter
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
 echo "==> Setting up bare repo at ~/.cfg..."
