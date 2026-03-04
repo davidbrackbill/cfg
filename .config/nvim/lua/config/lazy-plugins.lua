@@ -175,10 +175,7 @@ require('lazy').setup({
         code_style = {
           comments = 'none',
         },
-        colors = {
-          bg0 = '#16181e',
-          fg = '#b6bcc7',
-        },
+
       }
       vim.cmd.colorscheme 'onedark'
     end,
@@ -207,7 +204,7 @@ require('lazy').setup({
 
   {
     'nvim-telescope/telescope.nvim',
-    branch = '0.1.x',
+    branch = 'master',
     dependencies = {
       'nvim-lua/plenary.nvim',
       {
@@ -246,17 +243,18 @@ require('lazy').setup({
     }
   },
 
-  {
-    "jay-babu/mason-null-ls.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "williamboman/mason.nvim",
-      "nvimtools/none-ls.nvim",
-    },
-    opts = {
-      ensure_installed = { "black" },
-    }
 
+  {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,               desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end,          desc = "Flash Treesitter" },
+      { "r", mode = "o",               function() require("flash").remote() end,              desc = "Remote Flash" },
+      { "R", mode = { "o", "x" },      function() require("flash").treesitter_search() end,   desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" },       function() require("flash").toggle() end,               desc = "Toggle Flash Search" },
+    },
   },
 
   {

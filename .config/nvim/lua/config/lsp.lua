@@ -99,18 +99,6 @@ for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) d
     end
 end
 
--- Null-ls pretends it's an LSP
--- Enables Python to format with "LSP" but actually using black
-require("mason-null-ls").setup({
-  ensure_installed = { "black" }
-})
-local null_ls = require("null-ls")
-null_ls.setup({
-  sources = {
-    null_ls.builtins.formatting.black,
-  },
-})
-
 -- Closes html tags for you
 require('nvim-ts-autotag').setup({
   opts = {
