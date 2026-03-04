@@ -39,6 +39,7 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
+      'saghen/blink.cmp',
     },
   },
 
@@ -255,6 +256,7 @@ require('lazy').setup({
   {
     "luckasRanarison/tailwind-tools.nvim",
     name = "tailwind-tools",
+    ft = { 'html', 'css', 'svelte', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
     build = ":UpdateRemotePlugins",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
