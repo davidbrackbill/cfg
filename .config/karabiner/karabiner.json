@@ -1,0 +1,21 @@
+{
+    "profiles": [
+        {
+            "name": "Default",
+            "selected": true,
+            "simple_modifications": [
+                {
+                    "from": {
+                        "key_code": "h",
+                        "modifiers": { "mandatory": ["command"] }
+                    },
+                    "to": [{ "key_code": "vk_none" }]
+                }
+            ],
+            "virtual_hid_keyboard": {
+                "country_code": 0,
+                "keyboard_type_v2": "ansi"
+            }
+        }
+    ]
+}
