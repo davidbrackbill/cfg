@@ -17,7 +17,8 @@ brew install \
     bash neovim fd bat eza fzf atuin yazi lazygit \
     fish tmux jujutsu rm-improved mise starship \
     tree-sitter-cli vjeantet/tap/alerter \
-    1password-cli
+    1password-cli \
+    timg
 
 echo "==> Installing casks..."
 brew tap notwadegrimridge/brew
@@ -25,6 +26,14 @@ brew install --cask \
     karabiner-elements \
     raycast \
     pingplace
+
+# ── Node (via mise) ────────────────────────────────────────────────────────────
+echo "==> Installing node via mise..."
+mise install node@lts
+mise use -g node@lts
+eval "$(mise activate bash)"
+npm install -g @mermaid-js/mermaid-cli
+npx puppeteer browsers install chrome-headless-shell
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
 if [ ! -d "$HOME/.cfg" ]; then

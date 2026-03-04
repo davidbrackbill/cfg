@@ -3,6 +3,11 @@
     "type": "command",
     "command": "input=$(cat); remaining=$(echo \"$input\" | jq -r '.context_window.remaining_percentage // empty'); [ -n \"$remaining\" ] && printf \"Context left: %.0f%%\" \"$remaining\" || echo \"Context left: --\""
   },
+  "permissions": {
+    "allow": [
+      "Bash(mmdc:*)"
+    ]
+  },
   "hooks": {
     "Notification": [{ "matcher": "", "hooks": [{ "type": "command", "command": "printf '\\a' > /dev/tty" }] }],
     "Stop":         [{ "matcher": "", "hooks": [{ "type": "command", "command": "printf '\\a' > /dev/tty" }] }]
