@@ -20,14 +20,20 @@ brew install \
     1password-cli
 
 echo "==> Installing casks..."
+brew tap notwadegrimridge/brew
 brew install --cask \
     karabiner-elements \
-    raycast
+    raycast \
+    pingplace
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
-echo "==> Setting up bare repo at ~/.cfg..."
-cp -r "$REPO_DIR/.git" "$HOME/.cfg"
-git --git-dir="$HOME/.cfg" config --bool core.bare true
+if [ ! -d "$HOME/.cfg" ]; then
+    echo "==> Setting up bare repo at ~/.cfg..."
+    cp -r "$REPO_DIR/.git" "$HOME/.cfg"
+    git --git-dir="$HOME/.cfg" config --bool core.bare true
+else
+    echo "==> ~/.cfg already exists, skipping bare repo setup."
+fi
 
 cfg() { git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"; }
 
