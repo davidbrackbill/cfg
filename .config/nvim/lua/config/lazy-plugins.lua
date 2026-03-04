@@ -20,7 +20,18 @@ require('lazy').setup({
   'tpope/vim-obsession',
   'jeetsukumaran/vim-indentwise',
 
-  'gelguy/wilder.nvim',
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {
+      cmdline = { view = 'cmdline' },
+      presets = {
+        bottom_search = true,
+        long_message_to_split = true,
+      },
+    },
+  },
 
   {
     'neovim/nvim-lspconfig',
@@ -28,23 +39,35 @@ require('lazy').setup({
       { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
       { 'j-hui/fidget.nvim',       opts = {} },
-      'folke/neodev.nvim',
     },
   },
 
   {
-    'hrsh7th/nvim-cmp',
-    dependencies = {
-      -- Snippet Engine & its associated nvim-cmp source
-      'L3MON4D3/LuaSnip',
-      'saadparwaiz1/cmp_luasnip',
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    opts = {
+      library = {
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+      },
+    },
+  },
 
-      -- Adds LSP completion capabilities
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-
-      -- Adds a number of user-friendly snippets
-      'rafamadriz/friendly-snippets',
+  {
+    'saghen/blink.cmp',
+    version = '*',
+    dependencies = { 'rafamadriz/friendly-snippets' },
+    opts = {
+      keymap = {
+        preset = 'default',
+        ['<Tab>']   = { 'show', 'select_next', 'snippet_forward', 'fallback' },
+        ['<S-Tab>'] = { 'select_prev', 'snippet_backward', 'fallback' },
+      },
+      completion = {
+        menu = { auto_show = false },
+      },
+      sources = {
+        default = { 'lsp', 'path', 'snippets', 'buffer' },
+      },
     },
   },
 

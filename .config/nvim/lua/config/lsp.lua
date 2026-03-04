@@ -26,12 +26,7 @@ end
 -- mason-lspconfig requires mason to be set up first
 require('mason').setup()
 
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
-
--- Neodev handles neovim lua-ls (LSP) configuration, must come before lua_ls config
-require('neodev').setup()
+local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 -- Global defaults applied to all servers (replaces setup_handlers default function)
 vim.lsp.config('*', {
@@ -86,18 +81,6 @@ vim.lsp.config('rust_analyzer', {
 require('mason-lspconfig').setup({
   ensure_installed = { 'clangd', 'pyright', 'svelte', 'ts_ls', 'tinymist', 'lua_ls' },
 })
-
--- https://github.com/neovim/neovim/issues/30985
--- Fix by upgrading from v10.2->10.3
-for _, method in ipairs({ 'textDocument/diagnostic', 'workspace/diagnostic' }) do
-    local default_diagnostic_handler = vim.lsp.handlers[method]
-    vim.lsp.handlers[method] = function(err, result, context, config)
-        if err ~= nil and err.code == -32802 then
-            return
-        end
-        return default_diagnostic_handler(err, result, context, config)
-    end
-end
 
 -- Closes html tags for you
 require('nvim-ts-autotag').setup({
