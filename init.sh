@@ -18,7 +18,8 @@ brew install \
     fish tmux jujutsu rm-improved mise starship \
     tree-sitter-cli vjeantet/tap/alerter \
     1password-cli \
-    timg
+    timg \
+    ankitpokhrel/jira-cli/jira-cli
 
 echo "==> Installing casks..."
 brew tap notwadegrimridge/brew
@@ -28,11 +29,11 @@ brew install --cask \
     pingplace
 
 # ── Node (via mise) ────────────────────────────────────────────────────────────
-echo "==> Installing node via mise..."
-mise install node@lts
-mise use -g node@lts
+echo "==> Installing node + pnpm via mise..."
+mise install node@lts pnpm@latest
+mise use -g node@lts pnpm@latest
 eval "$(mise activate bash)"
-npm install -g @mermaid-js/mermaid-cli
+pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence
 npx puppeteer browsers install chrome-headless-shell
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
