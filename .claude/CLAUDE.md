@@ -11,6 +11,15 @@
 - **goenv** manages Go versions (`~/.goenv`). Do NOT use mise or brew for Go.
 - npm globals install via `npm install -g <pkg>` after mise node is active.
 
+## Skills
+
+Skills live in `~/.claude/skills/<name>/SKILL.md` and are invoked as `/<name>`. Each `SKILL.md` has a YAML frontmatter block (`name`, `description`, `argument-hint`) followed by step-by-step instructions for Claude to follow when the skill is triggered. Skills are tracked in `~/.cfg`.
+
+To create a new skill:
+1. `mkdir ~/.claude/skills/<name>`
+2. Write `~/.claude/skills/<name>/SKILL.md` with frontmatter + instructions
+3. Track it: `cfg add ~/.claude/skills/<name>/SKILL.md && cfg commit`
+
 ## ld CLI (Internal Tools)
 
 See [`~/.claude/ld-tools.md`](.claude/ld-tools.md) for full usage.
