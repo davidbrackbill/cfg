@@ -5,7 +5,8 @@
 # [[Appearance]]
 theme=Dracula
 font-size = 18
-minimum-contrast = 3
+minimum-contrast = 5
+background = #1e1b18
 window-save-state = always
 
 # [[Behavior]]
