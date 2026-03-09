@@ -26,7 +26,7 @@ brew tap notwadegrimridge/brew
 brew install --cask \
     karabiner-elements \
     raycast \
-    pingplace
+    hammerspoon
 
 # ── Node (via mise) ────────────────────────────────────────────────────────────
 echo "==> Installing node + pnpm via mise..."
