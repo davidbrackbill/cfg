@@ -21,6 +21,34 @@ require('lazy').setup({
   'jeetsukumaran/vim-indentwise',
 
   {
+    'olimorris/onedarkpro.nvim',
+    priority = 1000,
+    config = function()
+      require('onedarkpro').setup({
+        highlights = {
+          ['@variable.member']      = { fg = '${blue}' },   -- struct fields / object properties
+          ['@variable.parameter']   = { fg = '${orange}' }, -- function parameters
+          ['@type']                 = { fg = '${yellow}' },  -- type names
+          ['@type.builtin']         = { fg = '${yellow}' },  -- string, int, bool, etc.
+          ['@lsp.type.property']    = { fg = '${blue}' },   -- LSP semantic: properties (TS)
+          ['@lsp.type.field']       = { fg = '${blue}' },   -- LSP semantic: fields (Go)
+          ['@lsp.type.parameter']   = { fg = '${orange}' }, -- LSP semantic: parameters
+        },
+      })
+      vim.cmd.colorscheme('onedark_vivid')
+    end,
+  },
+
+  {
+    'EdenEast/nightfox.nvim',
+    -- Non-default variants:
+    -- vim.cmd.colorscheme('carbonfox')  -- dark carbon
+    -- vim.cmd.colorscheme('duskfox')    -- purple
+    -- vim.cmd.colorscheme('nordfox')    -- nord-inspired
+    -- vim.cmd.colorscheme('terafox')    -- green-tinted
+  },
+
+  {
     'folke/noice.nvim',
     event = 'VeryLazy',
     dependencies = { 'MunifTanjim/nui.nvim' },
