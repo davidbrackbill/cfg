@@ -50,6 +50,25 @@ local function buildCycleList()
   return result
 end
 
+function M.toggleHot()
+  local hot = {
+    { id = 'com.mitchellh.ghostty',   win = mainWin('com.mitchellh.ghostty') },
+    { id = 'com.vivaldi.Vivaldi',     win = mainWin('com.vivaldi.Vivaldi') },
+    { id = 'md.obsidian',             win = mainWin('md.obsidian') },
+  }
+  local focusedId = (hs.window.focusedWindow() and
+                     hs.window.focusedWindow():application():bundleID()) or ''
+  local currentIdx = 0
+  for i, entry in ipairs(hot) do
+    if entry.id == focusedId then currentIdx = i; break end
+  end
+  -- advance to next entry that has a window open
+  for offset = 1, #hot do
+    local next = hot[(currentIdx + offset - 1) % #hot + 1]
+    if next.win then next.win:focus(); return end
+  end
+end
+
 function M.cycle()
   local focused   = hs.window.focusedWindow()
   local focusedId = focused and focused:id()
@@ -63,6 +82,7 @@ function M.cycle()
 
   list[(currentIdx % #list) + 1]:focus()
 end
+
 
 -- ── display-aware layout ──────────────────────────────────────────────────────
 

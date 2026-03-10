@@ -34,6 +34,31 @@
                     "to": [{ "key_code": "vk_none" }]
                 }
             ],
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "cmd+tab → option+tab (AltTab passthrough)",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": { "mandatory": ["command"], "optional": ["caps_lock"] }
+                                },
+                                "to": [{ "key_code": "tab", "modifiers": ["option"] }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": { "mandatory": ["command", "shift"], "optional": ["caps_lock"] }
+                                },
+                                "to": [{ "key_code": "tab", "modifiers": ["option", "shift"] }]
+                            }
+                        ]
+                    }
+                ]
+            },
             "name": "Default",
             "selected": true,
             "simple_modifications": [
