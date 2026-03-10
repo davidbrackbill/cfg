@@ -113,4 +113,15 @@ function windowLeft()   setFrameFocused(0,   0, 3/8, 1) end
 function windowMiddle() setFrameFocused(3/8, 0, 3/8, 1) end
 function windowRight()  setFrameFocused(6/8, 0, 2/8, 1) end
 
+-- ── screen watcher ───────────────────────────────────────────────────────────
+-- Re-applies layout automatically when displays are connected/disconnected.
+
+function M.startWatcher()
+  local sw = hs.screen.watcher.new(function()
+    hs.timer.doAfter(1.5, M.applyLayout)  -- delay for screens to settle
+  end)
+  sw:start()
+  return sw
+end
+
 return M
