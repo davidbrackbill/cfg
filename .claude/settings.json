@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(mmdc:*)",
+      "Bash(tmux:*)",
       "WebFetch",
       "WebSearch",
       "LS"
