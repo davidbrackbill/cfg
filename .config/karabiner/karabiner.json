@@ -38,6 +38,10 @@
             "selected": true,
             "simple_modifications": [
                 {
+                    "from": { "key_code": "caps_lock" },
+                    "to": [{ "key_code": "f18" }]
+                },
+                {
                     "from": {
                         "key_code": "h",
                         "modifiers": { "mandatory": ["command"] }
