@@ -4,7 +4,7 @@
 
 # [[Appearance]]
 theme=Dracula
-font-size = 18
+font-size = 16
 minimum-contrast = 5
 background = #1e1b18
 window-save-state = always
@@ -37,7 +37,6 @@ keybind = super+k=text:\x1bk
 keybind = super+slash=text:\x1b/
 keybind = super+period=text:\x1b.
 keybind = super+comma=text:\x1b,
-
 # Cmd+Num = select window
 keybind = super+1=text:\x1b1
 keybind = super+2=text:\x1b2
