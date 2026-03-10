@@ -21,31 +21,16 @@ require('lazy').setup({
   'jeetsukumaran/vim-indentwise',
 
   {
-    'olimorris/onedarkpro.nvim',
+    'scottmckendry/cyberdream.nvim',
     priority = 1000,
     config = function()
-      require('onedarkpro').setup({
-        highlights = {
-          ['@variable.member']      = { fg = '${blue}' },   -- struct fields / object properties
-          ['@variable.parameter']   = { fg = '${orange}' }, -- function parameters
-          ['@type']                 = { fg = '${yellow}' },  -- type names
-          ['@type.builtin']         = { fg = '${yellow}' },  -- string, int, bool, etc.
-          ['@lsp.type.property']    = { fg = '${blue}' },   -- LSP semantic: properties (TS)
-          ['@lsp.type.field']       = { fg = '${blue}' },   -- LSP semantic: fields (Go)
-          ['@lsp.type.parameter']   = { fg = '${orange}' }, -- LSP semantic: parameters
-        },
+      require('cyberdream').setup({
+        variant = 'dark',
+        saturation = 0.7,
+        colors = { fg = '#e8e8e8' },
       })
-      vim.cmd.colorscheme('onedark_vivid')
+      vim.cmd.colorscheme('cyberdream')
     end,
-  },
-
-  {
-    'EdenEast/nightfox.nvim',
-    -- Non-default variants:
-    -- vim.cmd.colorscheme('carbonfox')  -- dark carbon
-    -- vim.cmd.colorscheme('duskfox')    -- purple
-    -- vim.cmd.colorscheme('nordfox')    -- nord-inspired
-    -- vim.cmd.colorscheme('terafox')    -- green-tinted
   },
 
   {
@@ -218,20 +203,6 @@ require('lazy').setup({
     }
   },
 
-  {
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      require('onedark').setup {
-        style = 'dark', -- Default theme style. Choose between 'dark', 'darker', 'cool', 'deep', 'warm', 'warmer' and 'light'
-        code_style = {
-          comments = 'none',
-        },
-
-      }
-      vim.cmd.colorscheme 'onedark'
-    end,
-  },
 
   {
     'nvim-lualine/lualine.nvim',
