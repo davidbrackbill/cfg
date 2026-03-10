@@ -1,6 +1,14 @@
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 -- New nvim-treesitter API: install parsers, highlight is automatic once installed
+-- Enable treesitter highlighting for all buffers immediately and on future opens
+vim.api.nvim_create_autocmd('FileType', {
+  callback = function() pcall(vim.treesitter.start) end,
+})
+for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+  pcall(vim.treesitter.start, buf)
+end
+
 vim.defer_fn(function()
   require('nvim-treesitter').install({
     'c', 'cpp', 'go', 'lua', 'python', 'rust',
