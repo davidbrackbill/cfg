@@ -29,7 +29,9 @@ vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagn
 -- Leaders
 vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 vim.keymap.set('n', '<leader>l', ':b#<cr>', { desc = 'Last buffer' })
-vim.keymap.set('n', '<leader>f', ':Format <cr>', { desc = 'Format' })
+vim.keymap.set('n', '<leader>f', function()
+  require('conform').format({ async = true, lsp_fallback = true })
+end, { desc = 'Format' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Sub text' })
 vim.keymap.set('n', '<leader>;', ':tab term ', { desc = 'Term' })
 vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Next tab' })

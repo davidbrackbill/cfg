@@ -307,7 +307,24 @@ require('lazy').setup({
     config = true
     -- use opts = {} for passing setup options
     -- this is equivalent to setup({}) function
-  }
+  },
+
+  {
+    'stevearc/conform.nvim',
+    opts = {
+      formatters_by_ft = {
+        sql = { 'sql_formatter' },
+      },
+      formatters = {
+        sql_formatter = require('config.formatters').sql_formatter,
+      },
+      format_on_save = function(bufnr)
+        if vim.bo[bufnr].filetype == 'sql' then
+          return { timeout_ms = 500 }
+        end
+      end,
+    },
+  },
 
 }, {
   git = {

@@ -5,7 +5,7 @@ vim.defer_fn(function()
   require('nvim-treesitter').install({
     'c', 'cpp', 'go', 'lua', 'python', 'rust',
     'javascript', 'typescript', 'svelte', 'css', 'html',
-    'vimdoc', 'vim', 'bash',
+    'vimdoc', 'vim', 'bash', 'sql',
   })
 
   require('nvim-treesitter-textobjects').setup({

@@ -33,7 +33,7 @@ echo "==> Installing node + pnpm via mise..."
 mise install node@lts pnpm@latest
 mise use -g node@lts pnpm@latest
 eval "$(mise activate bash)"
-pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence
+pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter
 npx puppeteer browsers install chrome-headless-shell
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
