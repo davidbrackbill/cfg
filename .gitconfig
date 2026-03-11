@@ -6,6 +6,7 @@
 [core]
 	autocrlf = input
 	editor = nvim
+	fsmonitor = true
 [credential]
 	useHttpPath = true
 	helper = store
@@ -15,4 +16,11 @@
 	context = 0
 
 [url "git@github.com:"]
-    insteadOf = https://github.com/
+	insteadOf = https://github.com/
+
+; Repo-specific maintenance registrations (added by `git maintenance start`)
+; [maintenance]
+; 	auto = false
+; 	repo = /path
+[include]
+	path = ~/.gitconfig-local
