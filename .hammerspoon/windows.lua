@@ -1,5 +1,5 @@
 -- ~/.hammerspoon/windows.lua
--- Window cycling (Caps Lock / F18) and display-aware layout (Cmd+Caps Lock).
+-- Window cycling (Cmd+Caps Lock / Cmd+F18) and display-aware layout.
 
 local M = {}
 
@@ -23,6 +23,22 @@ end
 local function mainWin(bundleId)
   local app = hs.application.find(bundleId)
   return app and app:mainWindow()
+end
+
+-- ── previous-window tracking ──────────────────────────────────────────────────
+
+local prevWindow = nil
+local currentWindow = nil
+
+hs.window.filter.new():subscribe(hs.window.filter.windowFocused, function(win)
+  if currentWindow and currentWindow ~= win then
+    prevWindow = currentWindow
+  end
+  currentWindow = win
+end)
+
+function M.focusPrev()
+  if prevWindow then prevWindow:focus() end
 end
 
 -- ── window cycling ────────────────────────────────────────────────────────────
@@ -62,7 +78,6 @@ function M.toggleHot()
   for i, entry in ipairs(hot) do
     if entry.id == focusedId then currentIdx = i; break end
   end
-  -- advance to next entry that has a window open
   for offset = 1, #hot do
     local next = hot[(currentIdx + offset - 1) % #hot + 1]
     if next.win then next.win:focus(); return end
