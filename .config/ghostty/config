@@ -4,6 +4,7 @@
 
 # [[Appearance]]
 theme=Dracula
+font-family = Iosevka
 font-size = 16
 minimum-contrast = 5
 background = #1e1b18
