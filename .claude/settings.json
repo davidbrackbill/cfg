@@ -26,6 +26,7 @@
       "Bash(gh run view:*)",
       "Bash(gh repo view:*)",
       "Bash(rg:*)",
+      "Bash(find:*)",
       "Bash(head:*)",
       "Bash(tail:*)",
       "Bash(find:*)",
