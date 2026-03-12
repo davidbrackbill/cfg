@@ -86,34 +86,7 @@
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "input=$(cat); remaining=$(echo \"$input\" | jq -r '.context_window.remaining_percentage // empty'); [ -n \"$remaining\" ] && { mkdir -p ~/.claude/contexts; printf \"%.0f%%\" \"$remaining\" > ~/.claude/contexts/${TMUX_PANE:-default}; }"
-  },
-  "mcpServers": {
-    "confluence": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@aashari/mcp-server-atlassian-confluence"
-      ]
-    },
-    "jira": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@aashari/mcp-server-atlassian-jira"
-      ]
-    },
-    "github": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ]
-    }
-  },
-  "effortLevel": "high",
+"effortLevel": "high",
   "attribution": {
     "commit": "",
     "pr": ""

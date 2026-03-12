@@ -95,6 +95,12 @@ EOF
     echo "  Saved to ~/.git.env"
 fi
 
+# ── Claude Code MCP servers ────────────────────────────────────────────────────
+echo "==> Configuring Claude Code MCP servers..."
+claude mcp add-json --scope user confluence '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-confluence"]}' 2>/dev/null || true
+claude mcp add-json --scope user jira '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-jira"]}' 2>/dev/null || true
+claude mcp add-json --scope user github '{"command":"npx","args":["-y","@modelcontextprotocol/server-github"]}' 2>/dev/null || true
+
 # ── Homebrew bash ──────────────────────────────────────────────────────────────
 BREW_BASH=/opt/homebrew/bin/bash
 if ! grep -qF "$BREW_BASH" /etc/shells 2>/dev/null; then
