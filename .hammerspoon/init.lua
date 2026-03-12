@@ -11,6 +11,17 @@ hs.hotkey.bind({}, 'f18', windows.focusPrev)
 -- Cmd+Caps Lock (→ Cmd+F18 via Karabiner) — hot app toggle
 hs.hotkey.bind({ 'cmd' }, 'f18', windows.toggleHot)
 
+-- Cmd+H (via Karabiner → F19) — focus Ghostty and send Alt+H
+hs.hotkey.bind({}, 'f19', function()
+  local app = hs.application.get('Ghostty') or hs.application.open('Ghostty')
+  if app then
+    app:activate()
+    hs.timer.doAfter(0.05, function()
+      hs.eventtap.keyStroke({ 'alt' }, 'h')
+    end)
+  end
+end)
+
 -- Auto-layout on display connect/disconnect
 windows.startWatcher()
 
