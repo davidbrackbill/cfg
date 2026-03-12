@@ -39,6 +39,11 @@ vim.o.cmdheight = 0
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Defer clipboard setup to avoid blocking startup
+vim.schedule(function()
+  vim.opt.clipboard = 'unnamedplus'
+end)
+
 -- Environment files
 vim.g.python3_host_prog = vim.fn.exepath('python3')
 vim.env.BASH_ENV = "~/.bash_aliases"
