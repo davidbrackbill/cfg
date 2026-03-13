@@ -1,6 +1,62 @@
 {
     "profiles": [
         {
+            "complex_modifications": {
+                "parameters": { "basic.to_if_alone_timeout_milliseconds": 200 },
+                "rules": [
+                    {
+                        "description": "Left Shift alone → Escape",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "left_shift",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "left_shift" }],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "cmd+tab → option+tab (AltTab passthrough)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command", "shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["option", "shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    }
+                ]
+            },
             "devices": [
                 {
                     "identifiers": {
@@ -34,45 +90,6 @@
                     "to": [{ "key_code": "vk_none" }]
                 }
             ],
-            "complex_modifications": {
-                "rules": [
-                    {
-                        "description": "Left Shift alone → Escape",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "left_shift",
-                                    "modifiers": { "optional": ["any"] }
-                                },
-                                "to": [{ "key_code": "left_shift" }],
-                                "to_if_alone": [{ "key_code": "escape" }]
-                            }
-                        ]
-                    },
-                    {
-                        "description": "cmd+tab → option+tab (AltTab passthrough)",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "tab",
-                                    "modifiers": { "mandatory": ["command"], "optional": ["caps_lock"] }
-                                },
-                                "to": [{ "key_code": "tab", "modifiers": ["option"] }]
-                            },
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "tab",
-                                    "modifiers": { "mandatory": ["command", "shift"], "optional": ["caps_lock"] }
-                                },
-                                "to": [{ "key_code": "tab", "modifiers": ["option", "shift"] }]
-                            }
-                        ]
-                    }
-                ]
-            },
             "name": "Default",
             "selected": true,
             "simple_modifications": [
