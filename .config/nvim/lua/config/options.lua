@@ -3,8 +3,7 @@
 -- Set highlight on search
 vim.o.hlsearch = false
 
--- Make line numbers default
-vim.wo.number = true
+vim.wo.number = false
 
 -- Enable mouse mode
 vim.o.mouse = 'a'
@@ -20,7 +19,7 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'auto'
+vim.wo.signcolumn = 'yes:1'
 
 -- Decrease update time
 vim.o.updatetime = 250
