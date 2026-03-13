@@ -13,6 +13,8 @@ window-save-state = always
 # [[Behavior]]
 # No confirmation prompt when closing a tab/window
 confirm-close-surface = false
+notify-on-command-finish-action = bell
+desktop-notifications = false
 
 # Send ESC sequences for Option key so alt+f, alt+b, etc. work in tmux/bash vi-mode
 macos-option-as-alt = true
