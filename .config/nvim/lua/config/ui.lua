@@ -1,11 +1,15 @@
 -- [[ UI Configuration ]]
 
--- [[ Custom colors \ themes ]]
-local WKGroups = { 'WhichKey', 'WhichKeyTitle', 'WhichKeyNormal', 'WhichKeyDesc', 'WhichKeyGroup', 'WhichKeyBorder' }
-for _, group in ipairs(WKGroups) do
-  -- FG: Onedark, BG: transparent
-  vim.api.nvim_set_hl(0, group, { fg = "#abb2bf", bg = "NONE" })
-end
+vim.api.nvim_create_autocmd('ColorScheme', {
+  pattern = '*',
+  callback = function()
+    vim.api.nvim_set_hl(0, 'Comment',            { fg = '#8a8a8a', italic = true })
+    vim.api.nvim_set_hl(0, '@comment',            { fg = '#8a8a8a', italic = true })
+    vim.api.nvim_set_hl(0, '@lsp.type.comment',   { fg = '#8a8a8a', italic = true })
+    vim.api.nvim_set_hl(0, '@variable.parameter', { fg = '#c0c0c0' })
+  end,
+})
+
 
 if vim.g.neovide then
   vim.g.neovide_cursor_animation_length = 0

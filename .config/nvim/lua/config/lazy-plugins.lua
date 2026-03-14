@@ -21,17 +21,29 @@ require('lazy').setup({
   'jeetsukumaran/vim-indentwise',
 
   {
-    'scottmckendry/cyberdream.nvim',
+    'Mofiqul/dracula.nvim',
     priority = 1000,
     config = function()
-      require('cyberdream').setup({
-        variant = 'dark',
-        saturation = 0.7,
-        colors = { fg = '#e8e8e8' },
+      require('dracula').setup({
+        colors = {
+          bg     = '#1e1b18',
+          pink   = '#d4689a',
+          purple = '#9d7fd4',
+          yellow = '#e6db74',
+          green  = '#63d68a',
+        },
+        overrides = function(_)
+          return {
+            Comment                = { fg = '#8a8a8a', italic = true },
+            ['@comment']           = { fg = '#8a8a8a', italic = true },
+            ['@variable.parameter']= { fg = '#c0c0c0' },
+          }
+        end,
       })
-      vim.cmd.colorscheme('cyberdream')
+      vim.cmd.colorscheme('dracula')
     end,
   },
+  { 'EdenEast/nightfox.nvim', lazy = true },
 
   {
     'folke/noice.nvim',
@@ -51,7 +63,7 @@ require('lazy').setup({
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
       'williamboman/mason-lspconfig.nvim',
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'arkav/lualine-lsp-progress' },
       'saghen/blink.cmp',
     },
   },
@@ -206,14 +218,31 @@ require('lazy').setup({
 
   {
     'nvim-lualine/lualine.nvim',
-    -- See `:help lualine.txt`
-    opts = {
-      options = {
-        icons_enabled = true,
-        component_separators = '|',
-        section_separators = '',
-      },
-    },
+    opts = function()
+      local tmux = {
+        normal   = { a = { fg = '#181a1f', bg = '#98c379', gui = 'bold' }, b = { fg = '#98c379', bg = '#2a2a2a' }, c = { fg = '#c0c0c0', bg = '#1e1b18' } },
+        insert   = { a = { fg = '#181a1f', bg = '#61afef', gui = 'bold' }, b = { fg = '#61afef', bg = '#2a2a2a' } },
+        visual   = { a = { fg = '#181a1f', bg = '#c678dd', gui = 'bold' }, b = { fg = '#c678dd', bg = '#2a2a2a' } },
+        replace  = { a = { fg = '#181a1f', bg = '#e06c75', gui = 'bold' }, b = { fg = '#e06c75', bg = '#2a2a2a' } },
+        inactive = { a = { fg = '#5c6370', bg = '#1e1b18' }, b = { fg = '#5c6370', bg = '#1e1b18' }, c = { fg = '#5c6370', bg = '#1e1b18' } },
+      }
+      return {
+        options = {
+          theme = tmux,
+          icons_enabled = false,
+          component_separators = '',
+          section_separators = '',
+        },
+        sections = {
+          lualine_a = { { '%l', type = 'stl', padding = 0 } },
+          lualine_b = {},
+          lualine_c = { 'diff', 'diagnostics', 'searchcount', 'lsp_progress' },
+          lualine_x = { { 'filename', path = 1 } },
+          lualine_y = {},
+          lualine_z = {},
+        },
+      }
+    end,
   },
 
   {
