@@ -1,7 +1,7 @@
 -- [[ Vim options ]]
 
 -- Set highlight on search
-vim.o.hlsearch = true
+vim.o.hlsearch = false
 
 vim.wo.number = false
 

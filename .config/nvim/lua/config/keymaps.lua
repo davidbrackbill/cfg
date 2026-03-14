@@ -9,17 +9,6 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- Auto-clear search highlight when not actively searching
-vim.on_key(function(char)
-  if vim.fn.mode() == 'n' then
-    local key = vim.fn.keytrans(char)
-    local is_search = vim.tbl_contains({ '<CR>', 'n', 'N', '*', '#', '?', '/' }, key)
-    if vim.opt.hlsearch:get() ~= is_search then
-      vim.opt.hlsearch = is_search
-    end
-  end
-end, vim.api.nvim_create_namespace('auto_hlsearch'))
-
 -- Commands
 vim.keymap.set("", ";", ":")
 vim.keymap.set('c', '<c-k>', '<up>')

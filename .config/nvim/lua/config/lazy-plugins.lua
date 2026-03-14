@@ -45,6 +45,18 @@ require('lazy').setup({
   },
   { 'EdenEast/nightfox.nvim', lazy = true },
 
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {
+      cmdline = { view = 'cmdline' },
+      presets = {
+        bottom_search = true,
+        long_message_to_split = true,
+      },
+    },
+  },
 
   {
     'neovim/nvim-lspconfig',
@@ -224,7 +236,7 @@ require('lazy').setup({
         sections = {
           lualine_a = { { '%l', type = 'stl', padding = 0 } },
           lualine_b = {},
-          lualine_c = { 'diff', 'diagnostics', 'searchcount', 'lsp_progress' },
+          lualine_c = { 'diff', 'diagnostics', 'lsp_progress' },
           lualine_x = { { 'filename', path = 1 } },
           lualine_y = {},
           lualine_z = {},
