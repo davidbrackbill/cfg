@@ -342,6 +342,8 @@ require('lazy').setup({
     },
   },
 
+  { import = 'plugins' },
+
 }, {
   git = {
     filter = false,
