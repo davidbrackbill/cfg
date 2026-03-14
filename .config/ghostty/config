@@ -3,11 +3,10 @@
 # command = /opt/homebrew/bin/bash
 
 # [[Appearance]]
-theme=Dracula
+theme=Catppuccin Mocha
 font-family = Iosevka
 font-size = 16
 minimum-contrast = 5
-background = #1e1b18
 window-save-state = always
 
 # [[Behavior]]

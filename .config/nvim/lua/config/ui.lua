@@ -1,14 +1,6 @@
 -- [[ UI Configuration ]]
 
-vim.api.nvim_create_autocmd('ColorScheme', {
-  pattern = '*',
-  callback = function()
-    vim.api.nvim_set_hl(0, 'Comment',            { fg = '#8a8a8a', italic = true })
-    vim.api.nvim_set_hl(0, '@comment',            { fg = '#8a8a8a', italic = true })
-    vim.api.nvim_set_hl(0, '@lsp.type.comment',   { fg = '#8a8a8a', italic = true })
-    vim.api.nvim_set_hl(0, '@variable.parameter', { fg = '#c0c0c0' })
-  end,
-})
+-- Comment/parameter overrides are handled in catppuccin's custom_highlights
 
 
 if vim.g.neovide then
