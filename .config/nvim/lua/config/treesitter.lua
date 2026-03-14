@@ -12,7 +12,7 @@ end
 vim.defer_fn(function()
   require('nvim-treesitter').install({
     'c', 'cpp', 'go', 'lua', 'python', 'rust',
-    'javascript', 'typescript', 'svelte', 'css', 'html',
+    'javascript', 'typescript', 'tsx', 'svelte', 'css', 'html',
     'vimdoc', 'vim', 'bash', 'sql',
   })
 

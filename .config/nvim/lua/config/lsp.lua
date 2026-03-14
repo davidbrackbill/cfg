@@ -79,7 +79,32 @@ vim.lsp.config('rust_analyzer', {
 -- mason-lspconfig: ensure servers installed, automatic_enable = true by default
 -- which calls vim.lsp.enable() for installed servers, picking up config above
 require('mason-lspconfig').setup({
-  ensure_installed = { 'clangd', 'pyright', 'svelte', 'ts_ls', 'tinymist', 'lua_ls' },
+  ensure_installed = { 'clangd', 'pyright', 'svelte', 'ts_ls', 'tinymist', 'lua_ls', 'gopls' },
+})
+
+vim.lsp.config('gopls', {
+  cmd = { 'gopls', '-remote=auto' },
+  settings = {
+    gopls = {
+      gofumpt = true,
+      staticcheck = true,
+      analyses = {
+        unusedparams = true,
+        shadow = true,
+        nilness = true,
+        unusedwrite = true,
+        useany = true,
+      },
+      directoryFilters = {
+        '-**/node_modules',
+        '-static',
+        '-bazel-bin',
+        '-bazel-out',
+        '-bazel-testlogs',
+      },
+      buildFlags = { '-tags=launchdarkly_easyjson' },
+    },
+  },
 })
 
 -- Closes html tags for you
