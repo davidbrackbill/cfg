@@ -34,10 +34,6 @@ vim.o.termguicolors = true
 -- Allow command-line to pop up when needed
 vim.o.cmdheight = 0
 
--- NOTE: Leader selection must precede plugins
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
 -- Defer clipboard setup to avoid blocking startup
 vim.schedule(function()
   vim.opt.clipboard = 'unnamedplus'

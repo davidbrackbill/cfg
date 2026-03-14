@@ -1,6 +1,6 @@
 -- [[ Configure plugins with lazy ]]
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system {
     'git',
     'clone',
@@ -14,11 +14,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
 
-  'tpope/vim-fugitive',
-  'tpope/vim-rhubarb',
+  { 'tpope/vim-fugitive', cmd = { 'Git', 'G', 'Gdiffsplit', 'Gvdiffsplit', 'Gread', 'Gwrite' } },
+  { 'tpope/vim-rhubarb', event = 'VeryLazy' },
   'tpope/vim-sleuth',
-  'tpope/vim-obsession',
-  'jeetsukumaran/vim-indentwise',
+  { 'tpope/vim-obsession', cmd = 'Obsession' },
+  { 'jeetsukumaran/vim-indentwise', event = 'VeryLazy' },
 
   {
     'Mofiqul/dracula.nvim',
@@ -239,8 +239,6 @@ require('lazy').setup({
     opts = {},
   },
 
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
 
   {
     'nvim-telescope/telescope.nvim',
@@ -267,7 +265,7 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
-  'windwp/nvim-ts-autotag',
+  { 'windwp/nvim-ts-autotag', event = 'InsertEnter' },
 
   {
     "luckasRanarison/tailwind-tools.nvim",

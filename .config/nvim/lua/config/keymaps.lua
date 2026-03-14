@@ -34,8 +34,8 @@ end
 vim.keymap.set('v', '<c-c>', clip, { desc = 'Clip to system' })
 vim.keymap.set('v', 'Y', clip, { desc = 'Clip to system' })
 
-vim.keymap.set('n', '||', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', '\\\\', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+vim.keymap.set('n', '||', function() vim.diagnostic.jump({ count = -1 }) end, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', '\\\\', function() vim.diagnostic.jump({ count = 1 }) end, { desc = 'Go to next diagnostic message' })
 
 -- Leaders
 vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
