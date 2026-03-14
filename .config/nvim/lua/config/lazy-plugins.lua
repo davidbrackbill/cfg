@@ -45,18 +45,6 @@ require('lazy').setup({
   },
   { 'EdenEast/nightfox.nvim', lazy = true },
 
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
-    dependencies = { 'MunifTanjim/nui.nvim' },
-    opts = {
-      cmdline = { view = 'cmdline' },
-      presets = {
-        bottom_search = true,
-        long_message_to_split = true,
-      },
-    },
-  },
 
   {
     'neovim/nvim-lspconfig',
