@@ -26,13 +26,19 @@ require('lazy').setup({
     priority = 1000,
     opts = {
       flavour = 'mocha',
-      custom_highlights = function(colors)
-        return {
-          Comment                = { fg = colors.overlay0, italic = true },
-          ['@comment']           = { fg = colors.overlay0, italic = true },
-          ['@variable.parameter']= { fg = colors.subtext0 },
-        }
-      end,
+      color_overrides = {
+        mocha = {
+          base = '#1a1a26',
+          mantle = '#141420',
+          crust = '#10101a',
+          text = '#cdd6f4',
+          subtext1 = '#bac2de',
+          subtext0 = '#a6adc8',
+          overlay2 = '#9399b2',
+          overlay1 = '#7f849c',
+          overlay0 = '#6c7086',
+        },
+      },
     },
     config = function(_, opts)
       require('catppuccin').setup(opts)
