@@ -47,20 +47,25 @@ esac
 # Go tools
 export PATH="$PATH:$HOME/go/bin"
 
+# [[FZF]]
+export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+
 # [[Functions]]
 
-# Fuzzy-find a file/dir under $dir
-fr() {
-    local dir="${1:-/}"
-    fd . "$dir" --hidden --exclude .git --exclude node_modules --exclude __pycache__ |
-        fzf-tmux --select-1 --query "${*:2}"
-}
-
-# Find and cd-to / open in nvim
+# Fuzzy find and open: dirs→yazi, text files→nvim, binary→macOS default
 f() {
     local path
-    path=$(fr "$HOME" "$*")
-    [[ -d $path ]] && cd "$path" || { cd "$(dirname "$path")" && nvim "$path"; }
+    path=$(fd --hidden --exclude .git | fzf --tmux 80% --select-1 --query "$*")
+    [[ -z "$path" ]] && return
+    if [[ -d "$path" ]]; then
+        yy "$path"
+    elif file --brief --mime "$path" | grep -q '^image/\|^application/pdf'; then
+        open "$path"
+    else
+        nvim "$path"
+    fi
 }
 
 # Yazi file manager, cd to exit dir

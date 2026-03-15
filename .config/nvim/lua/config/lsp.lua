@@ -5,15 +5,15 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  local telebuilt = require('telescope.builtin')
+  local fzf = require('fzf-lua')
 
   nmap('<leader>n', vim.lsp.buf.rename, 'Rename')
   nmap('\\\\!', vim.lsp.buf.code_action, 'Code action')
 
-  nmap('gd', telebuilt.lsp_definitions, 'Definition')
-  nmap('gr', telebuilt.lsp_references, 'References')
-  nmap('gI', telebuilt.lsp_implementations, 'Implementation')
-  nmap('gy', telebuilt.lsp_type_definitions, 'Type definition')
+  nmap('gd', fzf.lsp_definitions, 'Definition')
+  nmap('gr', fzf.lsp_references, 'References')
+  nmap('gI', fzf.lsp_implementations, 'Implementation')
+  nmap('gy', fzf.lsp_typedefs, 'Type definition')
   nmap('gh', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('gH', vim.lsp.buf.signature_help, 'Signature Documentation')
   nmap('gD', vim.lsp.buf.declaration, 'Declaration')
