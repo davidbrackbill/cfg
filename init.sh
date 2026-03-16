@@ -14,7 +14,7 @@ fi
 # ── Tools ──────────────────────────────────────────────────────────────────────
 echo "==> Installing tools..."
 brew install \
-    bash neovim fd bat eza fzf atuin yazi lazygit \
+    bash neovim fd bat eza fzf atuin yazi lazygit zoxide \
     fish tmux jujutsu rm-improved mise starship \
     tree-sitter-cli vjeantet/tap/alerter \
     1password-cli \

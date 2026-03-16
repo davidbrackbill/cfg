@@ -111,3 +111,8 @@ export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 
 # [[Obsidian]]
 export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
+
+# [[Zoxide]] — must be last to hook cd properly
+command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
+alias cd='z'
+alias zz='zi'
