@@ -3,15 +3,13 @@ alias aliases="nvim ~/.bash_aliases"
 alias bashup="source ~/.bashrc"
 alias bashrc="nvim ~/.bashrc"
 
-# [[Shell]]
-alias shwap="fish"
-
 # [[Utils]]
 alias r="rip"
 alias n="nvim"
 alias cl="clear"
 alias cat="bat"
-alias fdf="fd"
+alias cd='z'
+alias zz='zi'
 
 # [[Directories]]
 alias cd.="cd .."
@@ -27,6 +25,6 @@ alias l="yy"
 # [[Git]]
 alias lg="lazygit"
 
-# [[Language runtimes]]
-alias prt="npx prettier --write ."
-alias pipf="pip list --format=freeze > requirements.txt"
+# [[Claude]]
+alias claude=clod
+alias c=clod

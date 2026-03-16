@@ -23,8 +23,6 @@ bind -f ~/.inputrc
 # [[Sources]]
 safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
 
-
-
 safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
 safe_source /opt/homebrew/etc/profile.d/bash_completion.sh
 safe_source "$HOME/.ghcup/env"
@@ -93,9 +91,8 @@ ta() {
 # Lazygit for dotfiles bare repo
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
-# Claude Code with a sensible tmux window name
+# Window renames
 clod() { tmux rename-window "✦" 2>/dev/null; claude "$@"; tmux rename-window '$' 2>/dev/null; }
-alias claude=clod
 lazygit() { tmux rename-window "∆" 2>/dev/null; command lazygit "$@"; tmux rename-window '$' 2>/dev/null; }
 nvim() { tmux rename-window "¶" 2>/dev/null; command nvim "$@"; tmux rename-window '$' 2>/dev/null; }
 
@@ -114,5 +111,3 @@ export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
 
 # [[Zoxide]] — must be last to hook cd properly
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
-alias cd='z'
-alias zz='zi'
