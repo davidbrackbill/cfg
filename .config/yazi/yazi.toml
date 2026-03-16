@@ -2,6 +2,10 @@
 ratio = [3, 7, 8]
 show_hidden = false
 
+[preview]
+max_width = 0
+max_height = 0
+
 [opener]
 edit = [
 	{ run = '${EDITOR:=nvim} "$@"', desc = "$EDITOR", block = true, for = "unix" },
