@@ -26,5 +26,5 @@ alias l="yy"
 alias lg="lazygit"
 
 # [[Claude]]
-alias claude=clod
 alias c=clod
+alias claude=clod
