@@ -7,6 +7,7 @@
 	autocrlf = input
 	editor = nvim
 	fsmonitor = true
+	excludesfile = /Users/db/.gitignore_global
 [credential]
 	useHttpPath = true
 	helper = store

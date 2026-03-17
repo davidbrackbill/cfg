@@ -64,6 +64,9 @@ fi
 
 cfg config status.showUntrackedFiles no
 
+# ── Git global config ──────────────────────────────────────────────────────────
+git config --global core.excludesfile ~/.gitignore_global
+
 # ── Private env ────────────────────────────────────────────────────────────────
 if [ ! -f "$HOME/.ld.env" ]; then
     echo "==> Creating ~/.ld.env..."
