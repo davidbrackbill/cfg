@@ -17,7 +17,6 @@ HISTIGNORE='ls:bg:fg:history'
 HISTTIMEFORMAT='%F %T '
 PROMPT_DIRTRIM=1
 
-set -o vi
 bind -f ~/.inputrc
 
 # [[Sources]]

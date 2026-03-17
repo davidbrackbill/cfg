@@ -9,3 +9,5 @@
 "\e7":""
 "\e8":""
 "\e9":""
+
+"\C-g":edit-and-execute-command
