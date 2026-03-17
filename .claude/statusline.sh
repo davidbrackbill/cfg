@@ -1,6 +1,16 @@
 #!/bin/bash
 input=$(cat)
-PCT=$(echo "$input" | jq -r '.context_window.used_percentage // 0' | cut -d. -f1)
-FILLED=$((PCT / 5))
-BAR=$(printf "%${FILLED}s" | tr ' ' '|')$(printf "%$((20 - FILLED))s")
-echo "[$BAR]"
+USED=$(echo "$input" | jq -r '.context_window.current_usage | .input_tokens + .output_tokens + .cache_creation_input_tokens + .cache_read_input_tokens // 0')
+MAX=$(echo "$input" | jq -r '.context_window.context_window_size // 1000000')
+MODEL_ID=$(echo "$input" | jq -r '.model.id // "?"' | tr '[:upper:]' '[:lower:]')
+case "$MODEL_ID" in
+  *opus*) SYMBOL="🐘" ;;
+  *sonnet*) SYMBOL="🦊" ;;
+  *haiku*) SYMBOL="🐭" ;;
+  *) SYMBOL="?" ;;
+esac
+UNIT_SIZE=40000
+FILLED=$((USED / UNIT_SIZE))
+MAX_FILLED=$((MAX / UNIT_SIZE))
+BAR=$(printf "%${FILLED}s" | tr ' ' '|')$(printf "%$((MAX_FILLED - FILLED))s")
+echo "$SYMBOL [$BAR]"
