@@ -26,5 +26,8 @@ alias l="yy"
 alias lg="lazygit"
 
 # [[Claude]]
-alias c=clod
 alias claude=clod
+alias c=clod
+alias ch='claude --model haiku'
+alias cs='claude --model sonnet'
+alias co='claude --model opus'
