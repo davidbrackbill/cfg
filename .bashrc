@@ -9,6 +9,7 @@ esac
 
 # [[Options]]
 shopt -s histappend checkwinsize globstar nullglob expand_aliases autocd
+set -o ignoreeof
 
 HISTSIZE=100000
 HISTFILESIZE=1000000
