@@ -45,6 +45,12 @@ esac
 # Go tools
 export PATH="$PATH:$HOME/go/bin"
 
+# libpq (psql for CRDB access) — must come before /opt/homebrew/bin
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# LD dev tools (awslogin, update-aws-config, etc.)
+export PATH="$PATH:$HOME/ld/dev/bin"
+
 # [[FZF]]
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
