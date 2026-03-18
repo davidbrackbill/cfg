@@ -30,10 +30,10 @@
       "Bash(gh run view:*)",
       "Bash(gh repo view:*)",
       "Bash(rg:*)",
+      "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(head:*)",
       "Bash(tail:*)",
-      "Bash(find:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
       "Bash(diff:*)",
@@ -63,10 +63,46 @@
       "Bash(goenv version:*)",
       "WebFetch",
       "WebSearch",
-      "LS"
-    ]
+      "LS",
+      "mcp__confluence__*",
+      "mcp__jira__getJiraIssue",
+      "mcp__jira__searchJiraIssuesUsingJql",
+      "mcp__jira__getVisibleJiraProjects",
+      "mcp__jira__getJiraProjectIssueTypesMetadata",
+      "mcp__jira__getJiraIssueTypeMetaWithFields",
+      "mcp__jira__getTransitionsForJiraIssue",
+      "mcp__jira__getJiraIssueRemoteIssueLinks",
+      "mcp__jira__lookupJiraAccountId",
+      "mcp__jira__getIssueLinkTypes",
+      "mcp__jira__searchAtlassian",
+      "mcp__jira__fetchAtlassian",
+      "mcp__jira__atlassianUserInfo",
+      "mcp__jira__getAccessibleAtlassianResources",
+      "mcp__github__get_me",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_commit",
+      "mcp__github__get_tag",
+      "mcp__github__get_release_by_tag",
+      "mcp__github__get_latest_release",
+      "mcp__github__list_branches",
+      "mcp__github__list_commits",
+      "mcp__github__list_pull_requests",
+      "mcp__github__list_releases",
+      "mcp__github__list_tags",
+      "mcp__github__search_code",
+      "mcp__github__search_issues",
+      "mcp__github__search_pull_requests",
+      "mcp__github__search_repositories",
+      "mcp__github__search_users",
+      "mcp__github__issue_read",
+      "mcp__github__pull_request_read",
+      "mcp__github__get_teams",
+      "mcp__github__get_team_members",
+      "mcp__github__get_label",
+      "mcp__github__get_copilot_job_status"
+    ],
+    "additionalDirectories": ["~/ld"]
   },
-  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -95,8 +131,8 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-  "effortLevel": "high",
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true
-  }
+  },
+  "effortLevel": "high"
 }
