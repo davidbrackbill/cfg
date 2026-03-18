@@ -90,6 +90,18 @@ ta() {
     fi
 }
 
+rgf() {
+  local pattern="${1:-}"
+  fzf --ansi \
+      --disabled \
+      --query "$pattern" \
+      --bind "start:reload:rg --line-number --color=always {q}" \
+      --bind "change:reload:rg --line-number --color=always {q} || true" \
+      --delimiter : \
+      --preview 'bat --highlight-line {2} {1}' \
+      --bind "enter:become(nvim {1} +{2} +'set hlsearch' +'let @/=\"{q}\"')"
+}
+
 # Lazygit for dotfiles bare repo
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
