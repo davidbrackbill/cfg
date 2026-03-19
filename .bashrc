@@ -121,6 +121,7 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 # [[Starship prompt]]
 command -v starship &>/dev/null && eval "$(starship init bash)"
+[ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
 
 safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
