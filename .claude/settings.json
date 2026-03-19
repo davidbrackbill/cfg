@@ -56,7 +56,7 @@
       "Bash(column:*)",
       "Bash(base64:*)",
       "Bash(go list:*)",
-      "Bash(bazel query:*)",
+      "Bash(bazel:*)",
       "Bash(pnpm list:*)",
       "Bash(pnpm outdated:*)",
       "Bash(mise list:*)",
