@@ -34,6 +34,7 @@
       "Bash(find:*)",
       "Bash(head:*)",
       "Bash(tail:*)",
+      "Bash(awk:*)",
       "Bash(ls:*)",
       "Bash(wc:*)",
       "Bash(diff:*)",
@@ -101,7 +102,9 @@
       "mcp__github__get_label",
       "mcp__github__get_copilot_job_status"
     ],
-    "additionalDirectories": ["~/ld"]
+    "additionalDirectories": [
+      "~/ld"
+    ]
   },
   "hooks": {
     "Notification": [
