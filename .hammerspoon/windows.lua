@@ -144,9 +144,17 @@ local function setFrameFocused(x, y, w, h)
   if win then setFrame(win, win:screen(), x, y, w, h) end
 end
 
-function windowLeft()   setFrameFocused(0,   0, 3/8, 1) end
-function windowMiddle() setFrameFocused(3/8, 0, 3/8, 1) end
-function windowRight()  setFrameFocused(6/8, 0, 2/8, 1) end
+function windowLeft()      setFrameFocused(0,   0, 3/8, 1) end
+function windowMiddle()    setFrameFocused(3/8, 0, 3/8, 1) end
+function windowRight()     setFrameFocused(6/8, 0, 2/8, 1) end
+function windowRightWide() setFrameFocused(3/8, 0, 5/8, 1) end
+
+function windowLeftTop()      setFrameFocused(0,   0,   3/8, 1/2) end
+function windowLeftBottom()   setFrameFocused(0,   1/2, 3/8, 1/2) end
+function windowMiddleTop()    setFrameFocused(3/8, 0,   3/8, 1/2) end
+function windowMiddleBottom() setFrameFocused(3/8, 1/2, 3/8, 1/2) end
+function windowRightTop()     setFrameFocused(6/8, 0,   2/8, 1/2) end
+function windowRightBottom()  setFrameFocused(6/8, 1/2, 2/8, 1/2) end
 
 -- ── screen watcher ───────────────────────────────────────────────────────────
 -- Re-applies layout automatically when displays are connected/disconnected.
