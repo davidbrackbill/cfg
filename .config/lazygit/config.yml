@@ -1,5 +1,11 @@
+notARepository: 'skip'
+
 os:
   editPreset: 'nvim'
+
+keybinding:
+  universal:
+    openRecentRepos: '`'
 
 gui:
  # Catppuccin Mocha
