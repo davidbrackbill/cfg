@@ -29,13 +29,19 @@ brew install --cask \
     hammerspoon \
     betterdisplay
 
-# ── Node (via mise) ────────────────────────────────────────────────────────────
-echo "==> Installing node + pnpm via mise..."
+# ── Runtimes (via mise) ────────────────────────────────────────────────────────
+echo "==> Installing runtimes via mise..."
 mise install node@lts pnpm@latest
-mise use -g node@lts pnpm@latest
+mise use -g node@lts pnpm@latest uv@latest
+MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
 eval "$(mise activate bash)"
 pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter
 npx puppeteer browsers install chrome-headless-shell
+
+# ── nah (Claude Code permissions hook) ────────────────────────────────────────
+echo "==> Installing nah..."
+mise use -g pipx:nah
+uv pip install pyyaml --python "$(mise where pipx-nah)/nah/bin/python"
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
 if [ ! -d "$HOME/.cfg" ]; then

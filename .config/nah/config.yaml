@@ -1,0 +1,12 @@
+classify:
+  filesystem_read:
+  - fd
+  - mmdc
+  - jq
+  lang_exec:
+  - tmux
+  - bazel
+  - gopls
+  package_run:
+  - mise
+  - goenv
