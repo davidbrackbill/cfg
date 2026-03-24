@@ -1,7 +1,9 @@
 notARepository: 'skip'
 
-os:
-  editPreset: 'nvim'
+git:
+  commit:
+    autoWrapCommitMessage: false
+    autoUnwrapCommitMessage: false
 
 keybinding:
   universal:
