@@ -1,13 +1,10 @@
 #!/bin/sh
 cd "$1" || exit
 
-repo=$(git rev-parse --show-toplevel 2>/dev/null | xargs basename 2>/dev/null)
-[ -z "$repo" ] && exit
+repo=$(git config --get remote.origin.url | xargs basename | sed 's/.git$//')
+branch=$(git branch --show-current | sed 's/^db\///')
 
-branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-[ -z "$branch" ] && exit
-
-# If branch has any slashes, keep only first and last segments
-branch=$(echo "$branch" | awk -F/ 'NF > 1 { print $NF; next } { print }')
+[ "$repo" = "cfg" ] && exit
+[ -z "$repo" ] || [ -z "$branch" ] && exit
 
 echo " $repo/$branch"
