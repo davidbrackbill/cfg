@@ -55,6 +55,30 @@ detect_default_branch() {
   echo "$branch"
 }
 
+# List all non-default worktrees as repo/branch entries
+list_feature_worktrees() {
+  for dir in "$REPOS_DIR"/*/; do
+    [[ -d "$dir" ]] || continue
+    local name
+    name="$(basename "$dir")"
+    local bare="$dir/${name}.git"
+    [[ -d "$bare" ]] || continue
+
+    local default_branch
+    default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
+
+    while IFS= read -r line; do
+      local wt_path wt_branch
+      wt_path="$(echo "$line" | awk '{print $1}')"
+      wt_branch="$(echo "$line" | awk '{print $3}' | sed 's|^\[||;s|\]$||')"
+      [[ -n "$wt_branch" ]] || continue
+      [[ "$wt_branch" != "$default_branch" ]] || continue
+      local wt_rel="${wt_path#$REPOS_DIR/$name/}"
+      echo "${name}/${wt_rel}"
+    done < <(git -C "$bare" worktree list 2>/dev/null | tail -n +2)
+  done
+}
+
 setup_from_clone() {
   local remote="$1"
   local name
@@ -94,7 +118,28 @@ setup_from_existing() {
   local wrapper="$repo"
   local bare="$wrapper/${name}.git"
 
-  [[ -d "$repo/.git" ]] || { [[ -d "$bare" ]] && ok "Already converted: $name" && return 0; die "Not a git repo: $repo"; }
+  if [[ ! -d "$repo/.git" ]]; then
+    if [[ -d "$bare" ]]; then
+      # Already bare — ensure main worktree + hook exist
+      local default_branch
+      default_branch="$(detect_default_branch "$bare")"
+      local main_wt="$wrapper/$default_branch"
+      if [[ -d "$main_wt" ]]; then
+        ok "Already converted: $name"
+      else
+        log "$name: creating missing $default_branch worktree"
+        if git -C "$bare" show-ref --verify --quiet "refs/remotes/origin/$default_branch"; then
+          git -C "$bare" worktree add "$main_wt" "$default_branch"
+        else
+          git -C "$bare" worktree add -b "$default_branch" "$main_wt" HEAD
+        fi
+        install_pull_only_hook "$main_wt"
+        ok "$name: $main_wt created"
+      fi
+      return 0
+    fi
+    die "Not a git repo: $repo"
+  fi
 
   # Refuse if dirty
   if [[ -n "$(git -C "$repo" status --porcelain 2>/dev/null)" ]]; then
@@ -166,11 +211,16 @@ setup_from_existing() {
 # wt [open] — create worktree + tmux session for a feature
 # ---------------------------------------------------------------------------
 cmd_open() {
-  local branch="${1:-}"
-  shift 2>/dev/null || true
+  local no_prefix=false
+  local branch=""
+  local REPOS=()
 
-  # Remaining args are repo names
-  local REPOS=("$@")
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-prefix) no_prefix=true; shift ;;
+      *) if [[ -z "$branch" ]]; then branch="$1"; else REPOS+=("$1"); fi; shift ;;
+    esac
+  done
 
   # Repo selection via fzf if none given
   if [[ ${#REPOS[@]} -eq 0 ]]; then
@@ -196,13 +246,19 @@ cmd_open() {
     mapfile -t REPOS <<< "$selected"
   fi
 
-  # Branch name
+  # Worktree name
   if [[ -z "$branch" ]]; then
-    printf 'Branch name (e.g. db/1234): '
+    printf 'Worktree name (e.g. 1234): '
     read -r branch
   fi
-  [[ -n "$branch" ]] || die "Branch name required"
+  [[ -n "$branch" ]] || die "Name required"
   branch="${branch#/}"
+
+  # Git branch gets db/ prefix unless --no-prefix
+  local git_branch="$branch"
+  if ! "$no_prefix"; then
+    git_branch="db/${branch}"
+  fi
 
   # Create worktree + tmux session for each repo
   for repo_name in "${REPOS[@]}"; do
@@ -215,7 +271,7 @@ cmd_open() {
 
     [[ -d "$bare" ]] || die "Bare repo not found: $bare — run 'wt setup' first"
 
-    log "[$repo_name] Setting up $branch"
+    log "[$repo_name] Setting up $branch (branch: $git_branch)"
 
     # Create worktree
     if [[ -d "$worktree" ]]; then
@@ -226,10 +282,10 @@ cmd_open() {
 
       mkdir -p "$(dirname "$worktree")"
 
-      if git -C "$bare" show-ref --verify --quiet "refs/heads/$branch"; then
-        git -C "$bare" worktree add "$worktree" "$branch"
+      if git -C "$bare" show-ref --verify --quiet "refs/heads/$git_branch"; then
+        git -C "$bare" worktree add "$worktree" "$git_branch"
       else
-        git -C "$bare" worktree add -b "$branch" "$worktree" "$default_branch"
+        git -C "$bare" worktree add -b "$git_branch" "$worktree" "$default_branch"
       fi
       ok "worktree: $worktree"
     fi
@@ -256,54 +312,42 @@ cmd_open() {
 # ---------------------------------------------------------------------------
 cmd_close() {
   local repo_name=""
-  local branch=""
+  local git_branch=""
+  local worktree=""
 
   # Try to detect from pwd
   local wt_root
   wt_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
   if [[ -n "$wt_root" ]] && [[ "$wt_root" == "$REPOS_DIR"/* ]]; then
-    branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    git_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    worktree="$wt_root"
     local rel="${wt_root#$REPOS_DIR/}"
     repo_name="${rel%%/*}"
   fi
 
   # If we couldn't detect, fzf over worktrees from bare repos
-  if [[ -z "$repo_name" ]] || [[ -z "$branch" ]]; then
-    local entries=()
-    for dir in "$REPOS_DIR"/*/; do
-      [[ -d "$dir" ]] || continue
-      local name
-      name="$(basename "$dir")"
-      local bare="$dir/${name}.git"
-      [[ -d "$bare" ]] || continue
-
-      local default_branch
-      default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
-
-      while IFS= read -r line; do
-        local wt_branch
-        wt_branch="$(echo "$line" | awk '{print $3}' | sed 's|^\[||;s|\]$||')"
-        [[ -n "$wt_branch" ]] || continue
-        [[ "$wt_branch" != "$default_branch" ]] || continue
-        entries+=("${name}/${wt_branch}")
-      done < <(git -C "$bare" worktree list 2>/dev/null | tail -n +2)
-    done
-
-    [[ ${#entries[@]} -gt 0 ]] || die "No feature worktrees found"
+  if [[ -z "$repo_name" ]] || [[ -z "$git_branch" ]]; then
+    local worktrees
+    worktrees="$(list_feature_worktrees)"
+    [[ -n "$worktrees" ]] || die "No feature worktrees found"
 
     local selected
-    selected="$(printf '%s\n' "${entries[@]}" | fzf \
+    selected="$(echo "$worktrees" | fzf \
       --prompt='close > ' \
       --header='Pick worktree to close' \
       --height=40%)" || die "No selection"
 
     repo_name="${selected%%/*}"
-    branch="${selected#*/}"
+    local wt_rel="${selected#*/}"
+    worktree="$REPOS_DIR/$repo_name/$wt_rel"
+    git_branch="$(git -C "$worktree" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    [[ -n "$git_branch" ]] || die "Could not detect branch for $worktree"
   fi
 
   local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
-  local worktree="$REPOS_DIR/$repo_name/$branch"
-  local session="${repo_name}/${branch}"
+  # Session name matches the worktree path relative to repo dir
+  local wt_rel="${worktree#$REPOS_DIR/$repo_name/}"
+  local session="${repo_name}/${wt_rel}"
 
   [[ -d "$bare" ]] || die "Bare repo not found: $bare"
 
@@ -340,11 +384,11 @@ cmd_close() {
   # Optionally delete branch
   local default_branch
   default_branch="$(detect_default_branch "$bare")"
-  if [[ "$branch" != "$default_branch" ]]; then
-    printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$branch"
+  if [[ "$git_branch" != "$default_branch" ]]; then
+    printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$git_branch"
     read -r confirm
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      git -C "$bare" branch -D "$branch" && ok "deleted branch: $branch"
+      git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
     fi
   fi
 
@@ -364,6 +408,39 @@ cmd_close() {
 }
 
 # ---------------------------------------------------------------------------
+# wt attach — create tmux session for an existing worktree
+# ---------------------------------------------------------------------------
+cmd_attach() {
+  local worktrees
+  worktrees="$(list_feature_worktrees)"
+  [[ -n "$worktrees" ]] || die "No feature worktrees found"
+
+  local selected
+  selected="$(echo "$worktrees" | fzf \
+    --prompt='attach > ' \
+    --header='Pick worktree to attach' \
+    --height=40%)" || die "No selection"
+
+  local repo_name="${selected%%/*}"
+  local branch="${selected#*/}"
+  local worktree="$REPOS_DIR/$repo_name/$branch"
+  local session="${repo_name}/${branch}"
+
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    ok "session exists: $session"
+  else
+    tmux new-session -d -s "$session" -c "$worktree"
+    ok "session: $session"
+  fi
+
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "=$session"
+  else
+    tmux attach-session -t "=$session"
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 case "${1:-}" in
@@ -379,9 +456,15 @@ case "${1:-}" in
     shift
     cmd_close "$@"
     ;;
+  ls)
+    shift
+    cmd_attach "$@"
+    ;;
   -h|--help)
     echo "Usage:"
-    echo "  wt [branch] [repo]       Open feature worktree + tmux session"
+    echo "  wt [name] [repo...]       Open feature worktree + tmux session"
+    echo "                           Branch: db/<name> (use --no-prefix to skip)"
+    echo "  wt ls                    Attach tmux session to existing worktree"
     echo "  wt close                 Close current or fzf-picked session"
     echo "  wt setup <path>          Convert existing repo to bare"
     echo "  wt setup <remote-url>    Clone remote as bare repo"
