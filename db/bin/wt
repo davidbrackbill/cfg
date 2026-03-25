@@ -55,7 +55,37 @@ detect_default_branch() {
   echo "$branch"
 }
 
-# List all non-default worktrees as repo/branch entries
+# Build session name: [group/]name[/repo]
+make_session_name() {
+  local name="$1" repo="$2" group="${3:-}" multi="${4:-false}"
+  local session="$name"
+  if [[ -n "$group" ]]; then
+    session="${group}/${name}"
+  fi
+  if "$multi"; then
+    session="${session}/${repo}"
+  fi
+  echo "$session"
+}
+
+# Find tmux session for a worktree path (best-effort, scans pane cwds)
+find_session_for_worktree() {
+  local wt_path="$1"
+  while IFS=$'\t' read -r sess pane_path; do
+    if [[ "$pane_path" == "$wt_path"* ]]; then
+      echo "$sess"
+      return 0
+    fi
+  done < <(tmux list-panes -a -F $'#S\t#{pane_current_path}' 2>/dev/null)
+  return 1
+}
+
+# Generic fzf picker. Args: prompt. Always multi-select. Items via stdin.
+pick() {
+  fzf --prompt="$1 > " --multi --header='TAB to select multiple, ENTER to confirm' --height=40% || die "No selection"
+}
+
+# List all non-default worktrees as repo/wt_rel entries
 list_feature_worktrees() {
   for dir in "$REPOS_DIR"/*/; do
     [[ -d "$dir" ]] || continue
@@ -212,6 +242,7 @@ setup_from_existing() {
 # ---------------------------------------------------------------------------
 cmd_open() {
   local no_prefix=false
+  local group=""
   local branch=""
   local REPOS=()
 
@@ -221,6 +252,12 @@ cmd_open() {
       *) if [[ -z "$branch" ]]; then branch="$1"; else REPOS+=("$1"); fi; shift ;;
     esac
   done
+
+  # Parse group from "group//name" syntax
+  if [[ "$branch" == *"//"* ]]; then
+    group="${branch%%//*}"
+    branch="${branch#*//}"
+  fi
 
   # Repo selection via fzf if none given
   if [[ ${#REPOS[@]} -eq 0 ]]; then
@@ -237,12 +274,7 @@ cmd_open() {
     [[ ${#repo_list[@]} -gt 0 ]] || die "No bare repos found in $REPOS_DIR"
 
     local selected
-    selected="$(printf '%s\n' "${repo_list[@]}" | fzf \
-      --prompt='repo(s) > ' \
-      --multi \
-      --header='TAB to select multiple, ENTER to confirm' \
-      --height=40%)" || die "No repo selected"
-
+    selected="$(printf '%s\n' "${repo_list[@]}" | pick "repo")"
     mapfile -t REPOS <<< "$selected"
   fi
 
@@ -260,6 +292,9 @@ cmd_open() {
     git_branch="db/${branch}"
   fi
 
+  local multi=false
+  [[ ${#REPOS[@]} -le 1 ]] || multi=true
+
   # Create worktree + tmux session for each repo
   for repo_name in "${REPOS[@]}"; do
     repo_name="${repo_name// /}"
@@ -267,7 +302,8 @@ cmd_open() {
 
     local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
     local worktree="$REPOS_DIR/$repo_name/$branch"
-    local session="${repo_name}/${branch}"
+    local session
+    session="$(make_session_name "$branch" "$repo_name" "$group" "$multi")"
 
     [[ -d "$bare" ]] || die "Bare repo not found: $bare — run 'wt setup' first"
 
@@ -292,7 +328,21 @@ cmd_open() {
 
     # Create tmux session
     if tmux has-session -t "=$session" 2>/dev/null; then
-      ok "session exists: $session"
+      # Session exists — check if it's for a different repo
+      local existing_cwd
+      existing_cwd="$(tmux list-panes -t "=$session" -F '#{pane_current_path}' | head -1)"
+      if [[ ! "$existing_cwd" =~ $REPOS_DIR/$repo_name ]]; then
+        # Different repo — use multi-suffix format
+        session="${session}/${repo_name}"
+        if tmux has-session -t "=$session" 2>/dev/null; then
+          ok "session exists: $session"
+        else
+          tmux new-session -d -s "$session" -c "$worktree"
+          ok "session: $session"
+        fi
+      else
+        ok "session exists: $session"
+      fi
     else
       tmux new-session -d -s "$session" -c "$worktree"
       ok "session: $session"
@@ -310,66 +360,35 @@ cmd_open() {
 # ---------------------------------------------------------------------------
 # wt close — tear down worktree + tmux session
 # ---------------------------------------------------------------------------
-cmd_close() {
-  local repo_name=""
-  local git_branch=""
-  local worktree=""
-
-  # Try to detect from pwd
-  local wt_root
-  wt_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-  if [[ -n "$wt_root" ]] && [[ "$wt_root" == "$REPOS_DIR"/* ]]; then
-    git_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-    worktree="$wt_root"
-    local rel="${wt_root#$REPOS_DIR/}"
-    repo_name="${rel%%/*}"
-  fi
-
-  # If we couldn't detect, fzf over worktrees from bare repos
-  if [[ -z "$repo_name" ]] || [[ -z "$git_branch" ]]; then
-    local worktrees
-    worktrees="$(list_feature_worktrees)"
-    [[ -n "$worktrees" ]] || die "No feature worktrees found"
-
-    local selected
-    selected="$(echo "$worktrees" | fzf \
-      --prompt='close > ' \
-      --header='Pick worktree to close' \
-      --height=40%)" || die "No selection"
-
-    repo_name="${selected%%/*}"
-    local wt_rel="${selected#*/}"
-    worktree="$REPOS_DIR/$repo_name/$wt_rel"
-    git_branch="$(git -C "$worktree" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-    [[ -n "$git_branch" ]] || die "Could not detect branch for $worktree"
-  fi
-
+# Close a single worktree by its full path
+close_one() {
+  local worktree="$1"
+  local rel="${worktree#$REPOS_DIR/}"
+  local repo_name="${rel%%/*}"
   local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
-  # Session name matches the worktree path relative to repo dir
   local wt_rel="${worktree#$REPOS_DIR/$repo_name/}"
-  local session="${repo_name}/${wt_rel}"
+  local git_branch
+  git_branch="$(git -C "$worktree" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  local session
+  session="$(find_session_for_worktree "$worktree" 2>/dev/null || true)"
+  local display="${session:-$repo_name/$wt_rel}"
 
-  [[ -d "$bare" ]] || die "Bare repo not found: $bare"
-
-  # Confirm
-  printf '\033[0;33m  ?\033[0m Close %s? [y/N] ' "$session"
-  read -r confirm
-  [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
+  [[ -d "$bare" ]] || { warn "Bare repo not found: $bare"; return 1; }
 
   # Warn on uncommitted changes
   if [[ -d "$worktree" ]]; then
     if ! git -C "$worktree" diff --quiet 2>/dev/null || ! git -C "$worktree" diff --cached --quiet 2>/dev/null; then
-      warn "Uncommitted changes in $worktree"
+      warn "Uncommitted changes in $display"
       printf '\033[0;33m  ?\033[0m Remove anyway? [y/N] '
       read -r confirm
-      [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
+      [[ "$confirm" =~ ^[Yy]$ ]] || { warn "Skipped $display"; return 0; }
     fi
   fi
 
   # Remove worktree
   if [[ -d "$worktree" ]]; then
     git -C "$bare" worktree remove --force "$worktree"
-    ok "removed worktree: $worktree"
+    ok "removed worktree: $display"
   fi
 
   # Clean up empty parent dirs
@@ -377,24 +396,24 @@ cmd_close() {
   parent="$(dirname "$worktree")"
   while [[ "$parent" != "$REPOS_DIR/$repo_name" ]] && [[ -d "$parent" ]]; do
     rmdir "$parent" 2>/dev/null || break
-    ok "cleaned: $parent"
     parent="$(dirname "$parent")"
   done
 
   # Optionally delete branch
-  local default_branch
-  default_branch="$(detect_default_branch "$bare")"
-  if [[ "$git_branch" != "$default_branch" ]]; then
-    printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$git_branch"
-    read -r confirm
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-      git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
+  if [[ -n "$git_branch" ]]; then
+    local default_branch
+    default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
+    if [[ "$git_branch" != "$default_branch" ]]; then
+      printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$git_branch"
+      read -r confirm
+      if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
+      fi
     fi
   fi
 
   # Kill tmux session
   if [[ -n "$session" ]] && tmux has-session -t "=$session" 2>/dev/null; then
-    # Switch to last session if we're in the one being killed
     local current
     current="$(tmux display-message -p '#S' 2>/dev/null || true)"
     if [[ "$current" == "$session" ]]; then
@@ -403,6 +422,45 @@ cmd_close() {
     tmux kill-session -t "=$session"
     ok "killed session: $session"
   fi
+}
+
+cmd_close() {
+  local targets=()
+
+  # Try to detect from pwd
+  local wt_root
+  wt_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$wt_root" ]] && [[ "$wt_root" == "$REPOS_DIR"/* ]]; then
+    targets+=("$wt_root")
+  else
+    # fzf picker (multi-select)
+    local worktrees
+    worktrees="$(list_feature_worktrees)"
+    [[ -n "$worktrees" ]] || die "No feature worktrees found"
+
+    local selected
+    selected="$(echo "$worktrees" | pick "close")"
+
+    while IFS= read -r entry; do
+      local rn="${entry%%/*}"
+      local wr="${entry#*/}"
+      targets+=("$REPOS_DIR/$rn/$wr")
+    done <<< "$selected"
+  fi
+
+  # Confirm
+  if [[ ${#targets[@]} -eq 1 ]]; then
+    local display="${targets[0]#$REPOS_DIR/}"
+    printf '\033[0;33m  ?\033[0m Close %s? [y/N] ' "$display"
+  else
+    printf '\033[0;33m  ?\033[0m Close %d worktrees? [y/N] ' "${#targets[@]}"
+  fi
+  read -r confirm
+  [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
+
+  for wt in "${targets[@]}"; do
+    close_one "$wt"
+  done
 
   log "Done."
 }
@@ -416,28 +474,32 @@ cmd_attach() {
   [[ -n "$worktrees" ]] || die "No feature worktrees found"
 
   local selected
-  selected="$(echo "$worktrees" | fzf \
-    --prompt='attach > ' \
-    --header='Pick worktree to attach' \
-    --height=40%)" || die "No selection"
+  selected="$(echo "$worktrees" | pick "attach")"
 
-  local repo_name="${selected%%/*}"
-  local branch="${selected#*/}"
-  local worktree="$REPOS_DIR/$repo_name/$branch"
-  local session="${repo_name}/${branch}"
+  while IFS= read -r entry; do
+    local repo_name="${entry%%/*}"
+    local wt_rel="${entry#*/}"
+    local worktree="$REPOS_DIR/$repo_name/$wt_rel"
 
-  if tmux has-session -t "=$session" 2>/dev/null; then
-    ok "session exists: $session"
-  else
-    tmux new-session -d -s "$session" -c "$worktree"
-    ok "session: $session"
-  fi
+    # Try to find an existing session for this worktree
+    local session
+    session="$(find_session_for_worktree "$worktree" 2>/dev/null || true)"
 
-  if [[ -n "${TMUX:-}" ]]; then
-    tmux switch-client -t "=$session"
-  else
-    tmux attach-session -t "=$session"
-  fi
+    if [[ -n "$session" ]]; then
+      ok "session exists: $session"
+    else
+      session="$(make_session_name "$wt_rel" "$repo_name" "" false)"
+      tmux new-session -d -s "$session" -c "$worktree"
+      ok "session: $session"
+    fi
+
+    # Switch to last one selected
+    if [[ -n "${TMUX:-}" ]]; then
+      tmux switch-client -t "=$session"
+    else
+      tmux attach-session -t "=$session"
+    fi
+  done <<< "$selected"
 }
 
 # ---------------------------------------------------------------------------
@@ -462,8 +524,10 @@ case "${1:-}" in
     ;;
   -h|--help)
     echo "Usage:"
-    echo "  wt [name] [repo...]       Open feature worktree + tmux session"
+    echo "  wt [group//]name [repo...]"
+    echo "                           Open feature worktree + tmux session"
     echo "                           Branch: db/<name> (use --no-prefix to skip)"
+    echo "                           Session: [group/]name[/repo if multi]"
     echo "  wt ls                    Attach tmux session to existing worktree"
     echo "  wt close                 Close current or fzf-picked session"
     echo "  wt setup <path>          Convert existing repo to bare"
