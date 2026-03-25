@@ -1,0 +1,285 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPOS_DIR="${REPOS_DIR:-$HOME/ld}"
+
+log()  { printf '\033[0;34m==>\033[0m %s\n' "$*"; }
+ok()   { printf '\033[0;32m  ✓\033[0m %s\n' "$*"; }
+warn() { printf '\033[0;33m  !\033[0m %s\n' "$*"; }
+die()  { printf '\033[0;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
+
+# ---------------------------------------------------------------------------
+# wt setup — create a bare repo with a main worktree
+# ---------------------------------------------------------------------------
+cmd_setup() {
+  local from_existing=false
+  local target=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --from-existing) from_existing=true; shift ;;
+      *) target="$1"; shift ;;
+    esac
+  done
+
+  [[ -n "$target" ]] || die "Usage: wt setup <remote-url> | wt setup --from-existing <path>"
+
+  if "$from_existing"; then
+    setup_from_existing "$target"
+  else
+    setup_from_clone "$target"
+  fi
+}
+
+install_pull_only_hook() {
+  local worktree="$1"
+  local gitdir
+  gitdir="$(git -C "$worktree" rev-parse --git-dir)"
+  mkdir -p "$gitdir/hooks"
+  cat > "$gitdir/hooks/pre-push" <<'HOOK'
+#!/usr/bin/env bash
+echo "error: pushing from the main worktree is disabled."
+echo "       use wt to create a feature branch."
+exit 1
+HOOK
+  chmod +x "$gitdir/hooks/pre-push"
+  ok "pull-only hook installed"
+}
+
+detect_default_branch() {
+  local bare="$1"
+  local branch
+  branch="$(git -C "$bare" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null \
+    | sed 's|origin/||')" || true
+  if [[ -z "$branch" ]]; then
+    # Fallback: try common names
+    for candidate in main master; do
+      if git -C "$bare" show-ref --verify --quiet "refs/remotes/origin/$candidate"; then
+        branch="$candidate"
+        break
+      fi
+    done
+  fi
+  [[ -n "$branch" ]] || die "Could not detect default branch"
+  echo "$branch"
+}
+
+setup_from_clone() {
+  local remote="$1"
+  local name
+  name="$(basename "$remote" .git)"
+  local wrapper="$REPOS_DIR/$name"
+  local bare="$wrapper/${name}.git"
+
+  [[ ! -d "$bare" ]] || die "Bare repo already exists: $bare"
+
+  log "Cloning $remote (bare)"
+  mkdir -p "$wrapper"
+  git clone --bare "$remote" "$bare"
+
+  git -C "$bare" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+  git -C "$bare" fetch origin
+  ok "bare clone created, refspec fixed"
+
+  local default_branch
+  default_branch="$(detect_default_branch "$bare")"
+
+  local main_wt="$wrapper/$default_branch"
+  git -C "$bare" worktree add -b "$default_branch" "$main_wt" "origin/$default_branch"
+  ok "worktree: $main_wt"
+
+  install_pull_only_hook "$main_wt"
+
+  log "Done: $wrapper"
+  echo "    bare:     $bare"
+  echo "    worktree: $main_wt (pull-only)"
+}
+
+setup_from_existing() {
+  local repo
+  repo="$(realpath "$1")"
+  local name
+  name="$(basename "$repo")"
+  local wrapper="$repo"
+  local bare="$wrapper/${name}.git"
+
+  [[ -d "$repo/.git" ]] || { [[ -d "$bare" ]] && ok "Already converted: $name" && return 0; die "Not a git repo: $repo"; }
+
+  # Refuse if dirty
+  if [[ -n "$(git -C "$repo" status --porcelain 2>/dev/null)" ]]; then
+    die "$name has uncommitted changes. Commit or stash first."
+  fi
+
+  local default_branch
+  default_branch="$(git -C "$repo" symbolic-ref --short HEAD 2>/dev/null || echo "main")"
+  local remote
+  remote="$(git -C "$repo" remote get-url origin 2>/dev/null || true)"
+
+  log "Converting $repo in-place"
+
+  # Move .git to become bare repo
+  mv "$repo/.git" "$bare"
+  git -C "$bare" config core.bare true
+  ok "converted to bare"
+
+  # Fix fetch refspec if needed
+  local current_fetch
+  current_fetch="$(git -C "$bare" config remote.origin.fetch 2>/dev/null || true)"
+  if [[ "$current_fetch" != "+refs/heads/*:refs/remotes/origin/*" ]]; then
+    git -C "$bare" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    ok "refspec fixed"
+  fi
+
+  # Create main worktree
+  local main_wt="$wrapper/$default_branch"
+  if git -C "$bare" show-ref --verify --quiet "refs/remotes/origin/$default_branch"; then
+    git -C "$bare" worktree add "$main_wt" "$default_branch"
+  else
+    git -C "$bare" worktree add -b "$default_branch" "$main_wt" HEAD
+  fi
+  ok "worktree: $main_wt"
+
+  install_pull_only_hook "$main_wt"
+
+  # Remove old working tree files (everything except bare repo dir and worktree dir)
+  log "Cleaning old working tree files"
+  for item in "$wrapper"/*; do
+    local base
+    base="$(basename "$item")"
+    if [[ "$base" == "${name}.git" ]] || [[ "$base" == "$default_branch" ]]; then
+      continue
+    fi
+    rm -rf "$item"
+  done
+  # Also remove hidden files from old working tree (but not . and ..)
+  for item in "$wrapper"/.[!.]*; do
+    [[ -e "$item" ]] || continue
+    rm -rf "$item"
+  done
+  ok "old working tree cleaned"
+
+  log "Done: $wrapper"
+  echo "    bare:     $bare"
+  echo "    worktree: $main_wt (pull-only)"
+  if [[ -n "$remote" ]]; then
+    echo "    remote:   $remote"
+  fi
+  local stash_count
+  stash_count="$(git -C "$main_wt" stash list 2>/dev/null | wc -l | tr -d ' ')"
+  if [[ "$stash_count" -gt 0 ]]; then
+    echo "    stashes:  $stash_count preserved"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# wt [open] — create worktree + tmux session for a feature
+# ---------------------------------------------------------------------------
+cmd_open() {
+  local branch="${1:-}"
+  local repo_name="${2:-}"
+
+  # Repo selection
+  if [[ -z "$repo_name" ]]; then
+    local repo_list=()
+    for dir in "$REPOS_DIR"/*/; do
+      [[ -d "$dir" ]] || continue
+      local name
+      name="$(basename "$dir")"
+      if [[ -d "$dir/${name}.git" ]]; then
+        repo_list+=("$name")
+      fi
+    done
+
+    [[ ${#repo_list[@]} -gt 0 ]] || die "No bare repos found in $REPOS_DIR"
+
+    local selected
+    selected="$(printf '%s\n' "${repo_list[@]}" | fzf \
+      --prompt='repo(s) > ' \
+      --multi \
+      --header='TAB to select multiple, ENTER to confirm' \
+      --height=40%)" || die "No repo selected"
+
+    mapfile -t REPOS <<< "$selected"
+  else
+    REPOS=("$repo_name")
+  fi
+
+  # Branch name
+  if [[ -z "$branch" ]]; then
+    printf 'Branch name (e.g. db/1234): '
+    read -r branch
+  fi
+  [[ -n "$branch" ]] || die "Branch name required"
+  branch="${branch#/}"
+
+  # Create worktree + tmux session for each repo
+  for repo_name in "${REPOS[@]}"; do
+    repo_name="${repo_name// /}"
+    [[ -n "$repo_name" ]] || continue
+
+    local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
+    local worktree="$REPOS_DIR/$repo_name/$branch"
+    local session="${repo_name}/${branch}"
+
+    [[ -d "$bare" ]] || die "Bare repo not found: $bare — run 'wt setup' first"
+
+    log "[$repo_name] Setting up $branch"
+
+    # Create worktree
+    if [[ -d "$worktree" ]]; then
+      ok "worktree exists: $worktree"
+    else
+      local default_branch
+      default_branch="$(detect_default_branch "$bare")"
+
+      mkdir -p "$(dirname "$worktree")"
+
+      if git -C "$bare" show-ref --verify --quiet "refs/heads/$branch"; then
+        git -C "$bare" worktree add "$worktree" "$branch"
+      else
+        git -C "$bare" worktree add -b "$branch" "$worktree" "$default_branch"
+      fi
+      ok "worktree: $worktree"
+    fi
+
+    # Create tmux session
+    if tmux has-session -t "=$session" 2>/dev/null; then
+      ok "session exists: $session"
+    else
+      tmux new-session -d -s "$session" -c "$worktree"
+      ok "session: $session"
+    fi
+
+    # Switch/attach
+    if [[ -n "${TMUX:-}" ]]; then
+      tmux switch-client -t "=$session"
+    else
+      tmux attach-session -t "=$session"
+    fi
+  done
+}
+
+# ---------------------------------------------------------------------------
+# Dispatch
+# ---------------------------------------------------------------------------
+case "${1:-}" in
+  setup)
+    shift
+    cmd_setup "$@"
+    ;;
+  open)
+    shift
+    cmd_open "$@"
+    ;;
+  -h|--help)
+    echo "Usage:"
+    echo "  wt [branch] [repo]           Open feature worktree + tmux session"
+    echo "  wt setup <remote-url>        Create bare repo from remote"
+    echo "  wt setup --from-existing <path>  Convert existing repo to bare"
+    echo ""
+    echo "Env: REPOS_DIR (default: ~/ld)"
+    ;;
+  *)
+    cmd_open "$@"
+    ;;
+esac
