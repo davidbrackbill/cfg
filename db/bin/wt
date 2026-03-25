@@ -12,19 +12,10 @@ die()  { printf '\033[0;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
 # wt setup — create a bare repo with a main worktree
 # ---------------------------------------------------------------------------
 cmd_setup() {
-  local from_existing=false
-  local target=""
+  local target="${1:-}"
+  [[ -n "$target" ]] || die "Usage: wt setup <path-or-remote-url>"
 
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      --from-existing) from_existing=true; shift ;;
-      *) target="$1"; shift ;;
-    esac
-  done
-
-  [[ -n "$target" ]] || die "Usage: wt setup <remote-url> | wt setup --from-existing <path>"
-
-  if "$from_existing"; then
+  if [[ -d "$target" ]]; then
     setup_from_existing "$target"
   else
     setup_from_clone "$target"
@@ -176,10 +167,13 @@ setup_from_existing() {
 # ---------------------------------------------------------------------------
 cmd_open() {
   local branch="${1:-}"
-  local repo_name="${2:-}"
+  shift 2>/dev/null || true
 
-  # Repo selection
-  if [[ -z "$repo_name" ]]; then
+  # Remaining args are repo names
+  local REPOS=("$@")
+
+  # Repo selection via fzf if none given
+  if [[ ${#REPOS[@]} -eq 0 ]]; then
     local repo_list=()
     for dir in "$REPOS_DIR"/*/; do
       [[ -d "$dir" ]] || continue
@@ -200,8 +194,6 @@ cmd_open() {
       --height=40%)" || die "No repo selected"
 
     mapfile -t REPOS <<< "$selected"
-  else
-    REPOS=("$repo_name")
   fi
 
   # Branch name
@@ -260,6 +252,118 @@ cmd_open() {
 }
 
 # ---------------------------------------------------------------------------
+# wt close — tear down worktree + tmux session
+# ---------------------------------------------------------------------------
+cmd_close() {
+  local repo_name=""
+  local branch=""
+
+  # Try to detect from pwd
+  local wt_root
+  wt_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$wt_root" ]] && [[ "$wt_root" == "$REPOS_DIR"/* ]]; then
+    branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+    local rel="${wt_root#$REPOS_DIR/}"
+    repo_name="${rel%%/*}"
+  fi
+
+  # If we couldn't detect, fzf over worktrees from bare repos
+  if [[ -z "$repo_name" ]] || [[ -z "$branch" ]]; then
+    local entries=()
+    for dir in "$REPOS_DIR"/*/; do
+      [[ -d "$dir" ]] || continue
+      local name
+      name="$(basename "$dir")"
+      local bare="$dir/${name}.git"
+      [[ -d "$bare" ]] || continue
+
+      local default_branch
+      default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
+
+      while IFS= read -r line; do
+        local wt_branch
+        wt_branch="$(echo "$line" | awk '{print $3}' | sed 's|^\[||;s|\]$||')"
+        [[ -n "$wt_branch" ]] || continue
+        [[ "$wt_branch" != "$default_branch" ]] || continue
+        entries+=("${name}/${wt_branch}")
+      done < <(git -C "$bare" worktree list 2>/dev/null | tail -n +2)
+    done
+
+    [[ ${#entries[@]} -gt 0 ]] || die "No feature worktrees found"
+
+    local selected
+    selected="$(printf '%s\n' "${entries[@]}" | fzf \
+      --prompt='close > ' \
+      --header='Pick worktree to close' \
+      --height=40%)" || die "No selection"
+
+    repo_name="${selected%%/*}"
+    branch="${selected#*/}"
+  fi
+
+  local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
+  local worktree="$REPOS_DIR/$repo_name/$branch"
+  local session="${repo_name}/${branch}"
+
+  [[ -d "$bare" ]] || die "Bare repo not found: $bare"
+
+  # Confirm
+  printf '\033[0;33m  ?\033[0m Close %s? [y/N] ' "$session"
+  read -r confirm
+  [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
+
+  # Warn on uncommitted changes
+  if [[ -d "$worktree" ]]; then
+    if ! git -C "$worktree" diff --quiet 2>/dev/null || ! git -C "$worktree" diff --cached --quiet 2>/dev/null; then
+      warn "Uncommitted changes in $worktree"
+      printf '\033[0;33m  ?\033[0m Remove anyway? [y/N] '
+      read -r confirm
+      [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
+    fi
+  fi
+
+  # Remove worktree
+  if [[ -d "$worktree" ]]; then
+    git -C "$bare" worktree remove --force "$worktree"
+    ok "removed worktree: $worktree"
+  fi
+
+  # Clean up empty parent dirs
+  local parent
+  parent="$(dirname "$worktree")"
+  while [[ "$parent" != "$REPOS_DIR/$repo_name" ]] && [[ -d "$parent" ]]; do
+    rmdir "$parent" 2>/dev/null || break
+    ok "cleaned: $parent"
+    parent="$(dirname "$parent")"
+  done
+
+  # Optionally delete branch
+  local default_branch
+  default_branch="$(detect_default_branch "$bare")"
+  if [[ "$branch" != "$default_branch" ]]; then
+    printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$branch"
+    read -r confirm
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+      git -C "$bare" branch -D "$branch" && ok "deleted branch: $branch"
+    fi
+  fi
+
+  # Kill tmux session
+  if [[ -n "$session" ]] && tmux has-session -t "=$session" 2>/dev/null; then
+    # Switch to last session if we're in the one being killed
+    local current
+    current="$(tmux display-message -p '#S' 2>/dev/null || true)"
+    if [[ "$current" == "$session" ]]; then
+      tmux switch-client -l 2>/dev/null || tmux switch-client -n 2>/dev/null || true
+    fi
+    tmux kill-session -t "=$session"
+    ok "killed session: $session"
+  fi
+
+  log "Done."
+}
+
+# ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
 case "${1:-}" in
@@ -271,11 +375,16 @@ case "${1:-}" in
     shift
     cmd_open "$@"
     ;;
+  close)
+    shift
+    cmd_close "$@"
+    ;;
   -h|--help)
     echo "Usage:"
-    echo "  wt [branch] [repo]           Open feature worktree + tmux session"
-    echo "  wt setup <remote-url>        Create bare repo from remote"
-    echo "  wt setup --from-existing <path>  Convert existing repo to bare"
+    echo "  wt [branch] [repo]       Open feature worktree + tmux session"
+    echo "  wt close                 Close current or fzf-picked session"
+    echo "  wt setup <path>          Convert existing repo to bare"
+    echo "  wt setup <remote-url>    Clone remote as bare repo"
     echo ""
     echo "Env: REPOS_DIR (default: ~/ld)"
     ;;
