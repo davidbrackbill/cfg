@@ -127,6 +127,9 @@ safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 . "$HOME/.cargo/env"
 
+# Something setting this can prevent Lazygit amend commit from opening in nvim
+unset GIT_EDITOR
+
 # [[Obsidian]]
 export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
 
