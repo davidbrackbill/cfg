@@ -8,6 +8,7 @@
 	editor = nvim
 	fsmonitor = true
 	excludesfile = /Users/db/.gitignore_global
+	hooksPath = /Users/db/.git-hooks
 [credential]
 	useHttpPath = true
 	helper = store
