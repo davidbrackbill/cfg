@@ -1,8 +1,11 @@
+profile: basic
 classify:
   filesystem_read:
   - fd
   - mmdc
   - jq
+  - man
+  - ls
   lang_exec:
   - tmux
   - bazel
@@ -10,3 +13,5 @@ classify:
   package_run:
   - mise
   - goenv
+  git_write:
+  - git worktree
