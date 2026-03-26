@@ -11,3 +11,6 @@ build -c dbg --strip=never
 build --disk_cache=~/.cache/bazel-disk
 build --repository_cache=~/.cache/bazel-repos
 
+# Reuse sandbox directories to avoid setup/teardown overhead
+build --experimental_reuse_sandbox_directories
+
