@@ -13,5 +13,8 @@ classify:
   package_run:
   - mise
   - goenv
+  - bazel test
   git_write:
   - git worktree
+actions:
+  lang_exec: allow
