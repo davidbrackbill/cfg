@@ -1,0 +1,10 @@
+# wt configuration
+
+# Branch name prefix (empty = no prefix)
+BRANCH_PREFIX="db/"
+
+# Repository directory
+REPOS_DIR="$HOME/ld"
+
+# Auto-install pre-push hook on setup
+AUTO_INSTALL_HOOK=true

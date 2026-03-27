@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPOS_DIR="${REPOS_DIR:-$HOME/ld}"
+# Load config if it exists
+if [[ -f "$HOME/.config/.wt" ]]; then
+  source "$HOME/.config/.wt"
+fi
+
+REPOS_DIR="${REPOS_DIR:-$HOME/code/launchdarkly}"
+BRANCH_PREFIX="${BRANCH_PREFIX:-}"
+AUTO_INSTALL_HOOK="${AUTO_INSTALL_HOOK:-true}"
 
 log()  { printf '\033[0;34m==>\033[0m %s\n' "$*"; }
 ok()   { printf '\033[0;32m  ✓\033[0m %s\n' "$*"; }
@@ -24,6 +31,8 @@ cmd_setup() {
 
 install_pull_only_hook() {
   local worktree="$1"
+  [[ "$AUTO_INSTALL_HOOK" == "true" ]] || return 0
+
   local gitdir
   gitdir="$(git -C "$worktree" rev-parse --git-dir)"
   mkdir -p "$gitdir/hooks"
@@ -286,10 +295,10 @@ cmd_open() {
   [[ -n "$branch" ]] || die "Name required"
   branch="${branch#/}"
 
-  # Git branch gets db/ prefix unless --no-prefix
+  # Git branch gets prefix unless --no-prefix
   local git_branch="$branch"
-  if ! "$no_prefix"; then
-    git_branch="db/${branch}"
+  if ! "$no_prefix" && [[ -n "$BRANCH_PREFIX" ]]; then
+    git_branch="${BRANCH_PREFIX}${branch}"
   fi
 
   local multi=false
@@ -582,7 +591,10 @@ case "${1:-}" in
     echo "  wt setup <remote-url>    Clone remote as bare repo"
     echo "  wt <github-pr-url>       Check out a PR branch as a worktree"
     echo ""
-    echo "Env: REPOS_DIR (default: ~/ld)"
+    echo "Config: ~/.config/.wt"
+    echo "  BRANCH_PREFIX            Branch name prefix (default: empty)"
+    echo "  REPOS_DIR                Repository directory (default: ~/code/launchdarkly)"
+    echo "  AUTO_INSTALL_HOOK        Install pre-push hook on setup (default: true)"
     ;;
   *)
     cmd_open "$@"
