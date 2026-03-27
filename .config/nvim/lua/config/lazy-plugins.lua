@@ -60,6 +60,12 @@ require('lazy').setup({
   },
 
   {
+    'folke/neoconf.nvim',
+    lazy = false,  -- must load before lspconfig
+    config = true,
+  },
+
+  {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'williamboman/mason.nvim', config = true },
