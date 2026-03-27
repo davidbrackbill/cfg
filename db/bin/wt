@@ -326,34 +326,7 @@ cmd_open() {
       ok "worktree: $worktree"
     fi
 
-    # Create tmux session
-    if tmux has-session -t "=$session" 2>/dev/null; then
-      # Session exists — check if it's for a different repo
-      local existing_cwd
-      existing_cwd="$(tmux list-panes -t "=$session" -F '#{pane_current_path}' | head -1)"
-      if [[ ! "$existing_cwd" =~ $REPOS_DIR/$repo_name ]]; then
-        # Different repo — use multi-suffix format
-        session="${session}/${repo_name}"
-        if tmux has-session -t "=$session" 2>/dev/null; then
-          ok "session exists: $session"
-        else
-          tmux new-session -d -s "$session" -c "$worktree"
-          ok "session: $session"
-        fi
-      else
-        ok "session exists: $session"
-      fi
-    else
-      tmux new-session -d -s "$session" -c "$worktree"
-      ok "session: $session"
-    fi
-
-    # Switch/attach
-    if [[ -n "${TMUX:-}" ]]; then
-      tmux switch-client -t "=$session"
-    else
-      tmux attach-session -t "=$session"
-    fi
+    open_session "$session" "$worktree" "$repo_name"
   done
 }
 
@@ -502,6 +475,78 @@ cmd_attach() {
   done <<< "$selected"
 }
 
+# Create or reuse a tmux session and switch to it.
+# If a session with the same name exists for a different repo, appends /<repo_name>.
+# Args: session worktree [repo_name]
+open_session() {
+  local session="$1" worktree="$2" repo_name="${3:-}"
+
+  if tmux has-session -t "=$session" 2>/dev/null; then
+    if [[ -n "$repo_name" ]]; then
+      local existing_cwd
+      existing_cwd="$(tmux list-panes -t "=$session" -F '#{pane_current_path}' | head -1)"
+      if [[ ! "$existing_cwd" =~ $REPOS_DIR/$repo_name ]]; then
+        session="${session}/${repo_name}"
+        if tmux has-session -t "=$session" 2>/dev/null; then
+          ok "session exists: $session"
+        else
+          tmux new-session -d -s "$session" -c "$worktree"
+          ok "session: $session"
+        fi
+      else
+        ok "session exists: $session"
+      fi
+    else
+      ok "session exists: $session"
+    fi
+  else
+    tmux new-session -d -s "$session" -c "$worktree"
+    ok "session: $session"
+  fi
+
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "=$session"
+  else
+    tmux attach-session -t "=$session"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# wt <github-pr-url> — check out a PR branch as a worktree + tmux session
+# ---------------------------------------------------------------------------
+cmd_pr() {
+  local url="$1"
+  local org repo_name pr_num
+  org="$(echo "$url"       | sed -E 's|https://github.com/([^/]+)/.*|\1|')"
+  repo_name="$(echo "$url" | sed -E 's|https://github.com/[^/]+/([^/]+)/.*|\1|')"
+  pr_num="$(echo "$url"    | sed -E 's|.*/pull/([0-9]+).*|\1|')"
+
+  local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
+  [[ -d "$bare" ]] || die "Repo not set up: $repo_name — run 'wt setup $url' first"
+
+  log "Looking up PR #$pr_num in $org/$repo_name"
+  local branch
+  branch="$(gh pr view "$pr_num" --repo "$org/$repo_name" --json headRefName -q .headRefName)" \
+    || die "Could not fetch PR #$pr_num — check 'gh auth status'"
+  ok "branch: $branch"
+
+  log "Fetching $branch"
+  git -C "$bare" fetch origin "+refs/heads/${branch}:refs/heads/${branch}"
+  ok "fetched"
+
+  local worktree="$REPOS_DIR/$repo_name/$branch"
+  local session="$branch"
+
+  if [[ -d "$worktree" ]]; then
+    ok "worktree exists: $worktree"
+  else
+    git -C "$bare" worktree add "$worktree" "$branch"
+    ok "worktree: $worktree"
+  fi
+
+  open_session "$session" "$worktree"
+}
+
 # ---------------------------------------------------------------------------
 # Dispatch
 # ---------------------------------------------------------------------------
@@ -522,6 +567,9 @@ case "${1:-}" in
     shift
     cmd_attach "$@"
     ;;
+  https://github.com/*/pull/*)
+    cmd_pr "$1"
+    ;;
   -h|--help)
     echo "Usage:"
     echo "  wt [group//]name [repo...]"
@@ -532,6 +580,7 @@ case "${1:-}" in
     echo "  wt close                 Close current or fzf-picked session"
     echo "  wt setup <path>          Convert existing repo to bare"
     echo "  wt setup <remote-url>    Clone remote as bare repo"
+    echo "  wt <github-pr-url>       Check out a PR branch as a worktree"
     echo ""
     echo "Env: REPOS_DIR (default: ~/ld)"
     ;;
