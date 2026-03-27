@@ -89,11 +89,11 @@ vim.lsp.config('gopls', {
       gofumpt = true,
       staticcheck = true,
       analyses = {
-        unusedparams = true,
-        shadow = true,
-        nilness = true,
-        unusedwrite = true,
-        useany = true,
+        unusedparams = false,
+        shadow = false,
+        nilness = false,
+        unusedwrite = false,
+        useany = false,
       },
       directoryFilters = {
         '-**/node_modules',
