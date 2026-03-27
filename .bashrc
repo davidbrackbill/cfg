@@ -136,5 +136,12 @@ unset GIT_EDITOR
 # [[Obsidian]]
 export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
 
+# [[Atuin]]
+if command -v atuin &>/dev/null; then
+  eval "$(atuin init bash)"
+  # Start daemon in background on first shell
+  (atuin daemon start &>/dev/null &) 2>/dev/null
+fi
+
 # [[Zoxide]] — must be last to hook cd properly
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
