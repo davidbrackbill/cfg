@@ -83,7 +83,7 @@ require('mason-lspconfig').setup({
 })
 
 vim.lsp.config('gopls', {
-  cmd = { 'gopls', '-remote=auto' },
+  cmd = { 'gopls', '-remote=auto', '-remote.listen.timeout=1h' },
   settings = {
     gopls = {
       gofumpt = true,
