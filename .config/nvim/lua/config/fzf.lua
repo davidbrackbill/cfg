@@ -25,6 +25,18 @@ fzf.setup({
   },
 })
 
+local function _grep_oldfiles()
+  local oldfiles = vim.v.oldfiles
+  -- Filter to files that exist
+  local valid_files = {}
+  for _, f in ipairs(oldfiles) do
+    if vim.fn.filereadable(f) == 1 then
+      table.insert(valid_files, f)
+    end
+  end
+  fzf.live_grep({ files = valid_files })
+end
+
 local function _find_git_root()
   local current_file = vim.api.nvim_buf_get_name(0)
   local cwd = vim.fn.getcwd()
@@ -53,8 +65,9 @@ vim.keymap.set('n', '<leader>rr', function()
   fzf.live_grep({ cwd = _find_git_root() })
 end, { desc = 'Grep repo' })
 vim.keymap.set('n', '<leader>rc', fzf.live_grep, { desc = 'Grep cwd' })
-vim.keymap.set('n', '<leader>rb', fzf.lgrep_curbuf, { desc = 'Grep buffer' })
-vim.keymap.set('n', '<leader>ro', fzf.lines, { desc = 'Grep buffers' })
+vim.keymap.set('n', '<leader>rf', fzf.lgrep_curbuf, { desc = 'Grep buffer' })
+vim.keymap.set('n', '<leader>rb', fzf.lines, { desc = 'Grep buffers' })
+vim.keymap.set('n', '<leader>ro', _grep_oldfiles, { desc = 'Grep oldfiles' })
 
 -- Grep word under cursor (immediate)
 vim.keymap.set('n', '*', fzf.grep_cword, { desc = 'Grep cursor word' })
