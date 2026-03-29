@@ -37,6 +37,32 @@ local function _grep_oldfiles()
   fzf.live_grep({ files = valid_files })
 end
 
+-- Wrapper: live_grep + populate quickfix + search register
+local function _live_grep_with_qf(opts)
+  -- Store the search pattern before opening fzf
+  local last_query = ''
+
+  fzf.live_grep(vim.tbl_extend('force', opts, {
+    actions = {
+      ['default'] = function(selected)
+        if selected and #selected > 0 then
+          -- Extract pattern from fzf query if available
+          -- For now, open the file (live_grep default behavior)
+          vim.cmd('edit ' .. selected[1])
+
+          -- Populate quickfix with all matches for this pattern
+          -- This requires running grep command separately
+          vim.cmd('silent grep! --vimgrep ' .. vim.fn.escape(last_query, '/'))
+          vim.cmd('cfirst')
+
+          -- Set search register for n/N navigation
+          vim.fn.setreg('/', last_query)
+        end
+      end
+    }
+  }))
+end
+
 local function _find_git_root()
   local current_file = vim.api.nvim_buf_get_name(0)
   local cwd = vim.fn.getcwd()
