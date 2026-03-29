@@ -4,13 +4,13 @@ local fzf = require('fzf-lua')
 fzf.setup({
   'max-perf',
   winopts = {
-    height = 0.40,
-    width  = 0.60,
-    row    = 0.30,
+    height = 0.60,
+    width  = 0.95,
+    row    = 0.40,
     preview = {
       hidden  = 'hidden',
       layout  = 'vertical',
-      vertical = 'down:40%',
+      vertical = 'down:50%',
     },
   },
   keymap = {
