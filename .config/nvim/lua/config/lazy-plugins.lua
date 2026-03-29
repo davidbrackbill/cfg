@@ -14,11 +14,7 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
 
-  { 'tpope/vim-fugitive', cmd = { 'Git', 'G', 'Gdiffsplit', 'Gvdiffsplit', 'Gread', 'Gwrite' } },
-  { 'tpope/vim-rhubarb', event = 'VeryLazy' },
   'tpope/vim-sleuth',
-  { 'tpope/vim-obsession', cmd = 'Obsession' },
-  { 'jeetsukumaran/vim-indentwise', event = 'VeryLazy' },
 
   {
     'catppuccin/nvim',
@@ -112,8 +108,8 @@ require('lazy').setup({
       sort = { "manual" },
       spec = {
         -- Names
-        { '<leader>G', group = 'Git' },
-        { '<leader>G', group = 'Git',         mode = { 'v' } },
+        { '<leader>g', group = 'Git' },
+        { '<leader>g', group = 'Git',         mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
         { 'g',         group = 'Goto' },
@@ -186,40 +182,25 @@ require('lazy').setup({
           gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
         end, { desc = 'reset git hunk' })
 
-        map('n', '<leader>Gs', gs.stage_hunk, { desc = 'Stage hunk' })
-        map('n', '<leader>Gr', gs.reset_hunk, { desc = 'Reset hunk' })
-        map('n', '<leader>GS', gs.stage_buffer, { desc = 'Stage buffer' })
-        map('n', '<leader>Gu', gs.undo_stage_hunk, { desc = 'Stage hunk' })
-        map('n', '<leader>GR', gs.reset_buffer, { desc = 'Reset buffer' })
-        map('n', '<leader>Gp', gs.preview_hunk, { desc = 'Preview hunk' })
-        map('n', '<leader>Gb', function()
+        map('n', '<leader>gs', gs.stage_hunk, { desc = 'Stage hunk' })
+        map('n', '<leader>gr', gs.reset_hunk, { desc = 'Reset hunk' })
+        map('n', '<leader>gS', gs.stage_buffer, { desc = 'Stage buffer' })
+        map('n', '<leader>gu', gs.undo_stage_hunk, { desc = 'Undo stage hunk' })
+        map('n', '<leader>gR', gs.reset_buffer, { desc = 'Reset buffer' })
+        map('n', '<leader>gp', gs.preview_hunk, { desc = 'Preview hunk' })
+        map('n', '<leader>gb', function()
           gs.blame_line { full = false }
         end, { desc = 'Blame line' })
-        map('n', '<leader>Gd', gs.diffthis, { desc = 'Diff against index' })
-        map('n', '<leader>GD', function()
+        map('n', '<leader>gd', gs.diffthis, { desc = 'Diff against index' })
+        map('n', '<leader>gD', function()
           gs.diffthis '~'
         end, { desc = 'Diff against last commit' })
-        map('n', '<leader>GB', gs.toggle_current_line_blame, { desc = 'Toggle blame' })
-        map('n', '<leader>Gt', gs.toggle_deleted, { desc = 'Toggle deleted' })
+        map('n', '<leader>gB', gs.toggle_current_line_blame, { desc = 'Toggle blame' })
+        map('n', '<leader>gt', gs.toggle_deleted, { desc = 'Toggle deleted' })
 
         map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', { desc = 'select git hunk' })
       end,
     },
-  },
-
-  {
-    "kdheepak/lazygit.nvim",
-    cmd = {
-      "LazyGit",
-      "LazyGitConfig",
-      "LazyGitCurrentFile",
-      "LazyGitFilter",
-      "LazyGitFilterCurrentFile",
-    },
-    dependencies = { "nvim-lua/plenary.nvim", },
-    keys = {
-      { "<leader>g", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-    }
   },
 
 
@@ -262,36 +243,8 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
-  { 'windwp/nvim-ts-autotag', event = 'InsertEnter' },
-
-  {
-    "luckasRanarison/tailwind-tools.nvim",
-    name = "tailwind-tools",
-    ft = { 'html', 'css', 'svelte', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
-    build = ":UpdateRemotePlugins",
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-telescope/telescope.nvim", -- optional
-      "neovim/nvim-lspconfig", -- optional
-    },
-    opts = {
-      server = { override = false }, -- use vim.lsp.config / mason-lspconfig instead of lspconfig
-    }
-  },
 
 
-  {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    opts = {},
-    keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end,               desc = "Flash" },
-      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end,          desc = "Flash Treesitter" },
-      { "r", mode = "o",               function() require("flash").remote() end,              desc = "Remote Flash" },
-      { "R", mode = { "o", "x" },      function() require("flash").treesitter_search() end,   desc = "Treesitter Search" },
-      { "<c-s>", mode = { "c" },       function() require("flash").toggle() end,               desc = "Toggle Flash Search" },
-    },
-  },
 
   {
     "mikavilpas/yazi.nvim",
@@ -312,13 +265,6 @@ require('lazy').setup({
     },
   },
 
-  {
-    'windwp/nvim-autopairs',
-    event = "InsertEnter",
-    config = true
-    -- use opts = {} for passing setup options
-    -- this is equivalent to setup({}) function
-  },
 
   {
     'stevearc/conform.nvim',
