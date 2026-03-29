@@ -26,8 +26,17 @@ vim.keymap.set('v', 'Y', clip, { desc = 'Clip to system' })
 vim.keymap.set('n', '||', function() vim.diagnostic.jump({ count = -1 }) end, { desc = 'Go to previous diagnostic message' })
 vim.keymap.set('n', '\\\\', function() vim.diagnostic.jump({ count = 1 }) end, { desc = 'Go to next diagnostic message' })
 
+-- Paste mappings
+vim.keymap.set('n', 'p', '"0p', { desc = 'Paste yank after' })
+vim.keymap.set('n', 'P', '"0P', { desc = 'Paste yank before' })
+vim.keymap.set('v', 'p', '"0p', { desc = 'Paste yank after' })
+vim.keymap.set('v', 'P', '"0P', { desc = 'Paste yank before' })
+vim.keymap.set('n', '<C-p>', '"1p', { desc = 'Paste delete after' })
+vim.keymap.set('n', '<C-P>', '"1P', { desc = 'Paste delete before' })
+vim.keymap.set('v', '<C-p>', '"1p', { desc = 'Paste delete after' })
+vim.keymap.set('v', '<C-P>', '"1P', { desc = 'Paste delete before' })
+
 -- Leaders
-vim.keymap.set('n', '<leader>p', '"0p', { desc = 'Paste yank' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Sub text' })
 vim.keymap.set('n', '<leader>;', ':tab term ', { desc = 'Term' })
 vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Next tab' })
