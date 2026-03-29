@@ -56,7 +56,7 @@ return {
           group = get_augroup(client),
           buffer = bufnr,
           callback = function()
-            if not format_is_enabled then
+            if not format_is_enabled or vim.bo.readonly then
               return
             end
 
