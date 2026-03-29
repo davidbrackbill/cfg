@@ -40,30 +40,31 @@ local function _find_git_root()
   return git_root
 end
 
--- Config
-vim.keymap.set('n', '<leader>t', fzf.colorschemes, { desc = 'Themes' })
-vim.keymap.set('n', '<leader>`', fzf.builtin, { desc = 'Help' })
+-- Find files (quick access)
+vim.keymap.set('n', '<leader><leader>', fzf.files, { desc = 'Find files' })
 
--- Diagnostics
-vim.keymap.set('n', '\\\\a', fzf.diagnostics_workspace, { desc = 'Diagnostics list' })
+-- Find files (leader-f prefix)
+vim.keymap.set('n', '<leader>ff', fzf.git_files, { desc = 'Find files (repo)' })
+vim.keymap.set('n', '<leader>fc', fzf.files, { desc = 'Find files (cwd)' })
+vim.keymap.set('n', '<leader>fo', fzf.oldfiles, { desc = 'Find old files' })
 
--- Leaders
-vim.keymap.set('n', '<leader><space>', fzf.files, { desc = 'Files' })
-vim.keymap.set('n', '<leader>/', fzf.live_grep, { desc = 'Grep files' })
-vim.keymap.set('n', '<leader>?', fzf.lgrep_curbuf, { desc = 'Grep buffer' })
-vim.keymap.set('n', '<leader>b', fzf.buffers, { desc = 'Buffers' })
-vim.keymap.set('n', '<leader>B', fzf.lines, { desc = 'Grep buffers' })
-vim.keymap.set('n', '<leader>r', fzf.git_files, { desc = 'Repo files' })
-vim.keymap.set('n', '<leader>R', function()
+-- Grep (leader-r prefix)
+vim.keymap.set('n', '<leader>rr', function()
   fzf.live_grep({ cwd = _find_git_root() })
 end, { desc = 'Grep repo' })
-vim.keymap.set('n', '<leader>o', fzf.oldfiles, { desc = 'Old files' })
-vim.keymap.set('n', '<leader>h', function()
-  fzf.files({ cwd = '~/' })
-end, { desc = 'Home files' })
-vim.keymap.set('n', '<leader>\\\\', function()
-  fzf.files({ cwd = '/' })
-end, { desc = 'Root files' })
-vim.keymap.set('n', '<leader>*', fzf.grep_cword, { desc = 'Grep cursor word' })
-vim.keymap.set('n', '<leader>.', fzf.resume, { desc = 'Resume search' })
+vim.keymap.set('n', '<leader>rc', fzf.live_grep, { desc = 'Grep cwd' })
+vim.keymap.set('n', '<leader>rb', fzf.lgrep_curbuf, { desc = 'Grep buffer' })
+vim.keymap.set('n', '<leader>ro', fzf.lines, { desc = 'Grep buffers' })
+
+-- Grep word under cursor (immediate)
+vim.keymap.set('n', '*', fzf.grep_cword, { desc = 'Grep cursor word' })
+
+-- Buffers
+vim.keymap.set('n', '<leader>b', fzf.buffers, { desc = 'Buffers' })
+
+-- Resume search (up arrow)
+vim.keymap.set('n', '<Up>', fzf.resume, { desc = 'Resume search' })
+
+-- Diagnostics
 vim.keymap.set('n', '<leader>d', fzf.diagnostics_document, { desc = 'Diagnostics' })
+vim.keymap.set('n', '\\\\a', fzf.diagnostics_workspace, { desc = 'Diagnostics list' })

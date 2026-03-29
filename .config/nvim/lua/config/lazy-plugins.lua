@@ -108,6 +108,8 @@ require('lazy').setup({
       sort = { "manual" },
       spec = {
         -- Names
+        { '<leader>f', group = 'Find' },
+        { '<leader>r', group = 'gRep' },
         { '<leader>g', group = 'Git' },
         { '<leader>g', group = 'Git',         mode = { 'v' } },
         { '<leader>',  group = 'Commands' },
@@ -155,9 +157,9 @@ require('lazy').setup({
         end
 
         -- Navigation
-        map({ 'n', 'v' }, ']]', function()
+        map({ 'n', 'v' }, ']', function()
           if vim.wo.diff then
-            return ']]'
+            return ']'
           end
           vim.schedule(function()
             gs.next_hunk()
@@ -165,9 +167,9 @@ require('lazy').setup({
           return '<Ignore>'
         end, { expr = true, desc = 'Jump to next hunk' })
 
-        map({ 'n', 'v' }, '[[', function()
+        map({ 'n', 'v' }, '[', function()
           if vim.wo.diff then
-            return '[['
+            return '['
           end
           vim.schedule(function()
             gs.prev_hunk()
@@ -254,7 +256,7 @@ require('lazy').setup({
     event = "VeryLazy",
     keys = {
       {
-        "<leader>L",
+        "<leader>l",
         function() require("yazi").yazi() end,
         desc = "List files (yazi)"
       },
