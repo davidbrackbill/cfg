@@ -16,5 +16,8 @@ classify:
   - bazel test
   git_write:
   - git worktree
+  git_safe:
+  - mcp__github__search_pull_requests
+  - mcp__github__pull_request_read
 actions:
   lang_exec: allow
