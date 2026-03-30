@@ -257,6 +257,10 @@ require('lazy').setup({
     opts = {
       terminal = {},
       notifier = { enabled = true },
+      words = {
+        enabled = true,
+        debounce = 1000,
+      },
       lazygit = {
         win = {
           height = 0.98,
@@ -279,6 +283,16 @@ require('lazy').setup({
         '<leader>gf',
         function() Snacks.lazygit.log_file() end,
         desc = 'LazyGit log (current file)',
+      },
+      {
+        '<M-n>',
+        function() Snacks.words.jump(1) end,
+        desc = 'Next reference',
+      },
+      {
+        '<M-S-n>',
+        function() Snacks.words.jump(-1) end,
+        desc = 'Previous reference',
       },
     },
   },
