@@ -249,6 +249,24 @@ require('lazy').setup({
 
 
   {
+    'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
+    ---@type snacks.Config
+    opts = {
+      terminal = {},
+      notifier = { enabled = true },
+    },
+    keys = {
+      {
+        '<leader>t',
+        function() require('config.bazel_picker').bazel_tests() end,
+        desc = 'Bazel tests',
+      },
+    },
+  },
+
+  {
     "mikavilpas/yazi.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
