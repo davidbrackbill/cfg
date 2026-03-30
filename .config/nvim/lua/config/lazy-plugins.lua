@@ -283,23 +283,6 @@ require('lazy').setup({
   },
 
   {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MunifTanjim/nui.nvim',
-    },
-    keys = {
-      {
-        '<leader>t',
-        function() require('config.bazel_picker').bazel_tests() end,
-        desc = 'Bazel tests',
-      },
-    },
-  },
-
-  {
     "mikavilpas/yazi.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
