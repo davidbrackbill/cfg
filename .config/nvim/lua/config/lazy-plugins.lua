@@ -256,6 +256,39 @@ require('lazy').setup({
     opts = {
       terminal = {},
       notifier = { enabled = true },
+      lazygit = {
+        win = {
+          height = 0.98,
+          width = 0.98,
+        },
+      },
+    },
+    keys = {
+      {
+        '<leader>gg',
+        function() Snacks.lazygit() end,
+        desc = 'LazyGit',
+      },
+      {
+        '<leader>gl',
+        function() Snacks.lazygit.log() end,
+        desc = 'LazyGit log',
+      },
+      {
+        '<leader>gf',
+        function() Snacks.lazygit.log_file() end,
+        desc = 'LazyGit log (current file)',
+      },
+    },
+  },
+
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons',
+      'MunifTanjim/nui.nvim',
     },
     keys = {
       {
