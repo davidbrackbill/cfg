@@ -19,5 +19,8 @@ classify:
   git_safe:
   - mcp__github__search_pull_requests
   - mcp__github__pull_request_read
+  db_read:
+  - mcp__jira__getJiraIssue
+  - mcp__jira__getConfluencePage
 actions:
   lang_exec: allow
