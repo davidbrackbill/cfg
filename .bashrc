@@ -111,6 +111,7 @@ rgf() {
 # Lazygit for dotfiles bare repo
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
+
 # Window renames (subshell + EXIT trap so cleanup runs even on Ctrl+C / signals)
 clod() (trap 'tmux rename-window "$" 2>/dev/null' EXIT; tmux rename-window "✦" 2>/dev/null; command claude "$@")
 lazygit() (trap 'tmux rename-window "$" 2>/dev/null' EXIT; tmux rename-window "∆" 2>/dev/null; command lazygit "$@")
@@ -135,6 +136,20 @@ unset GIT_EDITOR
 
 # [[Obsidian]]
 export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
+
+# [[Local .bashrc.local]] — source from root down to current directory
+_source_bashrc_local() {
+  local dirs=()
+  local dir="$PWD"
+  while [[ "$dir" != "/" ]]; do
+    dirs+=("$dir")
+    dir=$(dirname "$dir")
+  done
+  for ((i=${#dirs[@]}-1; i>=0; i--)); do
+    [[ -f "${dirs[i]}/.bashrc.local" ]] && source "${dirs[i]}/.bashrc.local"
+  done
+}
+_source_bashrc_local
 
 # [[Zoxide]] — must be last to hook cd properly
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
