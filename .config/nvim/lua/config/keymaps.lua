@@ -36,6 +36,13 @@ vim.keymap.set('n', '<C-P>', '"1P', { desc = 'Paste delete before' })
 vim.keymap.set('v', '<C-p>', '"1p', { desc = 'Paste delete after' })
 vim.keymap.set('v', '<C-P>', '"1P', { desc = 'Paste delete before' })
 
+-- Copy +line /abs/path to clipboard (openable with: nvim $VAR)
+vim.keymap.set('n', '<leader>c', function()
+  local ref = '+' .. vim.fn.line('.') .. ' ' .. vim.fn.expand('%:p')
+  vim.fn.setreg('+', ref)
+  vim.notify(ref)
+end, { desc = 'Copy file position' })
+
 -- Leaders
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Sub text' })
 vim.keymap.set('n', '<leader>;', ':tab term ', { desc = 'Term' })
