@@ -112,10 +112,20 @@ rgf() {
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
 
-# Window renames (subshell + EXIT trap so cleanup runs even on Ctrl+C / signals)
-clod() (trap 'tmux rename-window "$" 2>/dev/null' EXIT; tmux rename-window "✦" 2>/dev/null; command claude "$@")
-lazygit() (trap 'tmux rename-window "$" 2>/dev/null' EXIT; tmux rename-window "∆" 2>/dev/null; command lazygit "$@")
-nvim() (trap 'tmux rename-window "$" 2>/dev/null' EXIT; tmux rename-window "¶" 2>/dev/null; command nvim "$@")
+# Window renames — higher-order helper captures previous name so nested calls restore correctly
+_with_icon() {
+  local icon="$1"; shift
+  local prev
+  prev=$(tmux display-message -p '#W' 2>/dev/null)
+  (
+    trap "tmux rename-window '$prev' 2>/dev/null" EXIT
+    tmux rename-window "$icon" 2>/dev/null
+    command "$@"
+  )
+}
+clod()    { _with_icon "✦" claude "$@"; }
+lazygit() { _with_icon "∆" lazygit "$@"; }
+nvim()    { _with_icon "¶" nvim "$@"; }
 
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
