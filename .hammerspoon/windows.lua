@@ -45,6 +45,56 @@ end
 
 local wf = hs.window.filter.new():setDefaultFilter({ visible = true, currentSpace = true })
 
+-- ── window cycling on current screen ─────────────────────────────────────────
+
+function M.cycleWindows()
+  local focused = hs.window.focusedWindow()
+  if not focused then return end
+
+  local allWins = {}
+  for _, win in ipairs(hs.window.visibleWindows()) do
+    if win:isStandard() and win:screen() == focused:screen() then
+      table.insert(allWins, win)
+    end
+  end
+  table.sort(allWins, function(a, b) return a:id() < b:id() end)
+
+  if #allWins < 2 then return end
+
+  local focusedId = focused:id()
+  local currentIdx = 0
+  for i, win in ipairs(allWins) do
+    if win:id() == focusedId then currentIdx = i; break end
+  end
+
+  allWins[(currentIdx % #allWins) + 1]:focus()
+end
+
+function M.switchScreen()
+  local focused = hs.window.focusedWindow()
+  if not focused then return end
+
+  local currentScreen = focused:screen()
+  local allScreens = hs.screen.allScreens()
+
+  if #allScreens < 2 then return end
+
+  local currentIdx = 0
+  for i, screen in ipairs(allScreens) do
+    if screen == currentScreen then currentIdx = i; break end
+  end
+
+  local nextScreen = allScreens[(currentIdx % #allScreens) + 1]
+  local allWins = wf:getWindows(hs.window.filter.sortByFocusedLast)
+
+  for _, win in ipairs(allWins) do
+    if win:screen() == nextScreen then
+      win:application():activate()
+      return
+    end
+  end
+end
+
 local function buildCycleList()
   local allWins   = wf:getWindows(hs.window.filter.sortByFocusedLast)
   local priorityWins, priorityIds = {}, {}
