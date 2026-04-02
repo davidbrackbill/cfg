@@ -13,13 +13,6 @@ UNIT_SIZE=40000
 FILLED=$((USED / UNIT_SIZE))
 MAX_FILLED=$((MAX / UNIT_SIZE))
 BAR=$(printf "%${FILLED}s" | tr ' ' '|')$(printf "%$((MAX_FILLED - FILLED))s")
+SESSION_ID=$(echo "$input" | jq -r '.session_id // ""')
 
-# Check for git worktree
-WORKTREE=""
-if git_dir=$(git rev-parse --git-dir 2>/dev/null); then
-  if [[ $git_dir =~ worktrees/([^/]+) ]]; then
-    WORKTREE="${BASH_REMATCH[1]}"
-  fi
-fi
-
-echo "$SYMBOL [$BAR] $WORKTREE"
+echo "$SYMBOL [$BAR] $SESSION_ID"
