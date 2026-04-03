@@ -358,14 +358,38 @@ close_one() {
   [[ -d "$bare" ]] || { warn "Bare repo not found: $bare"; return 1; }
 
   # Warn on uncommitted changes
+  local close_wt=false
+  local delete_branch=false
+
   if [[ -d "$worktree" ]]; then
     if ! git -C "$worktree" diff --quiet 2>/dev/null || ! git -C "$worktree" diff --cached --quiet 2>/dev/null; then
       warn "Uncommitted changes in $display"
-      printf '\033[0;33m  ?\033[0m Remove anyway? [y/N] '
-      read -r confirm
-      [[ "$confirm" =~ ^[Yy]$ ]] || { warn "Skipped $display"; return 0; }
     fi
   fi
+
+  # Combined prompt for close and branch delete
+  local prompt_branch=""
+  if [[ -n "$git_branch" ]]; then
+    local default_branch
+    default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
+    if [[ "$git_branch" != "$default_branch" ]]; then
+      prompt_branch=" and branch $git_branch"
+    fi
+  fi
+
+  printf '\033[0;33m  ?\033[0m Close worktree%s? [yy/yn/ny/nn/n] ' "$prompt_branch"
+  read -r response
+
+  # Parse response: first char = close worktree, second char = delete branch
+  if [[ "${response:0:1}" =~ ^[Yy]$ ]]; then
+    close_wt=true
+  fi
+  if [[ "${response:1:1}" =~ ^[Yy]$ ]] && [[ -n "$prompt_branch" ]]; then
+    delete_branch=true
+  fi
+
+  # If first answer is no, skip
+  [[ "$close_wt" == "true" ]] || { warn "Skipped $display"; return 0; }
 
   # Remove worktree
   if [[ -d "$worktree" ]]; then
@@ -381,17 +405,9 @@ close_one() {
     parent="$(dirname "$parent")"
   done
 
-  # Optionally delete branch
-  if [[ -n "$git_branch" ]]; then
-    local default_branch
-    default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
-    if [[ "$git_branch" != "$default_branch" ]]; then
-      printf '\033[0;33m  ?\033[0m Delete branch %s? [y/N] ' "$git_branch"
-      read -r confirm
-      if [[ "$confirm" =~ ^[Yy]$ ]]; then
-        git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
-      fi
-    fi
+  # Delete branch if requested
+  if [[ "$delete_branch" == "true" ]]; then
+    git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
   fi
 
   # Kill tmux session
