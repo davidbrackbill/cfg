@@ -47,7 +47,7 @@ local wf = hs.window.filter.new():setDefaultFilter({ visible = true, currentSpac
 
 -- ── window cycling on current screen ─────────────────────────────────────────
 
-function M.cycleWindows()
+local function cycleWindowsDir(direction)
   local focused = hs.window.focusedWindow()
   if not focused then return end
 
@@ -67,7 +67,18 @@ function M.cycleWindows()
     if win:id() == focusedId then currentIdx = i; break end
   end
 
-  allWins[(currentIdx % #allWins) + 1]:focus()
+  local nextIdx = currentIdx + direction
+  if nextIdx > #allWins then nextIdx = 1 end
+  if nextIdx < 1 then nextIdx = #allWins end
+  allWins[nextIdx]:focus()
+end
+
+function M.cycleWindows()
+  cycleWindowsDir(1)
+end
+
+function M.cycleWindowsReverse()
+  cycleWindowsDir(-1)
 end
 
 function M.switchScreen()

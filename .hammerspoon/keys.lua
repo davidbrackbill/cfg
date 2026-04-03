@@ -28,12 +28,8 @@ local function makeDoubleTapHandler(singleFn, doubleFn, threshold)
 end
 
 function M.bind()
-    -- Caps Lock (→ F18 via Karabiner) — single tap cycles windows, double-tap switches screen
-    hs.hotkey.bind({}, 'f18', makeDoubleTapHandler(
-      require('windows').cycleWindows,
-      require('windows').switchScreen,
-      0.2
-    ))
+    -- Caps Lock (→ F18 via Karabiner) — cycle windows forward
+    hs.hotkey.bind({}, 'f18', require('windows').cycleWindows)
 
     -- Cmd+H (via Karabiner → F19) — focus Ghostty and send Alt+H
     hs.hotkey.bind({}, 'f19', function()
@@ -45,6 +41,12 @@ function M.bind()
             end)
         end
     end)
+
+    -- Shift+Caps Lock (via Karabiner → F20) — cycle windows backward
+    hs.hotkey.bind({}, 'f20', require('windows').cycleWindowsReverse)
+
+    -- Alt+Caps Lock (via Karabiner → F16) — switch screen
+    hs.hotkey.bind({}, 'f16', require('windows').switchScreen)
 end
 
 return M

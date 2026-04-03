@@ -103,6 +103,20 @@
                         "modifiers": { "mandatory": ["command"] }
                     },
                     "to": [{ "key_code": "f19" }]
+                },
+                {
+                    "from": {
+                        "key_code": "caps_lock",
+                        "modifiers": { "mandatory": ["shift"] }
+                    },
+                    "to": [{ "key_code": "f20" }]
+                },
+                {
+                    "from": {
+                        "key_code": "caps_lock",
+                        "modifiers": { "mandatory": ["option"] }
+                    },
+                    "to": [{ "key_code": "f16" }]
                 }
             ],
             "virtual_hid_keyboard": {
