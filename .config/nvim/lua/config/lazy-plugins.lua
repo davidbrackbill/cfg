@@ -57,14 +57,14 @@ require('lazy').setup({
 
   {
     'folke/neoconf.nvim',
-    lazy = false,  -- must load before lspconfig
+    lazy = false, -- must load before lspconfig
     config = true,
   },
 
   {
     'neovim/nvim-lspconfig',
     dependencies = {
-      { 'williamboman/mason.nvim', config = true },
+      { 'williamboman/mason.nvim',   config = true },
       'williamboman/mason-lspconfig.nvim',
       { 'arkav/lualine-lsp-progress' },
       'saghen/blink.cmp',
@@ -87,7 +87,7 @@ require('lazy').setup({
     dependencies = { 'rafamadriz/friendly-snippets' },
     opts = {
       keymap = {
-        preset = 'default',
+        preset      = 'default',
         ['<Tab>']   = { 'show', 'select_next', 'snippet_forward', 'fallback' },
         ['<S-Tab>'] = { 'select_prev', 'snippet_backward', 'fallback' },
       },
@@ -263,8 +263,8 @@ require('lazy').setup({
       },
       lazygit = {
         win = {
-          height = 0.98,
-          width = 0.98,
+          height = .99,
+          width = .99,
         },
       },
     },
