@@ -94,7 +94,7 @@ vim.lsp.config('gopls', {
   settings = {
     gopls = {
       gofumpt = true,
-      staticcheck = true,
+      staticcheck = false,
       analyses = {
         unusedparams = false,
         shadow = false,
@@ -110,6 +110,9 @@ vim.lsp.config('gopls', {
         '-bazel-testlogs',
       },
       buildFlags = { '-tags=launchdarkly_easyjson' },
+      diagnosticsTrigger = 'Save',
+      vulncheck = 'Off',
+      symbolScope = 'workspace',
     },
   },
 })
