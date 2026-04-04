@@ -142,6 +142,7 @@
       "~/ld"
     ]
   },
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -236,7 +237,8 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
   "prefersReducedMotion": true
