@@ -447,15 +447,6 @@ cmd_close() {
   fi
 
   # Confirm
-  if [[ ${#targets[@]} -eq 1 ]]; then
-    local display="${targets[0]#$REPOS_DIR/}"
-    printf '\033[0;33m  ?\033[0m Close %s? [y/N] ' "$display"
-  else
-    printf '\033[0;33m  ?\033[0m Close %d worktrees? [y/N] ' "${#targets[@]}"
-  fi
-  read -r confirm
-  [[ "$confirm" =~ ^[Yy]$ ]] || die "Aborted"
-
   for wt in "${targets[@]}"; do
     close_one "$wt"
   done
