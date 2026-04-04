@@ -267,6 +267,11 @@ require('lazy').setup({
           width = .99,
         },
       },
+      gitbrowse = {},
+      gh = {},
+      picker = {
+        enabled = true,
+      },
     },
     keys = {
       {
@@ -283,6 +288,16 @@ require('lazy').setup({
         '<leader>gf',
         function() Snacks.lazygit.log_file() end,
         desc = 'LazyGit log (current file)',
+      },
+      {
+        '<leader>gp',
+        function() Snacks.picker.gh_pr({ search = 'is:open is:pr author:@me org:launchdarkly archived:false' }) end,
+        desc = 'GitHub pulls',
+      },
+      {
+        '<leader>gr',
+        function() Snacks.picker.gh_pr({ search = 'is:open is:pr review-requested:@me org:launchdarkly archived:false' }) end,
+        desc = 'GitHub requests',
       },
       {
         '<M-n>',
