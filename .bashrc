@@ -135,7 +135,8 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 [ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
 
 # [[History sharing across sessions]]
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a"
+# Append to file, clear session buffer, then reload — keeps history in sync across terminals
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a; history -c; history -r"
 
 safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
