@@ -38,6 +38,10 @@ eval "$(mise activate bash)"
 pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter
 npx puppeteer browsers install chrome-headless-shell
 
+# ── pre-commit (linting/formatting hooks for foundation) ─────────────────────
+echo "==> Installing pre-commit..."
+mise use -g pipx:pre-commit
+
 # ── nah (Claude Code permissions hook) ────────────────────────────────────────
 echo "==> Installing nah..."
 mise use -g pipx:nah

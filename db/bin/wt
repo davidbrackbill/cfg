@@ -333,6 +333,11 @@ cmd_open() {
         git -C "$bare" worktree add -b "$git_branch" "$worktree" "$default_branch"
       fi
       ok "worktree: $worktree"
+
+      # Install pre-commit hooks if config exists
+      if [[ -f "$worktree/.pre-commit-config.yaml" ]] && command -v pre-commit &>/dev/null; then
+        (cd "$worktree" && pre-commit install) 2>/dev/null && ok "pre-commit hooks installed" || true
+      fi
     fi
 
     open_session "$session" "$worktree" "$repo_name"
