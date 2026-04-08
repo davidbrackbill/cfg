@@ -142,7 +142,7 @@
       "~/ld"
     ]
   },
-  "model": "opus",
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
@@ -238,7 +238,8 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
   "prefersReducedMotion": true
