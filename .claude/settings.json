@@ -142,7 +142,7 @@
       "~/ld"
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
