@@ -1,0 +1,12 @@
+gotest() {
+  local dirs
+  dirs=$(fd "_test.go" . | sed 's|/[^/]*_test.go||' | sort -u | fzf --multi)
+
+  [[ -z "$dirs" ]] && return
+
+  echo "$dirs" | while read -r dir; do
+    echo "Testing $dir..."
+    go test -json -tags launchdarkly_easyjson "./$dir" | jq -r 'select(.Action=="pass" or .Action=="fail") | "\(.Action | ascii_upcase): \(.Test)"' | sed -E 's/PASS:/\x1b[32mPASS:\x1b[0m/; s/FAIL:/\x1b[31mFAIL:\x1b[0m/'
+  done
+}
+
