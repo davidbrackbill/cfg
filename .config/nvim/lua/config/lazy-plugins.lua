@@ -320,7 +320,7 @@ require('lazy').setup({
     event = "VeryLazy",
     keys = {
       {
-        "<leader>l",
+        "<leader>L",
         function() require("yazi").yazi() end,
         desc = "List files (yazi)"
       },

@@ -47,6 +47,7 @@ end, { desc = 'Copy file position' })
 vim.keymap.set('n', '<leader>s', ':%s/', { desc = 'Sub text' })
 vim.keymap.set('n', '<leader>;', ':tab term ', { desc = 'Term' })
 vim.keymap.set('n', '<leader><Tab>', ':tabNext <cr>', { desc = 'Next tab' })
+vim.keymap.set('n', '<leader>l', ':buffer #<cr>', { desc = 'Last buffer' })
 local gh_window = nil
 
 local function format_date(git_date)
