@@ -6,7 +6,13 @@ gotest() {
 
   echo "$dirs" | while read -r dir; do
     echo "Testing $dir..."
-    go test -json -tags launchdarkly_easyjson "./$dir" | jq -r 'select(.Action=="pass" or .Action=="fail") | "\(.Action | ascii_upcase): \(.Test)"' | sed -E 's/PASS:/\x1b[32mPASS:\x1b[0m/; s/FAIL:/\x1b[31mFAIL:\x1b[0m/'
+    go test -json -tags launchdarkly_easyjson "./$dir" | jq -r '
+      if .Action == "pass" then "PASS: \(.Test // .Package)"
+      elif .Action == "fail" then "FAIL: \(.Test // .Package)"
+      elif .Action == "output" and (.Output | test("^(=== RUN|--- PASS|^PASS\n|^ok |\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*\\tINFO\\t)") | not) then .Output | rtrimstr("\n")
+      else empty
+      end
+    ' | sed -E 's/^PASS:/\x1b[32mPASS:\x1b[0m/; s/^FAIL:/\x1b[31mFAIL:\x1b[0m/'
   done
 }
 
