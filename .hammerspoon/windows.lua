@@ -41,6 +41,25 @@ function M.focusPrev()
   if prevWindow then prevWindow:focus() end
 end
 
+-- ── toggle between last two windows on current screen ──────────────────────────
+
+function M.toggleLastWindow()
+  local focused = hs.window.focusedWindow()
+  if not focused then return end
+
+  local currentScreen = focused:screen()
+  local focusedId = focused:id()
+
+  -- If prevWindow is on the same screen, toggle to it
+  if prevWindow and prevWindow:screen() == currentScreen and prevWindow:id() ~= focusedId then
+    prevWindow:focus()
+    return
+  end
+
+  -- Otherwise cycle to the next window on the same screen (fallback)
+  cycleWindowsDir(1)
+end
+
 -- ── window cycling ────────────────────────────────────────────────────────────
 
 local wf = hs.window.filter.new():setDefaultFilter({ visible = true, currentSpace = true })

@@ -28,8 +28,8 @@ local function makeDoubleTapHandler(singleFn, doubleFn, threshold)
 end
 
 function M.bind()
-    -- Caps Lock (→ F18 via Karabiner) — cycle windows forward
-    hs.hotkey.bind({}, 'f18', require('windows').cycleWindows)
+    -- Caps Lock (→ F18 via Karabiner) — toggle between last two windows on current screen
+    hs.hotkey.bind({}, 'f18', require('windows').toggleLastWindow)
 
     -- Cmd+H (via Karabiner → F19) — focus Ghostty and send Alt+H
     hs.hotkey.bind({}, 'f19', function()
