@@ -51,6 +51,9 @@ export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 # LD dev tools (awslogin, update-aws-config, etc.)
 export PATH="$PATH:$HOME/ld/dev/bin"
 
+# Local project binaries
+export PATH="$HOME/db/bin:$PATH"
+
 # [[FZF]]
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
