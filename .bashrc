@@ -24,12 +24,12 @@ bind -f ~/.inputrc
 safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
 
 safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
-safe_source /opt/homebrew/etc/profile.d/bash_completion.sh
 safe_source "$HOME/.ghcup/env"
 safe_source "$HOME/.cargo/env"
 safe_source ~/.git.env
 safe_source ~/.ld.env
 safe_source ~/.bash_aliases
+safe_source ~/.velcro.launchdarklyrc
 
 # [[Exports]]
 export EDITOR=nvim
@@ -141,7 +141,6 @@ command -v starship &>/dev/null && eval "$(starship init bash)"
 # Append to file, clear session buffer, then reload — keeps history in sync across terminals
 PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a; history -c; history -r"
 
-safe_source ~/.velcro.launchdarklyrc
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 . "$HOME/.cargo/env"
 
