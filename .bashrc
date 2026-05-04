@@ -133,6 +133,12 @@ nvim()    { _with_icon "¶" nvim "$@"; }
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
+# [[Goenv]]
+export GOENV_ROOT="$HOME/.goenv"
+export PATH="$GOENV_ROOT/versions/1.26.2/bin:$PATH"
+export GOTOOLCHAIN=local
+export GO_BUILD_DEFINITIONS="$GOENV_ROOT/plugins/go-build/share/go-build"
+
 # [[Starship prompt]]
 command -v starship &>/dev/null && eval "$(starship init bash)"
 [ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
