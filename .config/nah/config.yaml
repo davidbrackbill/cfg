@@ -24,3 +24,5 @@ classify:
   - mcp__jira__getConfluencePage
 actions:
   lang_exec: allow
+  /Users/db/db/bin/hh: allow
+  grep: allow

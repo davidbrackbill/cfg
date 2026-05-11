@@ -47,3 +47,13 @@ Config: `~/.config/.jira/.config.yml`
 ## ld CLI (Internal Tools)
 
 See [`~/.claude/ld-tools.md`](.claude/ld-tools.md) for full usage.
+
+## Testing Practices
+
+When testing code changes, always add test cases to the project's existing test directory rather than creating temporary test files. This ensures:
+- Changes are persisted and can be reviewed
+- Tests are discoverable and maintainable
+- The test suite grows with the codebase
+- Other developers can understand what was being tested
+
+Do NOT create random temp testers or one-off test files in `/tmp/` unless explicitly requested.
