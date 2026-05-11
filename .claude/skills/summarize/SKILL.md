@@ -22,3 +22,5 @@ Write the summary to the filename provided as an argument, or to `compact.md` in
 Keep the summary concise but comprehensive—aim for ~500-1000 words. Use bullet points where they improve clarity. Include specific file paths, function names, and command examples where relevant.
 
 After writing the file, confirm the location where it was saved.
+
+Finally, once done writing the file, write in the chat a prompt for the next session.
