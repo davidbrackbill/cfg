@@ -54,6 +54,9 @@ export PATH="$PATH:$HOME/ld/dev/bin"
 # Local project binaries
 export PATH="$HOME/db/bin:$PATH"
 
+# Docker
+export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+
 # [[FZF]]
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
