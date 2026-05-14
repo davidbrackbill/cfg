@@ -166,7 +166,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '\\a' > /dev/tty"
+            "command": "terminal-notifier -title 'Claude Code' -message 'Ready' -sound default || true"
           }
         ]
       }
