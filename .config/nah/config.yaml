@@ -6,6 +6,9 @@ classify:
   - jq
   - man
   - ls
+  - head
+  - grep
+  - tail
   lang_exec:
   - tmux
   - bazel
@@ -22,7 +25,12 @@ classify:
   db_read:
   - mcp__jira__getJiraIssue
   - mcp__jira__getConfluencePage
+  filesystem_write:
+  - pnpm fmt:write:path
 actions:
   lang_exec: allow
   /Users/db/db/bin/hh: allow
   grep: allow
+  pnpm oxlint:js: allow
+  pnpm ts: allow
+  pnpm build: allow
