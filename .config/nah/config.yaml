@@ -34,3 +34,4 @@ actions:
   pnpm oxlint:js: allow
   pnpm ts: allow
   pnpm build: allow
+  pnpm *: allow
