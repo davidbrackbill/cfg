@@ -143,10 +143,6 @@ export GO_BUILD_DEFINITIONS="$GOENV_ROOT/plugins/go-build/share/go-build"
 command -v starship &>/dev/null && eval "$(starship init bash)"
 [ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
 
-# [[History sharing across sessions]]
-# Append to file, clear session buffer, then reload — keeps history in sync across terminals
-PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }history -a; history -c; history -r"
-
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
 . "$HOME/.cargo/env"
 
