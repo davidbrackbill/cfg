@@ -35,7 +35,7 @@ mise install node@lts pnpm@latest
 mise use -g node@lts pnpm@latest uv@latest
 MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
 eval "$(mise activate bash)"
-pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter
+pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files
 npx puppeteer browsers install chrome-headless-shell
 
 # ── pre-commit (linting/formatting hooks for foundation) ─────────────────────
@@ -113,6 +113,7 @@ echo "==> Configuring Claude Code MCP servers..."
 claude mcp add-json --scope user confluence '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-confluence"]}' 2>/dev/null || true
 claude mcp add-json --scope user jira '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-jira"]}' 2>/dev/null || true
 claude mcp add-json --scope user github '{"command":"npx","args":["-y","@modelcontextprotocol/server-github"]}' 2>/dev/null || true
+claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp 2>/dev/null || true
 
 # ── Homebrew bash ──────────────────────────────────────────────────────────────
 BREW_BASH=/opt/homebrew/bin/bash
