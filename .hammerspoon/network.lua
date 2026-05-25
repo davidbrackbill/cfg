@@ -38,8 +38,11 @@ end
 
 -- Find the Connect button inside the row/cell that also contains profileName.
 -- This prevents clicking the Connect button for a different profile row.
-local function findProfileConnectButton(el, profileName)
+local function findProfileConnectButton(el, profileName, depth)
   if not el then return nil end
+  depth = depth or 0
+  if depth > 20 then return nil end  -- Prevent infinite recursion from circular refs
+
   local children = el:attributeValue('AXChildren') or {}
 
   -- Collect any direct-child Connect buttons in this container
@@ -60,58 +63,97 @@ local function findProfileConnectButton(el, profileName)
 
   -- Otherwise recurse
   for _, child in ipairs(children) do
-    local found = findProfileConnectButton(child, profileName)
+    local found = findProfileConnectButton(child, profileName, depth + 1)
     if found then return found end
   end
   return nil
 end
 
-local connectDebounce
+-- Core click logic (no debounce) - used by both launch and reconnect paths
+local function clickConnectButton(retryCount)
+  retryCount = retryCount or 0
+  if isVpnConnected() then return end
 
-local function triggerConnect()
-  -- Debounce: ignore rapid repeated calls (e.g. during OpenVPN SIGUSR1 reconnect)
-  if connectDebounce then connectDebounce:stop() end
-  connectDebounce = hs.timer.doAfter(3, function()
-    if isVpnConnected() then return end  -- already up by now
+  local app = hs.application.find(VPN_BUNDLE)
+  if not app then return end
 
-    local app = hs.application.find(VPN_BUNDLE)
-    if not app then return end
+  app:activate()
+  hs.timer.doAfter(1, function()
+    local win = app:mainWindow()
+    if not win then
+      -- Window won't appear - quit and relaunch to force a window
+      print(">>> No window, relaunching app")
+      app:kill()
+      hs.timer.doAfter(2, function()
+        hs.application.open(VPN_BUNDLE)
+        hs.timer.doAfter(10, function() clickConnectButton(0) end)
+      end)
+      return
+    end
 
-    app:activate()
-    hs.timer.doAfter(0.5, function()
-      local win = app:mainWindow()
-      if not win then return end
+    local ax  = hs.axuielement.windowElement(win)
+    local btn = findProfileConnectButton(ax, VPN_PROFILE)
+    if btn then
+      print(">>> Clicking Connect button")
+      btn:performAction('AXPress')
 
-      local ax  = hs.axuielement.windowElement(win)
-      local btn = findProfileConnectButton(ax, VPN_PROFILE)
-      if btn then
-        btn:performAction('AXPress')
-        -- Okta browser window will open automatically
+      -- Wait 15s, then close window
+      hs.timer.doAfter(15, function()
+        print(">>> Closing window")
+        local app = hs.application.find(VPN_BUNDLE)
+        if app then
+          local win = app:mainWindow()
+          if win then win:close() end
+        end
+      end)
+    else
+      if retryCount < 5 then
+        print(">>> Button not found, retrying in 2s (attempt " .. (retryCount + 1) .. ")")
+        hs.timer.doAfter(2, function() clickConnectButton(retryCount + 1) end)
       else
         hs.notify.new({
           title           = 'VPN: action needed',
           informativeText = 'Could not find Connect button — please connect to "' .. VPN_PROFILE .. '" manually.',
         }):send()
       end
-    end)
+    end
   end)
 end
 
+local ensureVpnDebounce
+
 local function ensureVPN()
-  if not hs.application.find(VPN_BUNDLE) then
+  -- Already connected? Nothing to do
+  if isVpnConnected() then return end
+
+  -- Debounce: stop previous attempt if ensureVPN called rapidly
+  if ensureVpnDebounce then ensureVpnDebounce:stop() end
+
+  local app = hs.application.find(VPN_BUNDLE)
+  local appWasRunning = app ~= nil
+
+  -- Launch if not running
+  if not app then
+    print(">>> Launching VPN app")
     hs.application.open(VPN_BUNDLE)
-    hs.timer.doAfter(4, function()
-      local app = hs.application.find(VPN_BUNDLE)
-      if app then
-        local win = app:mainWindow()
-        if win then win:close() end
-      end
-      if not isVpnConnected() then triggerConnect() end
-    end)
-    return
   end
 
-  if not isVpnConnected() then triggerConnect() end
+  -- Schedule connect attempt (longer delay if we just launched)
+  local delay = appWasRunning and 3 or 10
+  print(">>> Will attempt connect in " .. delay .. "s (app was " .. (appWasRunning and "running" or "launched") .. ")")
+
+  ensureVpnDebounce = hs.timer.doAfter(delay, function()
+    if isVpnConnected() then return end
+
+    local app = hs.application.find(VPN_BUNDLE)
+    if not app then return end
+
+    -- Activate app and let clickConnectButton handle window detection with retries
+    app:activate()
+    hs.timer.doAfter(1, function()
+      clickConnectButton()
+    end)
+  end)
 end
 
 function M.startWatcher()
