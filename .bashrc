@@ -134,6 +134,28 @@ clod()    { _with_icon "✦" claude "$@"; }
 lazygit() { _with_icon "∆" lazygit "$@"; }
 nvim()    { _with_icon "¶" nvim "$@"; }
 
+# [[Bazel cleanup]]
+bazel-orphanage() {
+  local dirs=()
+  for dir in /private/var/tmp/_bazel_db/*/; do
+    local ws=$(cat "$dir/DO_NOT_BUILD_HERE" 2>/dev/null | head -1)
+    if [[ -n "$ws" && ! -d "$ws" ]]; then
+      echo "Orphaned: $ws"
+      dirs+=("$dir")
+    fi
+  done
+  if [[ ${#dirs[@]} -gt 0 ]]; then
+    echo "Removing ${#dirs[@]} orphaned output bases..."
+    sudo rm -rf "${dirs[@]}"
+    echo "Done"
+  else
+    echo "No orphaned Bazel output bases found"
+  fi
+}
+
+# Bazel CI tests need aws to be logged in
+alias bazel='aws-check && command bazel'
+
 # [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
@@ -169,6 +191,7 @@ _source_bashrc_local() {
   done
 }
 _source_bashrc_local
+
 
 # [[Zoxide]] — must be last to hook cd properly
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
