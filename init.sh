@@ -19,7 +19,8 @@ brew install \
     tree-sitter-cli vjeantet/tap/alerter \
     1password-cli \
     timg \
-    ankitpokhrel/jira-cli/jira-cli
+    ankitpokhrel/jira-cli/jira-cli \
+    docker-credential-helper-ecr
 
 echo "==> Installing casks..."
 brew tap notwadegrimridge/brew

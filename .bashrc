@@ -28,6 +28,7 @@ safe_source "$HOME/.ghcup/env"
 safe_source "$HOME/.cargo/env"
 safe_source ~/.git.env
 safe_source ~/.ld.env
+safe_source ~/.ecrrc
 safe_source ~/.bash_aliases
 safe_source ~/.velcro.launchdarklyrc
 
