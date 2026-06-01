@@ -121,6 +121,8 @@ local function clickConnectButton(retryCount)
 end
 
 local ensureVpnDebounce
+local sleepWatcher
+local ifWatcher
 
 local function ensureVPN()
   -- Already connected? Nothing to do
@@ -158,18 +160,19 @@ end
 
 function M.startWatcher()
   -- Watch for network interface changes (catches VPN connect/disconnect)
-  local ifWatcher = hs.network.configuration.open()
+  ifWatcher = hs.network.configuration.open()
   ifWatcher:setCallback(function() hs.timer.doAfter(2, ensureVPN) end)
   ifWatcher:monitorKeys({'State:/Network/Interface'}, false)
   ifWatcher:start()
 
-  -- Wake from sleep
-  hs.caffeinate.watcher.new(function(event)
+  -- Wake from sleep (must store reference to prevent GC)
+  sleepWatcher = hs.caffeinate.watcher.new(function(event)
     local w = hs.caffeinate.watcher
     if event == w.systemDidWake or event == w.screensDidWake then
       hs.timer.doAfter(5, ensureVPN)
     end
-  end):start()
+  end)
+  sleepWatcher:start()
 
   -- Internet reachability
   local r = hs.network.reachability.internet()
