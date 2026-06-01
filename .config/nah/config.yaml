@@ -35,3 +35,5 @@ actions:
   pnpm ts: allow
   pnpm build: allow
   pnpm *: allow
+  pnpm test:base: allow
+  pnpm test: allow
