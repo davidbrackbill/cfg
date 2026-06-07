@@ -143,11 +143,11 @@
       "mcp__github__get_label",
       "mcp__github__get_copilot_job_status"
     ],
+    "defaultMode": "default",
     "additionalDirectories": [
       "~/ld"
     ]
   },
-  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -247,5 +247,10 @@
     "typescript-lsp@claude-plugins-official": true
   },
   "effortLevel": "medium",
-  "prefersReducedMotion": true
+  "promptSuggestionEnabled": false,
+  "prefersReducedMotion": true,
+  "preferredNotifChannel": "terminal_bell",
+  "autoScrollEnabled": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true
 }
