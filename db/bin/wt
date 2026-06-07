@@ -334,10 +334,8 @@ cmd_open() {
       fi
       ok "worktree: $worktree"
 
-      # Install pre-commit hooks if config exists
-      if [[ -f "$worktree/.pre-commit-config.yaml" ]] && command -v pre-commit &>/dev/null; then
-        (cd "$worktree" && pre-commit install) 2>/dev/null && ok "pre-commit hooks installed" || true
-      fi
+      # Note: pre-commit hooks handled via shared core.hooksPath hooks in bare repo
+      # (pre-commit install won't work when core.hooksPath is set)
     fi
 
     open_session "$session" "$worktree" "$repo_name"
