@@ -37,3 +37,6 @@ actions:
   pnpm *: allow
   pnpm test:base: allow
   pnpm test: allow
+  mcp__datadog__analyze_datadog_logs: allow
+  mcp__datadog__search_datadog_logs: allow
+  pnpm vitest run: allow
