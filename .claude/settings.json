@@ -177,7 +177,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -186,7 +186,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -195,7 +195,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -204,7 +204,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -213,7 +213,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -222,7 +222,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       },
@@ -231,7 +231,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/Users/db/.local/share/mise/installs/pipx-nah/0.5.2/nah/bin/python /Users/db/.claude/hooks/nah_guard.py"
+            "command": "/Users/db/.local/bin/nah_conditional.sh"
           }
         ]
       }
