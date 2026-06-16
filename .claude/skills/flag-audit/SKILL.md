@@ -38,27 +38,35 @@ flagdown pre-classifies each flag. Map to action:
 
 | staleState | Meaning | Action |
 |---|---|---|
-| `readyForCodeRemoval` | launched in all checked envs, still has code refs | **Prime candidate** — remove branch, hardcode winning variation |
+| `readyForCodeRemoval` | has code refs AND is fully rolled out — every traffic-bearing env serves one deterministic variation, stably | **Prime candidate** — hardcode that variation, remove the branch |
 | `readyToArchive` | inactive everywhere, no code refs | Archive in LD (no code change) |
 | `inactive` | all envs inactive (off) but code refs remain | Likely removable — verify it's truly abandoned |
 | `launched` | launched everywhere, no code refs found | Archive in LD |
-| `active` | at least one env actively serving | **Not** a removal candidate — leave it |
+| `active` | still does real work (branches in some relevant env) | **Not** a removal candidate — leave it |
 | `unknown` / `archived` | no env data / already archived | Skip |
+
+Note: `readyForCodeRemoval` catches **fully-rolled-out flags that still have high eval
+counts** — a flag pinned to one variation everywhere is evaluated constantly but its code
+branch is dead. Do not dismiss a high-eval flag as "active"; trust the staleState.
 
 ## Step 4 — Corroborate with evidence (this is where flagdown earns its keep)
 
-Don't trust staleState alone. For each candidate, weigh:
+The classifier gives you the mechanical signal; you add judgment. For each candidate, weigh:
 
-- **Evaluation counts** — `environments[env].evaluations.total7d`. Near-zero across all
-  envs is the strongest "nobody uses this" signal, even if status looks active. High
-  recent counts mean it's live — downgrade or drop the candidate.
-- **Last evaluation** — a recent `lastEvaluation` contradicts "stale." Old/never = safer.
-- **Targeting complexity** — `targeting.ruleCount`/`targetCount`/`prerequisiteCount > 0`
-  means removal changes behavior for specific cohorts or breaks dependent flags. Flag as
-  **needs-care**, don't auto-remove.
-- **Temporary vs permanent** — `temporary: false` on an old flag may be intentional
-  long-lived config, not debt. Note it; ask before removing.
-- **Age** — derive from `creationDate`; old + launched + zero evals = textbook dead flag.
+- **Which variation it's rolled out to** — for a `readyForCodeRemoval` flag, determine the
+  value to hardcode: find the deterministic variation each relevant env serves
+  (`on` + `targeting.fallthroughVariation`, or `off` + `targeting.offVariation`) and map
+  the index through `variations[]`. State it explicitly (e.g. "hardcode `true`").
+- **Temporary vs permanent** — `temporary: false`, especially on an old flag, is often
+  intentional long-lived config (kill switches, numeric limits, access gates), not debt.
+  Mark **needs-care** and confirm before removing, even if it classifies removable.
+- **Prerequisites / dependents** — `targeting.prerequisiteCount > 0` means this flag gates
+  others; removing it can break dependent flags. **needs-care**.
+- **Targeting complexity on `active` flags** — rules/targets are why a flag stays `active`;
+  that's the tool correctly telling you it still differentiates behavior. Don't override it.
+- **Evaluation counts** — note `total7d`, but remember it does **not** indicate removability
+  on its own: rolled-out flags have high counts. Use it for context, not as the gate.
+- **Age** — derive from `creationDate`; old + fully-rolled-out = textbook dead branch.
 
 ## Step 5 — Report
 
