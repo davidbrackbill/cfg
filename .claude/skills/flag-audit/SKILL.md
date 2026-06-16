@@ -57,9 +57,11 @@ The classifier gives you the mechanical signal; you add judgment. For each candi
   value to hardcode: find the deterministic variation each relevant env serves
   (`on` + `targeting.fallthroughVariation`, or `off` + `targeting.offVariation`) and map
   the index through `variations[]`. State it explicitly (e.g. "hardcode `true`").
-- **Temporary vs permanent** — `temporary: false`, especially on an old flag, is often
-  intentional long-lived config (kill switches, numeric limits, access gates), not debt.
-  Mark **needs-care** and confirm before removing, even if it classifies removable.
+- **Permanent flags are config, not debt** — flagdown already excludes `temporary: false`
+  flags from `readyForCodeRemoval` (they're kill switches, numeric limits, access gates the
+  owner intends to keep). Do not resurrect them as removal candidates. Only if the user
+  *explicitly* asks to review permanent flags should you surface them — and frame it as
+  "should this still be permanent?", a deliberate review, never an automated cleanup.
 - **Prerequisites / dependents** — `targeting.prerequisiteCount > 0` means this flag gates
   others; removing it can break dependent flags. **needs-care**.
 - **Targeting complexity on `active` flags** — rules/targets are why a flag stays `active`;
