@@ -53,10 +53,10 @@ branch is dead. Do not dismiss a high-eval flag as "active"; trust the staleStat
 
 The classifier gives you the mechanical signal; you add judgment. For each candidate, weigh:
 
-- **Which variation it's rolled out to** — for a `readyForCodeRemoval` flag, determine the
-  value to hardcode: find the deterministic variation each relevant env serves
-  (`on` + `targeting.fallthroughVariation`, or `off` + `targeting.offVariation`) and map
-  the index through `variations[]`. State it explicitly (e.g. "hardcode `true`").
+- **Which variation it's rolled out to** — `readyForCodeRemoval` flags carry a
+  `recommendedValue` field: the exact value to hardcode. State it explicitly (e.g.
+  "hardcode `true`"). It's absent on every other flag, so its presence also confirms
+  removability. (Only fall back to deriving it from `targeting` if the field is missing.)
 - **Permanent flags are config, not debt** — flagdown already excludes `temporary: false`
   flags from `readyForCodeRemoval` (they're kill switches, numeric limits, access gates the
   owner intends to keep). Do not resurrect them as removal candidates. Only if the user
