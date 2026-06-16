@@ -38,6 +38,7 @@ flagdown pre-classifies each flag. Map to action:
 
 | staleState | Meaning | Action |
 |---|---|---|
+| `orphanedReference` | referenced in code but **not found in LD** (the flag 404s) | **Prime candidate** — the SDK call always returns the in-code default; remove the reference and hardcode that default. First rule out a wrong-project/renamed/typo'd key. |
 | `readyForCodeRemoval` | has code refs AND is fully rolled out — every traffic-bearing env serves one deterministic variation, stably | **Prime candidate** — hardcode that variation, remove the branch |
 | `readyToArchive` | inactive everywhere, no code refs | Archive in LD (no code change) |
 | `inactive` | all envs inactive (off) but code refs remain | Likely removable — verify it's truly abandoned |
