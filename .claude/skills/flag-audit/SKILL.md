@@ -25,6 +25,26 @@ removal safety.
 flagdown -dir <package-path> -format json
 ```
 
+**Monorepos with a separate wrapper package (gonfalon and friends): you MUST pass both
+`-definitions` and `-wrapper-modules`, together.** Flags are accessed through wrapper
+functions (`enableFoo()`) defined in a different package, and without the definitions
+flagdown can't map `enableFoo` → `enable-foo`:
+
+```bash
+flagdown -dir ~/ld/gonfalon/main/packages/<area>/src \
+  -definitions ~/ld/gonfalon/main/packages/dogfood-flags/src \
+  -wrapper-modules @gonfalon/dogfood-flags -format json
+```
+
+- `-definitions` must be a **DIRECTORY** (the one containing the wrapper definition files,
+  e.g. `dogfood-flags/src`), never a single file path.
+- **Sanity check before trusting results.** If stderr shows
+  `warning: N wrapper call(s) could not be resolved`, OR you see flag keys that are
+  `camelCase` (e.g. `enableFoo`) instead of `kebab-case` (`enable-foo`), OR a whole package
+  is suddenly `orphanedReference` — wrapper resolution failed. Fix the `-definitions`
+  directory path and re-run. Do **not** report those as removable/orphaned flags; they're a
+  configuration error, not flag debt.
+
 Parse the JSON. Top-level: `{ scan, flags }`. Each entry in `flags[]` has `key`,
 `staleState`, `callSites`, `codeRefs`, `temporary`, `creationDate`, `variations`, and
 `environments` (per env: `on`, `flagStatus`, `lastEvaluation`, `targeting`,
