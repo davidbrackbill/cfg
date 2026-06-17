@@ -244,7 +244,16 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+    "launchdarkly@launchdarkly-ai-tooling": true
+  },
+  "extraKnownMarketplaces": {
+    "launchdarkly-ai-tooling": {
+      "source": {
+        "source": "github",
+        "repo": "launchdarkly/ai-tooling"
+      }
+    }
   },
   "effortLevel": "medium",
   "promptSuggestionEnabled": false,
