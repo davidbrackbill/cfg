@@ -333,15 +333,21 @@ cmd_open() {
         git -C "$bare" worktree add -b "$git_branch" "$worktree" "$default_branch"
       fi
       ok "worktree: $worktree"
-
-      # Seed node_modules via bifrost if the hook script exists
-      local seed_script="$REPOS_DIR/$repo_name/scripts/post-checkout-seed-node-modules.sh"
-      if [[ -x "$seed_script" ]]; then
-        (cd "$worktree" && "$seed_script" "0000000000000000000000000000000000000000" "$REPOS_DIR/$repo_name/$default_branch")
-      fi
     fi
 
+    # Open session first
     open_session "$session" "$worktree" "$repo_name"
+
+    # Seed node_modules via bifrost in a new pane if the hook script exists
+    local seed_script="$REPOS_DIR/$repo_name/scripts/post-checkout-seed-node-modules.sh"
+    if [[ -x "$seed_script" ]]; then
+      local default_branch
+      default_branch="$(detect_default_branch "$bare")"
+
+      tmux new-window -t "=$session" -n "seed" -c "$worktree"
+      tmux send-keys -t "=$session:seed" "$seed_script 0000000000000000000000000000000000000000 $REPOS_DIR/$repo_name/$default_branch" Enter
+      ok "seeding node_modules in background pane"
+    fi
   done
 }
 
