@@ -1,6 +1,6 @@
 [credential "https://github.com"]
 	helper = 
-	helper = !gh auth git-credential
+	helper = !/opt/homebrew/bin/gh auth git-credential
 [user]
 	# name and email loaded from ~/.git.env via GIT_AUTHOR_*/GIT_COMMITTER_* env vars
 [core]
@@ -25,3 +25,6 @@
 ; 	repo = /path
 [include]
 	path = ~/.gitconfig-local
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
