@@ -5,6 +5,20 @@
 - **`~/init.sh`** — personal machine bootstrap script (dotfiles + brew installs). Add tools here when setting up work infrastructure that should be replicable on a new machine install.
 - **`~/.cfg`** — bare git repo tracking dotfiles (including `~/.claude/settings.json` and `~/.claude/skills/`). Use `git --git-dir=$HOME/.cfg --work-tree=$HOME` to manage, or the `cfg` shell alias.
 
+## Docker (macOS)
+
+Using **Docker Desktop**. The `docker`/`docker compose` CLIs talk to whatever daemon is running; Desktop just supplies the Linux VM. **Colima is installed as a Desktop-free fallback** (`brew install colima docker docker-compose`; `colima start --cpu 4 --memory 8`).
+
+**When Docker Desktop hangs** (`docker ps` blocks forever, no daemon socket):
+- Cause: a half-started backend — `com.docker.backend` is running but the VM never booted, and stale `*.sock` files from a prior instance remain. A force-kill (`killall Docker`) is what *leaves* this orphaned state, so don't lead with it.
+- Diagnose: `~/Library/Containers/com.docker.docker/Data/log/host/com.docker.virtualization.log` — a recent "running VM" line means the VM booted; its absence means it didn't. Stale sockets live in `Data/*.sock` and `~/.docker/run/docker.sock`.
+- Clean-restart fix (this reliably works):
+  1. `osascript -e 'quit app "Docker Desktop"'` (graceful first)
+  2. `pkill -9 -f com.docker.backend` (kills the `--autostart` backend; leave root `com.docker.vmnetd`), confirm 0 stragglers
+  3. `rm -f ~/Library/Containers/com.docker.docker/Data/*.sock ~/.docker/run/docker.sock`
+  4. `open -a Docker`, then poll `docker ps` (~30–40s to come up)
+- If it stalls twice, switch to Colima rather than fighting Desktop.
+
 ## Runtime Management
 
 - **mise** manages node (and other runtimes except Go). Use `mise install node@lts && mise use -g node@lts`. Do NOT use brew for node/python/ruby.
