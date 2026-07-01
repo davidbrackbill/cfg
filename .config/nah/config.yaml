@@ -40,3 +40,5 @@ actions:
   mcp__datadog__analyze_datadog_logs: allow
   mcp__datadog__search_datadog_logs: allow
   pnpm vitest run: allow
+known_registries:
+- flagpls
