@@ -1,7 +1,7 @@
 {
   "attribution": {
-    "commit": "",
-    "pr": ""
+    "commit": "Claude <claude@anthropic.com>",
+    "pr": "Claude <claude@anthropic.com>"
   },
   "permissions": {
     "allow": [
@@ -148,6 +148,7 @@
       "~/ld"
     ]
   },
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
