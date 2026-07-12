@@ -29,5 +29,5 @@ alias lg="lazygit"
 alias claude=clod
 alias c=clod
 alias ch='claude --model haiku'
-alias cs='claude --model claude-sonnet-4-6'
-alias co='claude --model claude-opus-4-8'
+alias cs='claude --model claude-sonnet-5'
+alias co='claude --model claude-opus-5'
