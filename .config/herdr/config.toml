@@ -26,6 +26,20 @@ type = "pane"
 command = "lazygit"
 description = "lazygit"
 
+# herdr-native port of switch-session.sh — fuzzy-pick/create a workspace
+[[keys.command]]
+key = "alt+s"
+type = "pane"
+command = "~/.herdr/switch-workspace.sh"
+description = "switch workspace"
+
+# tmux/wt worktree flow — bare-repo aware, not herdr's native new_worktree
+[[keys.command]]
+key = "prefix+shift+g"
+type = "pane"
+command = "wt open"
+description = "wt open"
+
 [ui]
 mouse_capture = true
 sidebar_collapsed_mode = "hidden"
