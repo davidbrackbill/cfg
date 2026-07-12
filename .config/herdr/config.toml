@@ -11,9 +11,11 @@ prefix = "alt+f"
 reload_config = "prefix+r"
 previous_tab = "alt+j"
 next_tab = "alt+k"
-new_tab = "ctrl+t"
+new_tab = ["ctrl+t", "cmd+t"]
 close_pane = "ctrl+w"
+close_tab = "cmd+w"
 open_notification_target = "alt+h"
+new_workspace = "cmd+n"
 
 [keys.indexed]
 tabs = "alt"
@@ -29,10 +31,11 @@ mouse_capture = true
 sidebar_collapsed_mode = "hidden"
 pane_borders = true
 pane_gaps = false
+prompt_new_tab_name = false
 agent_panel_sort = "priority"
 
 [ui.toast]
-delivery = "system"
+delivery = "herdr"
 delay_seconds = 1
 
 [ui.sound]
