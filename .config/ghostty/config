@@ -25,10 +25,14 @@ window-padding-y = 0
 window-padding-balance = true
 
 # [[Keybindings]]
-# Make cmd+t/cmd+w send ctrl+t/ctrl+w (e.g. for tmux window/pane management)
+# cmd+t sends ctrl+t (e.g. for tmux/herdr new-tab)
 keybind = super+t=text:\x14
-keybind = super+w=text:\x17
+# cmd+w passed through as-is so herdr sees a distinct cmd+w (close_tab),
+# not the same byte as ctrl+w (close_pane)
+keybind = super+w=unbind
 keybind = super+enter=unbind
+# cmd+n passed through to herdr (new_workspace) instead of opening a new Ghostty window
+keybind = super+n=unbind
 
 # Cmd+f = tmux prefix (sends Alt+f)
 keybind = super+f=text:\x1bf
