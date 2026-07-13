@@ -16,9 +16,14 @@ close_pane = "ctrl+w"
 close_tab = "cmd+w"
 open_notification_target = "alt+h"
 new_workspace = "cmd+n"
+last_pane = ["alt+l", "cmd+l"]
+goto = "cmd+slash"
+previous_workspace = "cmd+shift+j"
+next_workspace = "cmd+shift+k"
+next_agent = "cmd+h"
 
 [keys.indexed]
-tabs = "alt"
+agents = "alt"
 
 [[keys.command]]
 key = "alt+g"
@@ -43,6 +48,7 @@ description = "wt open"
 [ui]
 mouse_capture = true
 sidebar_collapsed_mode = "hidden"
+hide_tab_bar_when_single_tab = true
 pane_borders = true
 pane_gaps = false
 prompt_new_tab_name = false

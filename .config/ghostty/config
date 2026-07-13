@@ -42,9 +42,13 @@ keybind = super+l=text:\x1bl
 keybind = super+s=text:\x1bs
 keybind = super+j=text:\x1bj
 keybind = super+k=text:\x1bk
-keybind = super+slash=text:\x1b/
+# cmd+/ passed through as-is for herdr's goto (was remapped to alt+/ for tmux copy-mode)
+keybind = super+slash=unbind
 keybind = super+period=text:\x1b.
 keybind = super+comma=text:\x1b,
+# cmd+shift+j passed through for herdr's previous_workspace (was Ghostty's
+# default write_screen_file:paste,plain binding)
+keybind = super+shift+j=unbind
 # Cmd+Num = select window
 keybind = super+1=text:\x1b1
 keybind = super+2=text:\x1b2
