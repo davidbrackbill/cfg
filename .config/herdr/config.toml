@@ -21,6 +21,9 @@ goto = "cmd+slash"
 previous_workspace = "cmd+shift+j"
 next_workspace = "cmd+shift+k"
 next_agent = "cmd+h"
+rename_tab = "prefix+comma"
+rename_workspace = "prefix+$"
+toggle_sidebar = "cmd+b"
 
 [keys.indexed]
 agents = "alt"
