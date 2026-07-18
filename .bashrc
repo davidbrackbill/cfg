@@ -165,8 +165,17 @@ export PATH="$GOENV_ROOT/versions/1.26.2/bin:$PATH"
 export GOTOOLCHAIN=local
 export GO_BUILD_DEFINITIONS="$GOENV_ROOT/plugins/go-build/share/go-build"
 
-# [[Starship prompt]]
-command -v starship &>/dev/null && eval "$(starship init bash)"
+# [[Starship prompt]] — cache init script, invalidate when the binary changes
+if command -v starship &>/dev/null; then
+    _starship_bin="$(command -v starship)"
+    _starship_cache="$HOME/.cache/starship_init.bash"
+    if [[ ! -f "$_starship_cache" || "$_starship_bin" -nt "$_starship_cache" ]]; then
+        mkdir -p "$HOME/.cache"
+        starship init bash --print-full-init > "$_starship_cache"
+    fi
+    source "$_starship_cache"
+    unset _starship_bin _starship_cache
+fi
 [ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
 
 export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
@@ -184,7 +193,8 @@ _source_bashrc_local() {
   local dir="$PWD"
   while [[ "$dir" != "/" ]]; do
     dirs+=("$dir")
-    dir=$(dirname "$dir")
+    dir="${dir%/*}"
+    [[ -z "$dir" ]] && dir="/"
   done
   for ((i=${#dirs[@]}-1; i>=0; i--)); do
     [[ -f "${dirs[i]}/.bashrc.local" ]] && source "${dirs[i]}/.bashrc.local"
@@ -193,5 +203,14 @@ _source_bashrc_local() {
 _source_bashrc_local
 
 
-# [[Zoxide]] — must be last to hook cd properly
-command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
+# [[Zoxide]] — must be last to hook cd properly; cache init script like starship above
+if command -v zoxide &>/dev/null; then
+    _zoxide_bin="$(command -v zoxide)"
+    _zoxide_cache="$HOME/.cache/zoxide_init.bash"
+    if [[ ! -f "$_zoxide_cache" || "$_zoxide_bin" -nt "$_zoxide_cache" ]]; then
+        mkdir -p "$HOME/.cache"
+        zoxide init bash > "$_zoxide_cache"
+    fi
+    source "$_zoxide_cache"
+    unset _zoxide_bin _zoxide_cache
+fi
