@@ -1,11 +1,22 @@
 -- [[ Autocommands ]]
 
--- Auto save on focus lost
+-- Auto reload buffers changed on disk (e.g. by an external tool) instead of prompting
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+  callback = function()
+    if vim.bo.buftype == "" then
+      pcall(vim.cmd, "checktime")
+    end
+  end,
+  desc = "Check for external file changes",
+})
+
+-- Auto save on focus lost (only if the buffer actually has unsaved changes)
 vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "BufWinLeave", "InsertLeave" }, {
   -- nested = true, -- for format on save
   callback = function()
-    if vim.bo.filetype ~= "" and vim.bo.buftype == "" then
-      vim.cmd "silent! w"
+    if vim.bo.modified and vim.bo.filetype ~= "" and vim.bo.buftype == "" then
+      pcall(vim.cmd, "silent! w")
     end
   end,
   desc = "Auto Save",
