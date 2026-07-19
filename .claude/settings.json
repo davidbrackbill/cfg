@@ -148,7 +148,7 @@
       "~/ld"
     ]
   },
-  "model": "opus[1m]",
+  "model": "sonnet",
   "hooks": {
     "Notification": [
       {
@@ -236,6 +236,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Task|WebFetch|WebSearch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 /Users/db/.claude/hooks/ld-tool-summary.py >/dev/null 2>&1 &"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -246,7 +257,8 @@
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "launchdarkly@launchdarkly-ai-tooling": true
+    "launchdarkly@launchdarkly-ai-tooling": true,
+    "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "launchdarkly-ai-tooling": {
