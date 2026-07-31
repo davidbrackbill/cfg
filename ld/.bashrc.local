@@ -1,5 +1,22 @@
 alias ldev='ldcli-dev'
 
+# `okteto pipeline deploy` fails with "git repo doesn't have any remote" in
+# bare-repo + worktree layouts (~/ld's convention) — it uses go-git under
+# the hood, which doesn't resolve the commondir indirection for linked
+# worktrees' shared config, even though native git resolves the remote
+# fine. Works around it by resolving the remote via real git first and
+# passing it explicitly with -r. Any extra args (e.g. -b <branch>) pass
+# through.
+okteto_deploy_bare() {
+  local remote_url
+  remote_url="$(git config --get remote.origin.url 2>/dev/null)"
+  if [ -z "$remote_url" ]; then
+    echo "okteto_deploy_bare: no 'origin' remote found (run this from inside the repo)" >&2
+    return 1
+  fi
+  okteto pipeline deploy -r "$remote_url" "$@"
+}
+
 fullstack() {
   local session
   session=$(tmux display-message -p '#S')
