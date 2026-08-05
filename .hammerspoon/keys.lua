@@ -27,9 +27,61 @@ local function makeDoubleTapHandler(singleFn, doubleFn, threshold)
   end
 end
 
+-- Key tapped alone quickly (pressed & released within `threshold`, with no
+-- other key/modifier touched meanwhile) → jump to the last-focused window.
+-- Mirrors Karabiner's left-shift-alone-to-escape pattern (100ms), but done
+-- in Hammerspoon since Karabiner can't gate this on "no other key touched".
+local function bindTapToLastWindow(keyName, threshold)
+  threshold = threshold or 0.1
+  local downAt = nil
+  local usedWithOther = false
+
+  local tap = hs.eventtap.new(
+    { hs.eventtap.event.types.keyDown, hs.eventtap.event.types.keyUp, hs.eventtap.event.types.flagsChanged },
+    function(e)
+      local etype = e:getType()
+      local isTargetKey = hs.keycodes.map[keyName] == e:getKeyCode()
+
+      if etype == hs.eventtap.event.types.flagsChanged then
+        local flags = e:getFlags()
+        if downAt and (flags.cmd or flags.alt or flags.shift or flags.ctrl or flags.fn) then
+          usedWithOther = true
+        end
+        return false
+      end
+
+      if not isTargetKey then
+        if downAt then usedWithOther = true end
+        return false
+      end
+
+      if etype == hs.eventtap.event.types.keyDown then
+        if not downAt then
+          downAt = hs.timer.secondsSinceEpoch()
+          usedWithOther = false
+        end
+      elseif etype == hs.eventtap.event.types.keyUp then
+        if downAt then
+          local heldFor = hs.timer.secondsSinceEpoch() - downAt
+          if not usedWithOther and heldFor < threshold then
+            require('windows').focusPrev()
+          end
+        end
+        downAt = nil
+        usedWithOther = false
+      end
+
+      return false
+    end
+  )
+  tap:start()
+  return tap
+end
+
 function M.bind()
-    -- Caps Lock (→ F18 via Karabiner) — toggle between last two windows on current screen
-    hs.hotkey.bind({}, 'f18', require('windows').toggleLastWindow)
+    -- Caps Lock (→ F18 via Karabiner), tapped alone within 100ms →
+    -- jump back to the last-focused window
+    M.capsLockTapWatcher = bindTapToLastWindow('f18', 0.15)
 
     -- Cmd+H (via Karabiner → F19) — focus Ghostty and send Alt+H
     hs.hotkey.bind({}, 'f19', function()
