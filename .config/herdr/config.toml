@@ -56,6 +56,7 @@ pane_borders = true
 pane_gaps = false
 prompt_new_tab_name = false
 agent_panel_sort = "priority"
+tab_bar_position = "bottom"
 
 [ui.toast]
 delivery = "herdr"
