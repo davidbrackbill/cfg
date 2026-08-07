@@ -17,6 +17,43 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "cmd+tab → option+tab (AltTab passthrough)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "tab",
+                                    "modifiers": {
+                                        "mandatory": ["command", "shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["option", "shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },
@@ -56,20 +93,6 @@
             "name": "Default",
             "selected": true,
             "simple_modifications": [
-                {
-                    "from": {
-                        "key_code": "caps_lock",
-                        "modifiers": { "mandatory": ["option"] }
-                    },
-                    "to": [{ "key_code": "f16" }]
-                },
-                {
-                    "from": {
-                        "key_code": "caps_lock",
-                        "modifiers": { "mandatory": ["shift"] }
-                    },
-                    "to": [{ "key_code": "f20" }]
-                },
                 {
                     "from": { "key_code": "caps_lock" },
                     "to": [{ "key_code": "f18" }]
