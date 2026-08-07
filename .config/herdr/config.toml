@@ -24,6 +24,9 @@ next_agent = "cmd+h"
 rename_tab = "prefix+comma"
 rename_workspace = "prefix+$"
 toggle_sidebar = "cmd+b"
+# wt owns the worktree flow (bare-repo layout under $REPOS_DIR), so herdr's
+# native new_worktree stays unbound rather than offering a second, divergent one.
+new_worktree = ""
 
 [keys.indexed]
 agents = "alt"
@@ -41,11 +44,14 @@ type = "pane"
 command = "~/.herdr/switch-workspace.sh"
 description = "switch workspace"
 
-# tmux/wt worktree flow — bare-repo aware, not herdr's native new_worktree
+# wt worktree flow — bare-repo aware, not herdr's native new_worktree.
+# "shell" is the only command type that can spawn a tab: pane and popup both stay
+# inside the current tab, and there is no "tab" type. The wrapper creates the
+# tab, runs the picker in it, and disposes of it afterwards.
 [[keys.command]]
-key = "prefix+shift+g"
-type = "pane"
-command = "wt open"
+key = "cmd+shift+t"
+type = "shell"
+command = "~/.herdr/wt-tab.sh"
 description = "wt open"
 
 [ui]
