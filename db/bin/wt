@@ -16,6 +16,88 @@ warn() { printf '\033[0;33m  !\033[0m %s\n' "$*"; }
 die()  { printf '\033[0;31mERROR:\033[0m %s\n' "$*" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
+# Herdr helpers
+#
+# Herdr owns the terminal side of a worktree: `herdr worktree create/open`
+# creates the git worktree *and* a workspace whose `worktree.checkout_path`
+# points at it, so a worktree and its workspace stay linked without wt
+# tracking any state of its own.
+# ---------------------------------------------------------------------------
+require_herdr() {
+  command -v herdr >/dev/null 2>&1 || die "herdr not found in PATH"
+  [[ "${HERDR_ENV:-}" == "1" ]] || die "not running inside a Herdr session — start 'herdr' first"
+  command -v jq >/dev/null 2>&1 || die "jq not found in PATH"
+}
+
+# Run a herdr subcommand, die on API error, print the JSON response.
+hd() {
+  local out rc=0
+  out="$(herdr "$@" 2>&1)" || rc=$?
+  local err
+  err="$(printf '%s' "$out" | jq -r '.error.message // empty' 2>/dev/null || true)"
+  [[ -z "$err" ]] || die "herdr $1 $2: $err"
+  [[ "$rc" -eq 0 ]] || die "herdr $1 $2 failed: $out"
+  printf '%s' "$out"
+}
+
+# Workspace id whose worktree checkout is this path, or empty.
+workspace_for_worktree() {
+  hd workspace list \
+    | jq -r --arg p "$1" '
+        .result.workspaces[]
+        | select(.worktree.checkout_path == $p)
+        | .workspace_id' \
+    | head -1
+}
+
+workspace_label() {
+  hd workspace get "$1" | jq -r '.result.workspace.label // empty'
+}
+
+# Herdr names the implicitly-created bare-repo workspace "<repo>.git"; tidy it.
+tidy_repo_workspace() {
+  local bare="$1" repo_name="$2"
+  local ws
+  ws="$(workspace_for_worktree "$bare")"
+  [[ -n "$ws" ]] || return 0
+  [[ "$(workspace_label "$ws")" == "${repo_name}.git" ]] || return 0
+  hd workspace rename "$ws" "$repo_name" >/dev/null
+}
+
+# Create the worktree and its workspace. Reuses an existing branch when present.
+# Args: bare worktree git_branch base_branch label
+worktree_create() {
+  local bare="$1" worktree="$2" git_branch="$3" base="$4" label="$5"
+  mkdir -p "$(dirname "$worktree")"
+  hd worktree create \
+    --cwd "$bare" \
+    --branch "$git_branch" \
+    --base "$base" \
+    --path "$worktree" \
+    --label "$label" \
+    --focus \
+    | jq -r '.result.workspace.workspace_id'
+}
+
+# Open (or reuse) the workspace for an existing worktree. Args: bare worktree label
+worktree_open() {
+  local bare="$1" worktree="$2" label="$3"
+  local ws
+  ws="$(workspace_for_worktree "$worktree")"
+  if [[ -n "$ws" ]]; then
+    hd workspace focus "$ws" >/dev/null
+    echo "$ws"
+    return 0
+  fi
+  hd worktree open \
+    --cwd "$bare" \
+    --path "$worktree" \
+    --label "$label" \
+    --focus \
+    | jq -r '.result.workspace.workspace_id'
+}
+
+# ---------------------------------------------------------------------------
 # wt setup — create a bare repo with a main worktree
 # ---------------------------------------------------------------------------
 cmd_setup() {
@@ -64,29 +146,17 @@ detect_default_branch() {
   echo "$branch"
 }
 
-# Build session name: [group/]name[/repo]
-make_session_name() {
+# Build workspace label: [group/]name[/repo]
+make_workspace_label() {
   local name="$1" repo="$2" group="${3:-}" multi="${4:-false}"
-  local session="$name"
+  local label="$name"
   if [[ -n "$group" ]]; then
-    session="${group}/${name}"
+    label="${group}/${name}"
   fi
   if "$multi"; then
-    session="${session}/${repo}"
+    label="${label}/${repo}"
   fi
-  echo "$session"
-}
-
-# Find tmux session for a worktree path (best-effort, scans pane cwds)
-find_session_for_worktree() {
-  local wt_path="$1"
-  while IFS=$'\t' read -r sess pane_path; do
-    if [[ "$pane_path" == "$wt_path"* ]]; then
-      echo "$sess"
-      return 0
-    fi
-  done < <(tmux list-panes -a -F $'#S\t#{pane_current_path}' 2>/dev/null)
-  return 1
+  echo "$label"
 }
 
 # Generic fzf picker. Args: prompt. Always multi-select. Items via stdin.
@@ -96,25 +166,26 @@ pick() {
 
 # List all non-default worktrees as repo/wt_rel entries
 list_feature_worktrees() {
+  local dir name bare default_branch
   for dir in "$REPOS_DIR"/*/; do
     [[ -d "$dir" ]] || continue
-    local name
     name="$(basename "$dir")"
-    local bare="$dir/${name}.git"
+    bare="$dir/${name}.git"
     [[ -d "$bare" ]] || continue
 
-    local default_branch
     default_branch="$(detect_default_branch "$bare" 2>/dev/null || true)"
 
-    while IFS= read -r line; do
-      local wt_path wt_branch
-      wt_path="$(echo "$line" | awk '{print $1}')"
-      wt_branch="$(echo "$line" | awk '{print $3}' | sed 's|^\[||;s|\]$||')"
-      [[ -n "$wt_branch" ]] || continue
-      [[ "$wt_branch" != "$default_branch" ]] || continue
-      local wt_rel="${wt_path#$REPOS_DIR/$name/}"
-      echo "${name}/${wt_rel}"
-    done < <(git -C "$bare" worktree list 2>/dev/null | tail -n +2)
+    herdr worktree list --cwd "$bare" 2>/dev/null \
+      | jq -r --arg repo "$name" \
+              --arg prefix "$REPOS_DIR/$name/" \
+              --arg default "$default_branch" '
+          .result.worktrees[]?
+          | select(.is_linked_worktree == true)
+          | select((.branch // "") != "")
+          | select((.branch | sub("^refs/heads/"; "")) != $default)
+          | select(.path | startswith($prefix))
+          | $repo + "/" + (.path | ltrimstr($prefix))' \
+      || true
   done
 }
 
@@ -247,9 +318,11 @@ setup_from_existing() {
 }
 
 # ---------------------------------------------------------------------------
-# wt [open] — create worktree + tmux session for a feature
+# wt [open] — create worktree + herdr workspace for a feature
 # ---------------------------------------------------------------------------
 cmd_open() {
+  require_herdr
+
   local no_prefix=false
   local group=""
   local branch=""
@@ -304,55 +377,48 @@ cmd_open() {
   local multi=false
   [[ ${#REPOS[@]} -le 1 ]] || multi=true
 
-  # Create worktree + tmux session for each repo
+  # Create worktree + workspace for each repo
   for repo_name in "${REPOS[@]}"; do
     repo_name="${repo_name// /}"
     [[ -n "$repo_name" ]] || continue
 
     local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
     local worktree="$REPOS_DIR/$repo_name/$branch"
-    local session
-    session="$(make_session_name "$branch" "$repo_name" "$group" "$multi")"
+    local label
+    label="$(make_workspace_label "$branch" "$repo_name" "$group" "$multi")"
 
     [[ -d "$bare" ]] || die "Bare repo not found: $bare — run 'wt setup' first"
 
     log "[$repo_name] Setting up $branch (branch: $git_branch)"
 
-    # Create worktree
+    local default_branch ws
+    default_branch="$(detect_default_branch "$bare")"
+
     if [[ -d "$worktree" ]]; then
+      ws="$(worktree_open "$bare" "$worktree" "$label")"
       ok "worktree exists: $worktree"
     else
-      local default_branch
-      default_branch="$(detect_default_branch "$bare")"
-
-      mkdir -p "$(dirname "$worktree")"
-
-      if git -C "$bare" show-ref --verify --quiet "refs/heads/$git_branch"; then
-        git -C "$bare" worktree add "$worktree" "$git_branch"
-      else
-        git -C "$bare" worktree add -b "$git_branch" "$worktree" "$default_branch"
-      fi
+      ws="$(worktree_create "$bare" "$worktree" "$git_branch" "$default_branch" "$label")"
       ok "worktree: $worktree"
     fi
+    tidy_repo_workspace "$bare" "$repo_name"
+    ok "workspace: $label ($ws)"
 
-    # Open session first
-    open_session "$session" "$worktree" "$repo_name"
-
-    # Seed node_modules via bifrost in a new pane if the hook script exists
+    # Seed node_modules via bifrost in a background tab if the hook script exists
     local seed_script="$REPOS_DIR/$repo_name/scripts/post-checkout-seed-node-modules.sh"
     if [[ -x "$seed_script" ]]; then
-      local default_branch
-      default_branch="$(detect_default_branch "$bare")"
-
-      tmux new-window -t "=$session" -n "seed" -c "$worktree"
-      tmux send-keys -t "=$session:seed" "$seed_script 0000000000000000000000000000000000000000 $REPOS_DIR/$repo_name/$default_branch" Enter
-      ok "seeding node_modules in background pane"
+      local seed_pane
+      seed_pane="$(hd tab create --workspace "$ws" --cwd "$worktree" --label seed --no-focus \
+        | jq -r '.result.root_pane.pane_id')"
+      hd pane run "$seed_pane" \
+        "$seed_script 0000000000000000000000000000000000000000 $REPOS_DIR/$repo_name/$default_branch" >/dev/null
+      ok "seeding node_modules in background tab ($seed_pane)"
     fi
   done
 }
 
 # ---------------------------------------------------------------------------
-# wt close — tear down worktree + tmux session
+# wt close — tear down worktree + herdr workspace
 # ---------------------------------------------------------------------------
 # Close a single worktree by its full path
 close_one() {
@@ -363,9 +429,12 @@ close_one() {
   local wt_rel="${worktree#$REPOS_DIR/$repo_name/}"
   local git_branch
   git_branch="$(git -C "$worktree" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  local session
-  session="$(find_session_for_worktree "$worktree" 2>/dev/null || true)"
-  local display="${session:-$repo_name/$wt_rel}"
+  local ws
+  ws="$(workspace_for_worktree "$worktree" || true)"
+  local display="$repo_name/$wt_rel"
+  if [[ -n "$ws" ]]; then
+    display="$(workspace_label "$ws")"
+  fi
 
   [[ -d "$bare" ]] || { warn "Bare repo not found: $bare"; return 1; }
 
@@ -403,8 +472,12 @@ close_one() {
   # If first answer is no, skip
   [[ "$close_wt" == "true" ]] || { warn "Skipped $display"; return 0; }
 
-  # Remove worktree
-  if [[ -d "$worktree" ]]; then
+  # Remove worktree. When herdr owns a workspace for it, one call removes the
+  # checkout and closes the workspace together.
+  if [[ -n "$ws" ]]; then
+    hd worktree remove --workspace "$ws" --force >/dev/null
+    ok "removed worktree + workspace: $display"
+  elif [[ -d "$worktree" ]]; then
     git -C "$bare" worktree remove --force "$worktree"
     ok "removed worktree: $display"
   fi
@@ -421,20 +494,11 @@ close_one() {
   if [[ "$delete_branch" == "true" ]]; then
     git -C "$bare" branch -D "$git_branch" && ok "deleted branch: $git_branch"
   fi
-
-  # Kill tmux session
-  if [[ -n "$session" ]] && tmux has-session -t "=$session" 2>/dev/null; then
-    local current
-    current="$(tmux display-message -p '#S' 2>/dev/null || true)"
-    if [[ "$current" == "$session" ]]; then
-      tmux switch-client -l 2>/dev/null || tmux switch-client -n 2>/dev/null || true
-    fi
-    tmux kill-session -t "=$session"
-    ok "killed session: $session"
-  fi
 }
 
 cmd_close() {
+  require_herdr
+
   local targets=()
 
   # Try to detect from pwd
@@ -467,82 +531,38 @@ cmd_close() {
 }
 
 # ---------------------------------------------------------------------------
-# wt attach — create tmux session for an existing worktree
+# wt ls — open a herdr workspace for an existing worktree
 # ---------------------------------------------------------------------------
 cmd_attach() {
+  require_herdr
+
   local worktrees
   worktrees="$(list_feature_worktrees)"
   [[ -n "$worktrees" ]] || die "No feature worktrees found"
 
   local selected
-  selected="$(echo "$worktrees" | pick "attach")"
+  selected="$(echo "$worktrees" | pick "open")"
 
   while IFS= read -r entry; do
     local repo_name="${entry%%/*}"
     local wt_rel="${entry#*/}"
     local worktree="$REPOS_DIR/$repo_name/$wt_rel"
+    local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
 
-    # Try to find an existing session for this worktree
-    local session
-    session="$(find_session_for_worktree "$worktree" 2>/dev/null || true)"
-
-    if [[ -n "$session" ]]; then
-      ok "session exists: $session"
-    else
-      session="$(make_session_name "$wt_rel" "$repo_name" "" false)"
-      tmux new-session -d -s "$session" -c "$worktree"
-      ok "session: $session"
-    fi
-
-    # Switch to last one selected
-    if [[ -n "${TMUX:-}" ]]; then
-      tmux switch-client -t "=$session"
-    else
-      tmux attach-session -t "=$session"
-    fi
+    local label ws
+    label="$(make_workspace_label "$wt_rel" "$repo_name" "" false)"
+    ws="$(worktree_open "$bare" "$worktree" "$label")"
+    tidy_repo_workspace "$bare" "$repo_name"
+    ok "workspace: $(workspace_label "$ws") ($ws)"
   done <<< "$selected"
 }
 
-# Create or reuse a tmux session and switch to it.
-# If a session with the same name exists for a different repo, appends /<repo_name>.
-# Args: session worktree [repo_name]
-open_session() {
-  local session="$1" worktree="$2" repo_name="${3:-}"
-
-  if tmux has-session -t "=$session" 2>/dev/null; then
-    if [[ -n "$repo_name" ]]; then
-      local existing_cwd
-      existing_cwd="$(tmux list-panes -t "=$session" -F '#{pane_current_path}' | head -1)"
-      if [[ ! "$existing_cwd" =~ $REPOS_DIR/$repo_name ]]; then
-        session="${session}/${repo_name}"
-        if tmux has-session -t "=$session" 2>/dev/null; then
-          ok "session exists: $session"
-        else
-          tmux new-session -d -s "$session" -c "$worktree"
-          ok "session: $session"
-        fi
-      else
-        ok "session exists: $session"
-      fi
-    else
-      ok "session exists: $session"
-    fi
-  else
-    tmux new-session -d -s "$session" -c "$worktree"
-    ok "session: $session"
-  fi
-
-  if [[ -n "${TMUX:-}" ]]; then
-    tmux switch-client -t "=$session"
-  else
-    tmux attach-session -t "=$session"
-  fi
-}
-
 # ---------------------------------------------------------------------------
-# wt <github-pr-url> — check out a PR branch as a worktree + tmux session
+# wt <github-pr-url> — check out a PR branch as a worktree + workspace
 # ---------------------------------------------------------------------------
 cmd_pr() {
+  require_herdr
+
   local url="$1"
   local org repo_name pr_num
   org="$(echo "$url"       | sed -E 's|https://github.com/([^/]+)/.*|\1|')"
@@ -563,16 +583,19 @@ cmd_pr() {
   ok "fetched"
 
   local worktree="$REPOS_DIR/$repo_name/$branch"
-  local session="$branch"
+  local ws
 
   if [[ -d "$worktree" ]]; then
+    ws="$(worktree_open "$bare" "$worktree" "$branch")"
     ok "worktree exists: $worktree"
   else
-    git -C "$bare" worktree add "$worktree" "$branch"
+    local default_branch
+    default_branch="$(detect_default_branch "$bare")"
+    ws="$(worktree_create "$bare" "$worktree" "$branch" "$default_branch" "$branch")"
     ok "worktree: $worktree"
   fi
-
-  open_session "$session" "$worktree"
+  tidy_repo_workspace "$bare" "$repo_name"
+  ok "workspace: $branch ($ws)"
 }
 
 # ---------------------------------------------------------------------------
@@ -601,14 +624,17 @@ case "${1:-}" in
   -h|--help)
     echo "Usage:"
     echo "  wt [group//]name [repo...]"
-    echo "                           Open feature worktree + tmux session"
+    echo "                           Open feature worktree + herdr workspace"
     echo "                           Branch: db/<name> (use --no-prefix to skip)"
-    echo "                           Session: [group/]name[/repo if multi]"
-    echo "  wt ls                    Attach tmux session to existing worktree"
-    echo "  wt close                 Close current or fzf-picked session"
+    echo "                           Workspace: [group/]name[/repo if multi]"
+    echo "  wt ls                    Open herdr workspace for an existing worktree"
+    echo "  wt close                 Close current or fzf-picked worktree + workspace"
     echo "  wt setup <path>          Convert existing repo to bare"
     echo "  wt setup <remote-url>    Clone remote as bare repo"
     echo "  wt <github-pr-url>       Check out a PR branch as a worktree"
+    echo ""
+    echo "Requires a running Herdr session (HERDR_ENV=1) plus jq for all"
+    echo "commands except 'wt setup'."
     echo ""
     echo "Config: ~/.config/.wt"
     echo "  BRANCH_PREFIX            Branch name prefix (default: empty)"
