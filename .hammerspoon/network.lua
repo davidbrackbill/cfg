@@ -70,7 +70,8 @@ local function findProfileConnectButton(el, profileName, depth)
 end
 
 -- Core click logic (no debounce) - used by both launch and reconnect paths
-local function clickConnectButton(retryCount)
+-- previousApp: the app that had focus before we activated the VPN window; restored after clicking
+local function clickConnectButton(retryCount, previousApp)
   retryCount = retryCount or 0
   if isVpnConnected() then return end
 
@@ -86,7 +87,7 @@ local function clickConnectButton(retryCount)
       app:kill()
       hs.timer.doAfter(2, function()
         hs.application.open(VPN_BUNDLE)
-        hs.timer.doAfter(10, function() clickConnectButton(0) end)
+        hs.timer.doAfter(10, function() clickConnectButton(0, previousApp) end)
       end)
       return
     end
@@ -97,19 +98,26 @@ local function clickConnectButton(retryCount)
       print(">>> Clicking Connect button")
       btn:performAction('AXPress')
 
-      -- Wait 15s, then close window
+      -- Return focus immediately; don't leave VPN window in the foreground
+      if previousApp and previousApp:isRunning() then
+        previousApp:activate()
+      end
+
+      -- Wait 15s, then hide the window. app:hide() keeps the VPN tunnel up;
+      -- win:close() would kill it.
       hs.timer.doAfter(15, function()
-        print(">>> Closing window")
-        local app = hs.application.find(VPN_BUNDLE)
-        if app then
-          local win = app:mainWindow()
-          if win then win:close() end
-        end
+        print(">>> Hiding VPN app")
+        local vpnApp = hs.application.find(VPN_BUNDLE)
+        if vpnApp then vpnApp:hide() end
       end)
     else
+      -- Return focus before the retry delay so the user isn't stuck waiting
+      if previousApp and previousApp:isRunning() then
+        previousApp:activate()
+      end
       if retryCount < 5 then
         print(">>> Button not found, retrying in 2s (attempt " .. (retryCount + 1) .. ")")
-        hs.timer.doAfter(2, function() clickConnectButton(retryCount + 1) end)
+        hs.timer.doAfter(2, function() clickConnectButton(retryCount + 1, previousApp) end)
       else
         hs.notify.new({
           title           = 'VPN: action needed',
@@ -130,6 +138,9 @@ local function ensureVPN()
 
   -- Debounce: stop previous attempt if ensureVPN called rapidly
   if ensureVpnDebounce then ensureVpnDebounce:stop() end
+
+  -- Capture focus now, before any VPN window activation
+  local previousApp = hs.application.frontmostApplication()
 
   local app = hs.application.find(VPN_BUNDLE)
   local appWasRunning = app ~= nil
@@ -153,7 +164,7 @@ local function ensureVPN()
     -- Activate app and let clickConnectButton handle window detection with retries
     app:activate()
     hs.timer.doAfter(1, function()
-      clickConnectButton()
+      clickConnectButton(0, previousApp)
     end)
   end)
 end
