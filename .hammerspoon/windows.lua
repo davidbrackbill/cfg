@@ -146,6 +146,26 @@ local function buildCycleList()
   return result
 end
 
+local HOT_CYCLE = {
+  'com.mitchellh.ghostty',
+  'com.vivaldi.Vivaldi',
+  'md.obsidian',
+}
+
+function M.cycleHot(direction)
+  local focusedBundle = (hs.window.focusedWindow() and
+                         hs.window.focusedWindow():application():bundleID()) or ''
+  local currentIdx = 0
+  for i, id in ipairs(HOT_CYCLE) do
+    if id == focusedBundle then currentIdx = i; break end
+  end
+  for offset = 1, #HOT_CYCLE do
+    local nextIdx = (currentIdx - 1 + direction * offset) % #HOT_CYCLE + 1
+    local win = mainWin(HOT_CYCLE[nextIdx])
+    if win then win:focus(); return end
+  end
+end
+
 function M.toggleHot()
   local hot = {
     { id = 'com.mitchellh.ghostty',   win = mainWin('com.mitchellh.ghostty') },
