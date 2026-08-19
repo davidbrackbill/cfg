@@ -453,6 +453,81 @@ cmd_open() {
 }
 
 # ---------------------------------------------------------------------------
+# wt add — create worktree only, no herdr session required
+# ---------------------------------------------------------------------------
+cmd_add() {
+  local no_prefix=false
+  local branch=""
+  local REPOS=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-prefix) no_prefix=true; shift ;;
+      *) if [[ -z "$branch" ]]; then branch="$1"; else REPOS+=("$1"); fi; shift ;;
+    esac
+  done
+
+  # Strip group// prefix if provided (ignored here, kept for compat with open syntax)
+  if [[ "$branch" == *"//"* ]]; then
+    branch="${branch#*//}"
+  fi
+
+  # Repo selection via fzf if none given
+  if [[ ${#REPOS[@]} -eq 0 ]]; then
+    local repo_list=()
+    for dir in "$REPOS_DIR"/*/; do
+      [[ -d "$dir" ]] || continue
+      local name
+      name="$(basename "$dir")"
+      if [[ -d "$dir/${name}.git" ]]; then
+        repo_list+=("$name")
+      fi
+    done
+
+    [[ ${#repo_list[@]} -gt 0 ]] || die "No bare repos found in $REPOS_DIR"
+
+    local selected
+    selected="$(printf '%s\n' "${repo_list[@]}" | pick "repo")"
+    mapfile -t REPOS <<< "$selected"
+  fi
+
+  if [[ -z "$branch" ]]; then
+    printf 'Worktree name (e.g. 1234): '
+    read -r branch
+  fi
+  [[ -n "$branch" ]] || die "Name required"
+  branch="${branch#/}"
+
+  local git_branch="$branch"
+  if ! "$no_prefix" && [[ -n "$BRANCH_PREFIX" ]]; then
+    git_branch="${BRANCH_PREFIX}${branch}"
+  fi
+
+  for repo_name in "${REPOS[@]}"; do
+    repo_name="${repo_name// /}"
+    [[ -n "$repo_name" ]] || continue
+
+    local bare="$REPOS_DIR/$repo_name/${repo_name}.git"
+    local worktree="$REPOS_DIR/$repo_name/$branch"
+
+    [[ -d "$bare" ]] || die "Bare repo not found: $bare — run 'wt setup' first"
+
+    log "[$repo_name] Setting up $branch (branch: $git_branch)"
+
+    local default_branch
+    default_branch="$(detect_default_branch "$bare")"
+
+    if [[ -d "$worktree" ]]; then
+      ok "worktree exists: $worktree"
+    else
+      git_worktree_add "$bare" "$worktree" "$git_branch" "$default_branch"
+      ok "worktree: $worktree"
+    fi
+
+  done
+}
+
+# ---------------------------------------------------------------------------
 # wt close — tear down worktree + herdr workspace
 # ---------------------------------------------------------------------------
 # Close a single worktree by its full path
@@ -671,6 +746,10 @@ case "${1:-}" in
     shift
     cmd_setup "$@"
     ;;
+  add)
+    shift
+    cmd_add "$@"
+    ;;
   open)
     shift
     cmd_open "$@"
@@ -692,7 +771,8 @@ case "${1:-}" in
     echo "                           Open feature worktree + herdr workspace"
     echo "                           Branch: db/<name> (use --no-prefix to skip)"
     echo "                           Workspace: [group/]name[/repo if multi]"
-    echo "  wt ls                    Open herdr workspace for an existing worktree"
+    echo "  wt add [name] [repo...]  Create worktree only, no herdr session required
+  wt ls                    Open herdr workspace for an existing worktree"
     echo "  wt close                 Close current or fzf-picked worktree + workspace"
     echo "  wt setup <path>          Convert existing repo to bare"
     echo "  wt setup <remote-url>    Clone remote as bare repo"
