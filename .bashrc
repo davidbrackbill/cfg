@@ -66,10 +66,28 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
 # [[Functions]]
 
 # Fuzzy find and open: dirs→yazi, text files→nvim, binary→macOS default
+# After opening a file or aborting, stuffs "f <query>" into the tty input buffer
+# via TIOCSTI so the next readline prompt is prepopulated.
+_exit_with_query() {
+    python3 -c "
+import fcntl, sys
+for c in sys.argv[1]:
+    fcntl.ioctl(sys.stdin, 0x80017472, c.encode())
+" "$1"
+}
+
 f() {
-    local path
-    path=$(fd --hidden --exclude .git | fzf --tmux 80% --select-1 --query "$*")
-    [[ -z "$path" ]] && return
+    local out typed_query path
+    out=$(fd --hidden --exclude .git | fzf --tmux 80% --select-1 --query "$*" \
+        --print-query \
+        --bind 'esc:print-query+abort' \
+        --bind 'ctrl-c:print-query+abort')
+    typed_query=$(sed -n '1p' <<< "$out")
+    path=$(sed -n '2p' <<< "$out")
+    if [[ -z "$path" ]]; then
+        _exit_with_query "$typed_query"
+        return
+    fi
     if [[ -d "$path" ]]; then
         yy "$path"
     elif file --brief --mime "$path" | grep -q '^image/\|^application/pdf'; then
@@ -77,6 +95,7 @@ f() {
     else
         nvim "$path"
     fi
+    _exit_with_query "$typed_query"
 }
 
 # Yazi file manager, cd to exit dir
