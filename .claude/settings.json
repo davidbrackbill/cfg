@@ -257,7 +257,7 @@
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "launchdarkly@launchdarkly-ai-tooling": true,
+    "launchdarkly@launchdarkly-ai-tooling": false,
     "frontend-design@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
