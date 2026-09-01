@@ -271,8 +271,10 @@
   "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "prefersReducedMotion": true,
+  "verbose": false,
   "preferredNotifChannel": "terminal_bell",
   "autoScrollEnabled": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "awaySummaryEnabled": false
 }
