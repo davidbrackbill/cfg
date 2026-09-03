@@ -1,6 +1,6 @@
 ---
-name: summarize
-description: Summarize the current session to compact.md with context, motivation, approaches, resources, results, acceptance criteria, current state, and next steps
+name: cram
+description: Summarize the current session to cram.md with context, motivation, approaches, resources, results, acceptance criteria, current state, and next steps
 argument-hint: additional details for prompt
 ---
 
@@ -17,7 +17,7 @@ Summarize the current session to a markdown file with the following structure:
 7. **Current State** — What's the status now? What works, what doesn't?
 8. **Next Steps** — What remains to be done, if anything?
 
-Write the summary to `compact.md` in the current working directory.
+Write the summary to `cram.md` in the current working directory.
 
 Use additional details from the extra prompt information in the argument.
 
