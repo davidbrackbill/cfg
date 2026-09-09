@@ -20,7 +20,8 @@ brew install \
     1password-cli \
     timg \
     ankitpokhrel/jira-cli/jira-cli \
-    docker-credential-helper-ecr
+    docker-credential-helper-ecr \
+    go-task
 
 echo "==> Installing casks..."
 brew tap notwadegrimridge/brew
