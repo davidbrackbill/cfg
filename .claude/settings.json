@@ -280,11 +280,16 @@
   },
   "effortLevel": "medium",
   "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "prefersReducedMotion": true,
   "verbose": false,
   "preferredNotifChannel": "terminal_bell",
   "autoScrollEnabled": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "awaySummaryEnabled": false
+  "modelSettings": {
+    "claude-sonnet-4-6": {
+      "effortLevel": "xhigh"
+    }
+  }
 }
