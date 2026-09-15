@@ -2,7 +2,7 @@
     "profiles": [
         {
             "complex_modifications": {
-                "parameters": { "basic.to_if_alone_timeout_milliseconds": 100 },
+                "parameters": { "basic.to_if_alone_timeout_milliseconds": 80 },
                 "rules": [
                     {
                         "description": "Left Shift alone → Escape",
