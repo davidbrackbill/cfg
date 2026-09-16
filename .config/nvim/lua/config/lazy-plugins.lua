@@ -49,7 +49,6 @@ require('lazy').setup({
     opts = {
       cmdline = { view = 'cmdline' },
       presets = {
-        bottom_search = true,
         long_message_to_split = true,
       },
     },
@@ -247,13 +246,6 @@ require('lazy').setup({
   },
 
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-    opts = {},
-    ft = { 'markdown' },
-  },
-
-  {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
@@ -261,10 +253,6 @@ require('lazy').setup({
     opts = {
       terminal = {},
       notifier = { enabled = true },
-      words = {
-        enabled = true,
-        debounce = 1000,
-      },
       lazygit = {
         win = {
           height = .99,
@@ -302,16 +290,6 @@ require('lazy').setup({
         '<leader>gr',
         function() Snacks.picker.gh_pr({ search = 'is:open is:pr review-requested:@me org:launchdarkly archived:false' }) end,
         desc = 'GitHub requests',
-      },
-      {
-        '<M-n>',
-        function() Snacks.words.jump(1) end,
-        desc = 'Next reference',
-      },
-      {
-        '<M-S-n>',
-        function() Snacks.words.jump(-1) end,
-        desc = 'Previous reference',
       },
     },
   },
