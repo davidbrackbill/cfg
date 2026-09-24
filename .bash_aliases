@@ -16,20 +16,16 @@ alias cd.="cd .."
 alias cd-="cd -"
 alias cd~="cd ~"
 alias ls="eza"
-alias la="eza -la"
-alias ll="eza -l"
-alias lt="eza --tree"
 alias grep="grep --color=auto"
 alias l="yy"
 
 # [[Git]]
 alias lg="lazygit"
 
-# [[Claude]]
-alias claude=clod
-alias c=clod
+# [[Agents]]
 alias ch='claude --model haiku'
 alias cs='claude --model claude-sonnet-4-6'
 alias co='claude --model claude-opus-4-6'
-alias cs5='claude --model claude-sonnet-5'
-alias co5='claude --model claude-opus-5'
+alias css='claude --model claude-sonnet-5'
+alias coo='claude --model claude-opus-5'
+alias cu='agent'

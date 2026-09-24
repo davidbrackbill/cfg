@@ -138,21 +138,6 @@ rgf() {
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
 
-# Window renames — higher-order helper captures previous name so nested calls restore correctly
-_with_icon() {
-  local icon="$1"; shift
-  local prev
-  prev=$(tmux display-message -p '#W' 2>/dev/null)
-  (
-    trap "tmux rename-window '$prev' 2>/dev/null" EXIT
-    tmux rename-window "$icon" 2>/dev/null
-    command "$@"
-  )
-}
-clod()    { _with_icon "✦" claude "$@"; }
-lazygit() { _with_icon "∆" lazygit "$@"; }
-nvim()    { _with_icon "¶" nvim "$@"; }
-
 # [[Bazel cleanup]]
 bazel-orphanage() {
   local dirs=()
