@@ -23,9 +23,10 @@ alias l="yy"
 alias lg="lazygit"
 
 # [[Agents]]
-alias ch='claude --model haiku'
-alias cs='claude --model claude-sonnet-4-6'
-alias co='claude --model claude-opus-4-6'
-alias css='claude --model claude-sonnet-5'
-alias coo='claude --model claude-opus-5'
-alias cu='agent'
+alias cs4='claude --model claude-sonnet-4-6'
+alias co4='claude --model claude-opus-4-6'
+# alias cs='claude --model claude-sonnet-5-5' # Restricted by org currently
+alias cs='claude --model claude-sonnet-5'
+alias co='claude --model claude-opus-5-5'
+alias ag='agent'
+alias cur='agent'
