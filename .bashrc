@@ -137,6 +137,37 @@ rgf() {
 # Lazygit for dotfiles bare repo
 cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
+gitfind() {
+    local input=$1 url host path pattern dir repo
+    local skip=(Library .Trash go .cache .npm pnpm-store .rustup .goenv .bun .cargo .local)
+    local roots=()
+
+    url=${input,,}
+    if [[ $input != *://* && $input != *@* && $input != *:* ]]; then
+        url=github.com/$url
+    fi
+    url=${url#*://}
+    url=${url#*@}
+    url=${url/://}
+    url=${url%/}
+    url=${url%.git}
+
+    host=${url%%/*}
+    path=${url#*/}
+    pattern="^\s*url\s*=.*${host//./\\.}[:/]${path//./\\.}(\.git)?/?\s*$"
+
+    for dir in "$HOME"/* "$HOME"/.[!.]*; do
+        [[ -d $dir ]] || continue
+        [[ " ${skip[*]} " == *" ${dir##*/} "* ]] && continue
+        roots+=("$dir")
+    done
+
+    fd -H -t f '^config$' "${roots[@]}" -E node_modules -X rg -l -i "$pattern" 2>/dev/null |
+        while read -r config; do
+            repo=${config%/config}
+            echo "${repo%/.git}"
+        done
+}
 
 # [[Bazel cleanup]]
 bazel-orphanage() {
