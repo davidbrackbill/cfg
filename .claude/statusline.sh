@@ -12,7 +12,19 @@ esac
 UNIT_SIZE=40000
 FILLED=$((USED / UNIT_SIZE))
 MAX_FILLED=$((MAX / UNIT_SIZE))
-BAR=$(printf "%${FILLED}s" | tr ' ' '|')$(printf "%$((MAX_FILLED - FILLED))s")
+ESC=$'\033'
+# Each mark sits at k * UNIT_SIZE tokens: yellow past 150k, red past 250k
+FILLED_BAR=""
+for ((k = 1; k <= FILLED; k++)); do
+  if ((k * UNIT_SIZE > 250000)); then
+    FILLED_BAR+="${ESC}[31m|${ESC}[0m"
+  elif ((k * UNIT_SIZE > 150000)); then
+    FILLED_BAR+="${ESC}[33m|${ESC}[0m"
+  else
+    FILLED_BAR+="|"
+  fi
+done
+EMPTY_BAR=$(printf "%$((MAX_FILLED - FILLED))s")
 SESSION_ID=$(echo "$input" | jq -r '.session_id // ""')
 
-echo "$SYMBOL [$BAR] $SESSION_ID"
+printf "%s [%s%s] %s\n" "$SYMBOL" "$FILLED_BAR" "$EMPTY_BAR" "$SESSION_ID"
