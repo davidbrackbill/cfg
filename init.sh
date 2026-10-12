@@ -110,6 +110,12 @@ EOF
     echo "  Saved to ~/.git.env"
 fi
 
+# ── nit (PR review suggestions; its skill is tracked in ~/.cfg) ────────────────
+echo "==> Installing nit..."
+uv tool install git+https://github.com/launchdarkly-labs/nit \
+    || echo "  nit install failed (private repo): run gh auth login, then rerun this step"
+mkdir -p "$HOME/.cursor/skills/nit" && cp "$HOME/.claude/skills/nit/SKILL.md" "$HOME/.cursor/skills/nit/"
+
 # ── Claude Code MCP servers ────────────────────────────────────────────────────
 echo "==> Configuring Claude Code MCP servers..."
 claude mcp add-json --scope user confluence '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-confluence"]}' 2>/dev/null || true
