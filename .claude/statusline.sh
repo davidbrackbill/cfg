@@ -26,5 +26,7 @@ for ((k = 1; k <= FILLED; k++)); do
 done
 EMPTY_BAR=$(printf "%$((MAX_FILLED - FILLED))s")
 SESSION_ID=$(echo "$input" | jq -r '.session_id // ""')
+CWD=$(echo "$input" | jq -r '.cwd // .workspace.current_dir // ""')
+CWD="${CWD/#$HOME/~}"
 
-printf "%s [%s%s] %s\n" "$SYMBOL" "$FILLED_BAR" "$EMPTY_BAR" "$SESSION_ID"
+printf "%s [%s%s] %s c -r %s\n" "$SYMBOL" "$FILLED_BAR" "$EMPTY_BAR" "$CWD" "$SESSION_ID"
