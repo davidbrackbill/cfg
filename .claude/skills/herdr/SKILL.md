@@ -193,3 +193,9 @@ If the user explicitly asks for another tab, workspace, or worktree, discover th
 - Do not close workspaces, tabs, panes, or sessions you did not create unless the user explicitly asked.
 - Never run `herdr server stop` from an active session unless the user explicitly intends to stop the server and its pane processes.
 - Never kill the main Herdr process. Use named test sessions for experiments that need an isolated server.
+
+## Installed-CLI addenda (Oct 13)
+
+- There is no top-level `herdr wait`. Waits are `herdr agent wait <target> --until idle --until done [--until blocked] --timeout MS`. `herdr agent prompt <target> <text> [--wait]` submits a prompt more reliably than `pane run`. Run `herdr agent` to see the group.
+- Cursor: run `cursor-agent` (add `--model <id>` only when asked; `cursor-agent --list-models` lists ids). A long `pane run` lands as a "[Pasted text]" block without submitting; send `herdr agent send-keys <pane> Enter`, then confirm `working`.
+- `done` can arrive early, e.g. when an agent's subagents are interrupted. Read the transcript before treating `done` as final, and re-arm the wait if it is still working.
