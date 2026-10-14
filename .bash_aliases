@@ -10,6 +10,7 @@ alias cl="clear"
 alias cat="bat"
 alias cd='z'
 alias zz='zi'
+alias csv='csvlens'
 
 # [[Directories]]
 alias cd.="cd .."
