@@ -6,62 +6,38 @@ argument-hint: PR URL or number, and what to look for
 
 # Reviewing a PR with nit
 
-nit turns the working tree's diff against a PR's head into GitHub suggestions in
-the user's **pending** review. Only the user can see a pending review until they
-submit it on GitHub, and nit never submits.
+nit turns the working tree's diff against the PR head into suggestions, plus `-c`
+comments, in the user's pending review. Run it as `nit`; it needs `git` and `gh`.
 
-Run it as `nit` if it's on the PATH, or as `python3 <clone>/nit.py`. It needs `git`
-and an authenticated `gh`.
+1. **Check out the PR head.** Use `gh pr checkout <n>`, or a detached worktree
+   (`git fetch origin pull/<n>/head && git worktree add --detach <dir> FETCH_HEAD`)
+   and pass `--pr <url>` on every call.
+2. **Suggest by editing.** Read `gh pr diff <n>` and fix things in the files. Each
+   hunk becomes one suggestion, so keep each edit small and about one thing, and
+   inside the PR's diff.
+3. **Explain each suggestion with a `-c` on its exact lines**, never with a code
+   comment inside the suggested code: `-c 'path:LINE why'`. nit posts it as a reply
+   in the suggestion's thread.
+4. **Comment on everything else** with `-c 'path:LINE text'` or `path:START-END`.
+   Lines are in the PR head's numbering, `\n` is a newline, and `-c -` reads one per
+   line from stdin. Keep the list in a file and pass it on every run.
+   - To reword a comment, rerun with new text on the same lines.
+   - `-c 'path:LINE'` with no text deletes it.
+   - **Style:** one point per comment, in a sentence or two, under 300 characters
+     (nit refuses longer; pass `--max-chars` only when the user asks). Say what you see, then ask: "`X` doesn't filter on `term`.
+     Should we add it?" Use backticks for code. Don't restate the PR description,
+     cite sources, or explain how you found it; the author can ask.
+   - **Check each one against the PR body.** Drop what it already answers or
+     accepts as a known limitation, unless you disagree; then say why.
+5. **Preview** with `nit --dry-run` and the same `-c` flags. `+` adds, `~` rewrites,
+   `-` removes, `=` is already pending. Report any `! skipped` lines, and turn the
+   important ones into comments on a nearby line in the diff.
+6. **Post and open.** A pending review is visible only to the user, so post it with
+   `nit --yes` and the same flags without asking, then open the review for them:
+   `${BROWSER:-open} <pr-url>/files`. Summarize what you staged, then recommend
+   **Pass** (approve, comments are optional) or **Block** (request changes), with
+   a one-line reason. The user decides and submits.
 
-## Steps
-
-1. **Get a checkout at the PR head.** Use `gh pr checkout <n>` in the repo, or a
-   worktree so the user's checkout isn't disturbed:
-   `git fetch origin pull/<n>/head && git worktree add --detach <dir> FETCH_HEAD`.
-   A detached checkout needs `--pr <url>` on every nit call.
-2. **Review and edit.** Read the PR diff (`gh pr diff <n>`), then fix things
-   directly in the files. Each hunk becomes one suggestion, so keep each edit
-   small and about one thing. There's no need to commit: nit diffs the working tree,
-   and committed edits count too.
-3. **Add comments for things that aren't a code edit:**
-   `-c 'path:LINE text'` or `-c 'path:START-END text'`. Lines are in the PR head's
-   numbering, and `\n` makes a newline. For several comments, pipe one per line
-   to `-c -`.
-4. **Preview:** run `nit --dry-run`, plus the same `-c` flags. Check its plan:
-   - `+` will be added, `=` is already pending, `✓` is already in a submitted review,
-     and `-` will be removed (a reverted edit, an outdated copy or a duplicate).
-   - `! ... skipped` lines can't become suggestions: they're outside the PR diff,
-     or in new, deleted, binary or untracked files. Say what was skipped. Turn
-     the important ones into `-c` comments on a nearby line that's in the diff,
-     or mention them in your summary.
-   - `! ... overlaps` means two suggestions touch the same line, and GitHub's
-     batch apply takes only one. Merge or split those edits.
-5. **Ask before posting.** Show the user the plan and get a yes, then run
-   `nit --yes` with the same `-c` flags.
-6. **Hand off:** give the user the `.../pull/<n>/files` link to review and submit.
-
-## Iterating
-
-Rerunning is safe. nit adds what's missing, keeps what's posted (even after the
-author's pushes move it), and removes its pending suggestions that you've
-reverted in the tree. To drop a suggestion, undo that edit and rerun. `-c`
-comments persist without being repeated. Comments without nit's hidden marker,
-and submitted reviews, are never touched.
-
-## When nit refuses (exit 2)
-
-- **The tree isn't at or ahead of the PR head, or the head moved:** the author
-  pushed. Run `git pull` (or merge the new head) and rerun.
-- **The head isn't in this repo:** run `gh pr checkout <n>`, or fetch it.
-- **Confirmation required:** pass `--yes`, but only after the user has approved.
-- **The review was submitted or deleted mid-run:** rerun.
-- **The PR is closed or merged:** stop.
-
-Exit 1 is an error, such as no PR found (pass `--pr`), or a `gh` or `git`
-failure. Report it rather than retrying blindly.
-
-## Don't
-
-- Submit, approve or request changes on the review. That's the user's call.
-- Edit or delete the user's own comments. nit leaves them alone, and so should you.
-- Run `nit --yes` without the user's go-ahead.
+Reruns are safe: reverting an edit removes its suggestion. If nit refuses (exit 2)
+because the head moved, update the tree and rerun. Never submit the review; that's
+the user's call. Never touch the user's own comments.

@@ -62,6 +62,10 @@ Config: `~/.config/.jira/.config.yml`
 
 See [`~/.claude/ld-tools.md`](.claude/ld-tools.md) for full usage.
 
+## Pull Requests
+
+Keep PR descriptions to 500 characters or less, including the attribution line.
+
 ## Testing Practices
 
 When testing code changes, always add test cases to the project's existing test directory rather than creating temporary test files. This ensures:
