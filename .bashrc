@@ -250,3 +250,66 @@ if command -v zoxide &>/dev/null; then
     source "$_zoxide_cache"
     unset _zoxide_bin _zoxide_cache
 fi
+
+# ---- Utilities ----
+
+# herdr move TABNAME WORKSPACE: move a tab in the current Herdr workspace to another workspace.
+# Other herdr subcommands pass straight through to the real binary.
+herdr() {
+  if [ "${1:-}" != "move" ]; then
+    command herdr "$@"
+    return
+  fi
+  shift
+  if [ "$#" -ne 2 ]; then
+    echo "usage: herdr move TABNAME_IN_CURRENT_SPACE WORKSPACE_TO_MOVE_TO" >&2
+    return 2
+  fi
+  local tab_name="$1" dest="$2" src_ws tab_ids tab_id dest_ws pane first=1 new_tab="" out
+  if [ -z "${HERDR_WORKSPACE_ID:-}" ]; then
+    echo "herdr move: not inside a Herdr-managed pane" >&2
+    return 1
+  fi
+  src_ws="$HERDR_WORKSPACE_ID"
+
+  tab_ids=$(command herdr tab list --workspace "$src_ws" \
+    | jq -r --arg n "$tab_name" '.result.tabs[] | select((.label | ascii_downcase) == ($n | ascii_downcase)) | .tab_id')
+  if [ -z "$tab_ids" ]; then
+    echo "herdr move: no tab named '$tab_name' in this workspace" >&2
+    return 1
+  fi
+  if [ "$(printf '%s\n' "$tab_ids" | wc -l)" -gt 1 ]; then
+    echo "herdr move: more than one tab named '$tab_name' in this workspace" >&2
+    return 1
+  fi
+  tab_id="$tab_ids"
+
+  dest_ws=$(command herdr workspace list \
+    | jq -r --arg d "$dest" '.result.workspaces[] | select(.workspace_id == $d or ((.label | ascii_downcase) == ($d | ascii_downcase))) | .workspace_id' \
+    | head -n 1)
+  if [ -z "$dest_ws" ]; then
+    echo "herdr move: no workspace matching '$dest'" >&2
+    return 1
+  fi
+  if [ "$dest_ws" = "$src_ws" ]; then
+    echo "herdr move: '$tab_name' is already in that workspace" >&2
+    return 1
+  fi
+
+  # Move the tab's panes in list order: the first creates the tab in the destination, the rest split into it.
+  for pane in $(command herdr pane list --workspace "$src_ws" \
+    | jq -r --arg t "$tab_id" '.result.panes[] | select(.tab_id == $t) | .pane_id'); do
+    if [ "$first" -eq 1 ]; then
+      out=$(command herdr pane move "$pane" --new-tab --workspace "$dest_ws" --label "$tab_name" --no-focus)
+      new_tab=$(printf '%s' "$out" | jq -r '.result.move_result.created_tab.tab_id')
+      first=0
+    else
+      command herdr pane move "$pane" --tab "$new_tab" --split right --no-focus >/dev/null
+    fi
+  done
+  if [ "$first" -eq 1 ]; then
+    echo "herdr move: tab '$tab_name' has no panes to move" >&2
+    return 1
+  fi
+  echo "moved '$tab_name' to workspace $dest_ws (tab $new_tab)"
+}
