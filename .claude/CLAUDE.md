@@ -1,5 +1,9 @@
 # Global Memory
 
+## Explanations
+
+Please do explanations as plain prose for a human to read.
+
 ## Dev Setup
 
 - **`~/init.sh`** — personal machine bootstrap script (dotfiles + brew installs). Add tools here when setting up work infrastructure that should be replicable on a new machine install.
