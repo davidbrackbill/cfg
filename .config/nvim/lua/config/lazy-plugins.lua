@@ -43,18 +43,6 @@ require('lazy').setup({
   },
 
   {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
-    dependencies = { 'MunifTanjim/nui.nvim' },
-    opts = {
-      cmdline = { view = 'cmdline' },
-      presets = {
-        long_message_to_split = true,
-      },
-    },
-  },
-
-  {
     'folke/neoconf.nvim',
     lazy = false, -- must load before lspconfig
     config = true,
@@ -114,7 +102,6 @@ require('lazy').setup({
         { '<leader>',  group = 'Commands' },
         { '\\',        group = 'Diagnostics' },
         { 'g',         group = 'Goto' },
-        { ',',         group = 'Conjure' },
         { ']',         group = 'Treesitter->' },
         { '[',         group = '<-Treesitter' },
       },
@@ -227,13 +214,6 @@ require('lazy').setup({
   },
 
   {
-    'lukas-reineke/indent-blankline.nvim',
-    main = 'ibl',
-    opts = {},
-  },
-
-
-  {
     'ibhagwan/fzf-lua',
   },
 
@@ -243,55 +223,6 @@ require('lazy').setup({
       'nvim-treesitter/nvim-treesitter-textobjects',
     },
     build = ':TSUpdate',
-  },
-
-  {
-    'folke/snacks.nvim',
-    priority = 1000,
-    lazy = false,
-    ---@type snacks.Config
-    opts = {
-      terminal = {},
-      notifier = { enabled = true },
-      lazygit = {
-        win = {
-          height = .99,
-          width = .99,
-        },
-      },
-      gitbrowse = {},
-      gh = {},
-      picker = {
-        enabled = true,
-      },
-    },
-    keys = {
-      {
-        '<leader>gg',
-        function() Snacks.lazygit() end,
-        desc = 'LazyGit',
-      },
-      {
-        '<leader>gl',
-        function() Snacks.lazygit.log() end,
-        desc = 'LazyGit log',
-      },
-      {
-        '<leader>gf',
-        function() Snacks.lazygit.log_file() end,
-        desc = 'LazyGit log (current file)',
-      },
-      {
-        '<leader>gp',
-        function() Snacks.picker.gh_pr({ search = 'is:open is:pr author:@me org:launchdarkly archived:false' }) end,
-        desc = 'GitHub pulls',
-      },
-      {
-        '<leader>gr',
-        function() Snacks.picker.gh_pr({ search = 'is:open is:pr review-requested:@me org:launchdarkly archived:false' }) end,
-        desc = 'GitHub requests',
-      },
-    },
   },
 
   {

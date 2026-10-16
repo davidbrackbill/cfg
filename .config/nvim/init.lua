@@ -9,7 +9,6 @@ require('config.lazy-plugins')
 require('config.lsp')
 require('config.fzf')
 require('config.treesitter')
-require('config.ui')
 
 -- flagpls: LD flag lookup (:Flagpls / <leader>fd). Plugin symlinked into lua/flagpls.lua.
 require('flagpls').setup()
