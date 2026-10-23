@@ -84,8 +84,8 @@ if [ ! -f "$HOME/.ld.env" ]; then
     echo "==> Creating ~/.ld.env..."
     cat > "$HOME/.ld.env" <<'EOF'
 # Private tokens — do not commit
-# export GITHUB_TOKEN=
-# export HOMEBREW_GITHUB_API_TOKEN=
+export GITHUB_TOKEN="$(gh auth token 2>/dev/null)"
+export HOMEBREW_GITHUB_API_TOKEN="$GITHUB_TOKEN"
 EOF
 fi
 
