@@ -20,7 +20,6 @@ brew install \
     1password-cli \
     timg \
     ankitpokhrel/jira-cli/jira-cli \
-    speakeasy-api/tap/speakeasy \
     docker-credential-helper-ecr \
     go-task
 
@@ -116,14 +115,6 @@ echo "==> Installing nit..."
 uv tool install git+https://github.com/launchdarkly-labs/nit \
     || echo "  nit install failed (private repo): run gh auth login, then rerun this step"
 mkdir -p "$HOME/.cursor/skills/nit" && cp "$HOME/.claude/skills/nit/SKILL.md" "$HOME/.cursor/skills/nit/"
-
-# ── gentbench (agent evals; skill symlinks into the clone) ─────────────────────
-echo "==> Installing gentbench..."
-if [ -d "$HOME/ld/gentbench" ]; then
-    uv tool install --editable "$HOME/ld/gentbench" && gentbench skill install
-else
-    echo "  ~/ld/gentbench missing: clone launchdarkly-labs/gentbench there, then rerun this step"
-fi
 
 # ── Claude Code MCP servers ────────────────────────────────────────────────────
 echo "==> Configuring Claude Code MCP servers..."
