@@ -1,10 +1,25 @@
 ---
 name: termag
 description: Use a termag box (LaunchDarkly DevSpeed's EC2 agent workspaces) from the laptop. Covers first-time setup (CLI, SSM plugin, login, SSH key, GitHub, AWS profile), starting/creating a box, SSH over SSM, running git/Go/regen work on the box, and reviewing diffs with lazygit. Use when asked to use, set up, start, SSH into, or run work on a termag box, or when a heavy gonfalon task (merge + regen, bazel, dev stack) should run off the laptop.
-argument-hint: [box-name] [task]
+argument-hint: <what to do on the box, e.g. "run spec regen on PR 74844">
 ---
 
 # termag
+
+## Task mode
+
+The arguments are **a task to carry out on the box**, e.g. `/termag run spec regen on PR 74844`. Do it end to end:
+
+1. **Preflight** (§1): `termag doctor` and `termag box list`. Fix setup gaps (§2). If the box is parked, start it (§3). Use the user's only box unless they named one.
+2. **Resolve the target.** For a PR, run `gh pr view <n> -R launchdarkly/<repo> --json headRefName,baseRefName` to get the branch. Repo defaults to gonfalon.
+3. **Prepare a worktree on the box** (§4): fetch, then `git worktree add -B <branch> ~/src/<short-name> origin/<branch>`. If it already exists, reuse it and `git pull --ff-only`.
+4. **Do the task** in that worktree over `ssh -A -o BatchMode=yes termag-<box>`. Run anything that takes minutes in the background. Common recipes:
+   - *spec regen (gonfalon):* `make generate-api-assets`, then check `git status`. Expect only `apidocs/*`, `packages/openapi/**` and generated mocks to change. Anything else means the regen picked up something unexpected, so flag it.
+   - *merge main / resolve conflicts:* `git merge origin/main`. Hand-resolve source files, take `--theirs` for generated files and regen afterwards, then `gofmt` the Go.
+   - *tests/build:* run the repo's normal command for the touched package.
+5. **Commit on the box. Don't push.** Summarize what changed (files, +/-, anything surprising) and give the lazygit command (§5). Push only after the user OKs it.
+
+If the task is only about setup or access ("set up termag", "ssh into my box"), do just that part.
 
 termag gives each user EC2 "boxes" (arm64, `t4g.medium`) with tmux-backed projects. Boxes have **no inbound network**: all access is SSH tunnelled through AWS SSM by the `termag` CLI. Docs: `launchdarkly/termag` → `USAGE.md`, `cli/README.md`. Web UI: https://app.termag.ldinfra.net/termag. Slack: #feedback-termag, #proj-devspeed-termag.
 
