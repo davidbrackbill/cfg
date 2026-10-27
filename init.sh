@@ -29,7 +29,8 @@ brew install --cask \
     karabiner-elements \
     raycast \
     hammerspoon \
-    betterdisplay
+    betterdisplay \
+    session-manager-plugin
 
 # ── Runtimes (via mise) ────────────────────────────────────────────────────────
 echo "==> Installing runtimes via mise..."
@@ -39,6 +40,11 @@ MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
 eval "$(mise activate bash)"
 pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files
 npx puppeteer browsers install chrome-headless-shell
+
+# ── termag CLI (DevSpeed agent boxes; needs Lumos "Termag Access") ────────────
+echo "==> Installing termag CLI..."
+[ -d "$HOME/ld/termag" ] || git clone git@github.com:launchdarkly/termag.git "$HOME/ld/termag"
+make -C "$HOME/ld/termag" install-cli
 
 # ── pre-commit (linting/formatting hooks for foundation) ─────────────────────
 echo "==> Installing pre-commit..."
