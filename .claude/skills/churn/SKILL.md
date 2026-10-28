@@ -11,8 +11,10 @@ argument-hint: PR number or URL (default - the current branch's PR)
 
    ```sh
    d=$(mktemp -d) && gh repo clone <owner>/<repo> "$d" -- --filter=blob:none --no-checkout
-   cd "$d" && git fetch origin pull/<n>/head && churn origin/<base> FETCH_HEAD
+   cd "$d" && git fetch origin pull/<n>/head && churn "$(git merge-base origin/<base> FETCH_HEAD)" FETCH_HEAD
    ```
+
+   Use the merge base, not `origin/<base>` directly: if the base has moved ahead, a plain two-dot diff counts its new commits too and overstates the PR.
 
    With no PR given, use the current branch's PR and run plain `churn` in the repo (diffs `HEAD` against the merge base with `origin/main`; commit first, since uncommitted changes are not counted).
 3. Append the output at the bottom of the PR description, after a blank line, unless the user says where to put it. Do not edit it.
