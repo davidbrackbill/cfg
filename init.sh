@@ -21,7 +21,8 @@ brew install \
     timg \
     ankitpokhrel/jira-cli/jira-cli \
     docker-credential-helper-ecr \
-    go-task
+    go-task \
+    cloc
 
 echo "==> Installing casks..."
 brew tap notwadegrimridge/brew
