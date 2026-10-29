@@ -92,26 +92,15 @@ Focusing a pane, switching to its tab, or regaining outer terminal focus marks t
 
 ## Start agents interactively
 
-Default to a sibling pane in the current tab and current working directory. Do not create a workspace, tab, worktree, or different cwd unless the user explicitly requests that topology or location.
-
-Honor a direction requested by the user. Otherwise inspect the caller pane's current rectangle:
+Always open a new tab in the current workspace and current working directory, never a split pane. Do not split panes, or create a workspace, worktree, or different cwd, unless the user explicitly asks for that. Keep the user's focus where it is:
 
 ```bash
-herdr pane layout --pane "$HERDR_PANE_ID"
+herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "reviewer" --no-focus
 ```
 
-Split a wide pane to the right and a narrow or tall pane down. Avoid repeated same-direction splits that would create unusably narrow columns or short rows. Keep the user's focus in the calling pane:
+Read `result.root_pane.pane_id` from the JSON response, then start the requested agent in it by running only its normal executable so its interactive TUI opens:
 
 ```bash
-herdr pane split --current --direction right --no-focus
-```
-
-Replace `right` with `down` when the layout calls for it.
-
-Read `result.pane.pane_id` from the JSON response. Give the pane a useful label, then start the requested agent by running only its normal executable so its interactive TUI opens:
-
-```bash
-herdr pane rename <returned-pane-id> "reviewer"
 herdr pane run <returned-pane-id> "codex"
 ```
 
@@ -155,15 +144,15 @@ Submit follow-ups the same way:
 herdr pane run <returned-pane-id> "Now check the failing test."
 ```
 
-## Run an ordinary command in another pane
+## Run an ordinary command in another tab
 
-Split the calling pane using the same geometry rule without moving the user's focus:
+Open a new tab the same way, without moving the user's focus:
 
 ```bash
-herdr pane split --current --direction right --no-focus
+herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" --label "tests" --no-focus
 ```
 
-Read the new `pane_id` from the JSON response, then run and inspect the command:
+Read `result.root_pane.pane_id` from the JSON response, then run and inspect the command:
 
 ```bash
 herdr pane run <returned-pane-id> "just test"
@@ -182,7 +171,7 @@ Use the read source that matches the task:
 
 Use `--format ansi` when colors and terminal styling are evidence. Otherwise use text.
 
-If the user explicitly asks for another tab, workspace, or worktree, discover that command group and use returned IDs. Do not infer a larger topology from a request to start an agent or command.
+If the user explicitly asks for a split pane, another workspace, or a worktree, discover that command group and use returned IDs. Do not infer a larger topology from a request to start an agent or command.
 
 ## Safety and coordination rules
 
