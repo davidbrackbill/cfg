@@ -34,7 +34,7 @@ Clean up the worktrees of the bare repo (for example `~/ld/mcp/mcp.git`). Keep a
 8. **Branches with a gone upstream.** `git for-each-ref --format='%(refname:short)|%(upstream:track)' refs/heads`, keep rows whose track is `[gone]`. For each branch:
    - Skip it if any worktree has it checked out (`git worktree list --porcelain`). Git refuses those anyway.
    - Delete it only if its tip is an ancestor of `origin/main`, or an ancestor of the `headRefOid` of a merged PR for that branch name. Squash merges fail a plain `git branch -d`, so use `git branch -D` only after this check passes.
-   - Otherwise keep it, and list its unique commits in the report.
+   - Otherwise keep it, and list its unique commits in the report. Then unset its gone upstream with `git branch --unset-upstream <name>`. This only clears the config pointer, so the `[gone]` label stops showing and no commits change.
    - Record each deleted tip SHA in the report so it can be restored with `git branch <name> <sha>`.
 9. **Report** in prose: what was removed and why, what was kept and why, and what was skipped as out of scope. Give the final `git worktree list` for the bare repo.
 
