@@ -1,6 +1,6 @@
 ---
 name: prune
-description: Remove git worktrees of this bare repo that are merged, have no changes, or are stale (directory deleted). Never forces, never deletes branches, and keeps anything with local-only work. Use when asked to prune, clean up, or close worktrees.
+description: Remove git worktrees of this bare repo that are merged, have no changes, or are stale (directory deleted), and delete local branches whose upstream is gone once their commits are merged. Never forces, never deletes remote branches, and keeps anything with local-only work. Use when asked to prune, clean up, or close worktrees or branches.
 argument-hint: "[--dry-run]"
 ---
 
@@ -31,11 +31,16 @@ Clean up the worktrees of the bare repo (for example `~/ld/mcp/mcp.git`). Keep a
 5. **Dry run first** if `--dry-run` was passed or the set is large. Print the plan and stop.
 6. **Remove.** `git worktree remove <path>` for each merged or no-changes tree. Never add `--force`. If git refuses, keep the tree and report git's message.
 7. **Prune** stale entries: `git worktree prune --verbose`.
-8. **Report** in prose: what was removed and why, what was kept and why, and what was skipped as out of scope. Give the final `git worktree list` for the bare repo.
+8. **Branches with a gone upstream.** `git for-each-ref --format='%(refname:short)|%(upstream:track)' refs/heads`, keep rows whose track is `[gone]`. For each branch:
+   - Skip it if any worktree has it checked out (`git worktree list --porcelain`). Git refuses those anyway.
+   - Delete it only if its tip is an ancestor of `origin/main`, or an ancestor of the `headRefOid` of a merged PR for that branch name. Squash merges fail a plain `git branch -d`, so use `git branch -D` only after this check passes.
+   - Otherwise keep it, and list its unique commits in the report.
+   - Record each deleted tip SHA in the report so it can be restored with `git branch <name> <sha>`.
+9. **Report** in prose: what was removed and why, what was kept and why, and what was skipped as out of scope. Give the final `git worktree list` for the bare repo.
 
 ## Rules
 
-- Never delete branches (`git branch -D`) or remote branches.
+- Delete local branches only under step 8. Never delete remote branches.
 - Never use `--force` on removal or discard edits.
 - A worktree with an open PR is not automatically kept. Remove it only if it is clean and fully pushed. Say so in the report, since the branch can be checked out again.
 - If a removal would leave work only in the reflog (a detached HEAD with commits no ref contains), keep it and ask.
