@@ -68,7 +68,23 @@ See [`~/.claude/ld-tools.md`](.claude/ld-tools.md) for full usage.
 
 ## Pull Requests
 
-Keep PR descriptions to 500 characters or less, including the attribution line.
+Keep PR descriptions to 500 characters or less, including the attribution line (the churn block below is the one exception).
+
+Use this format, as in https://github.com/launchdarkly/gonfalon/pull/76843:
+
+```
+## Why
+
+<the problem or motivation, one or two sentences; a `> [!NOTE]` callout for open questions>
+
+## Details
+
+<what changed, briefly>
+
+<attribution line>
+```
+
+After the attribution line, run the `/churn` skill and append its diff-breakdown block at the very end of the description. Re-run it and replace the old block whenever the PR changes.
 
 ## Testing Practices
 
