@@ -87,6 +87,11 @@ Always non-interactive and batch: `ssh -A -o BatchMode=yes termag-<box> '<cmds>'
 - **gonfalon apidocs regen:** `make generate-api-assets` (~3 min on the box).
 - **Pushing:** gonfalon's pre-push (pre-commit) hooks need `pre-commit` and `pnpm` on the box. Install them (`uv tool install pre-commit`, node/pnpm), or push with `--no-verify` **only when the user OKs skipping**.
 - **Copy files:** `scp`/`rsync` with `termag-<box>:path`.
+- **herdr:** not baked into either box image (full or `--minimal`). Before any herdr use on a box, ensure it's there. The official installer is idempotent: it puts the aarch64 binary at `~/.local/bin/herdr` and checks its SHA-256 against the release manifest:
+  ```bash
+  ssh -o BatchMode=yes termag-<box> 'export PATH=$HOME/.local/bin:$PATH; command -v herdr >/dev/null || curl -fsSL https://herdr.dev/install.sh | sh; herdr --version'
+  ```
+  Update an existing install with `herdr update` on the box. (An interactive `herdr --remote` also offers to install it, but a non-interactive one fails instead.)
 
 ## 5. Reviewing before pushing
 
@@ -105,5 +110,6 @@ Push only after the user approves.
 
 - **Connection reuse:** add `ControlMaster auto`, `ControlPersist 4h`, `ControlPath ~/.ssh/cm-%r@%h:%p` under `Host termag-*` so repeated calls skip the slow SSM handshake.
 - **Durable sessions:** `termag attach <box>/<project> [--ctrl]` attaches to the project's tmux session, which survives laptop sleep.
+- **herdr on the box:** after the install step in §4, the user runs `herdr --remote termag-<box>` in its own terminal window from the laptop. The box's herdr server owns the panes and the laptop draws the UI. A local `herdr` in another window stays independent. To keep Local and the box in one herdr window, use herdr's saved SSH machines (https://herdr.dev/docs/connecting-machines/). Don't run `--remote` from inside a local herdr pane, because the nested prefix keys clash.
 - **Agent on the box:** `termag ask <box>/<project> "<prompt>"`, the web UI, or Slack `/t`.
 - **Ports:** `termag forward <box> 3000`, or `termag gonfalon-up` for gonfalon's dev stack on `localhost:8090`.
