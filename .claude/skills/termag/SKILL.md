@@ -89,11 +89,18 @@ Always non-interactive and batch: `ssh -A -o BatchMode=yes termag-<box> '<cmds>'
 - **gonfalon apidocs regen:** `make generate-api-assets` (~3 min on the box).
 - **Pushing:** gonfalon's pre-push (pre-commit) hooks need `pre-commit` and `pnpm` on the box. Install them (`uv tool install pre-commit`, node/pnpm), or push with `--no-verify` **only when the user OKs skipping**.
 - **Copy files:** `scp`/`rsync` with `termag-<box>:path`.
-- **herdr:** not baked into either box image (full or `--minimal`). Before any herdr use on a box, ensure it's there. The official installer is idempotent: it puts the aarch64 binary at `~/.local/bin/herdr` and checks its SHA-256 against the release manifest:
+- **herdr:** not baked into either box image (full or `--minimal`). Before any herdr use on a box, install **the laptop's version**: `herdr --remote` refuses a mismatched server and offers to replace it, which stops its panes. Don't use `herdr.dev/install.sh` or `herdr update` on the box: both always fetch latest. This is a no-op when versions already match. Otherwise it fetches the release asset, checks the SHA-256 from GitHub's release metadata, and stops the box's herdr server (ending its panes) before swapping the binary, so **ask first if the box server has workspaces the user cares about** (`herdr workspace list` on the box):
   ```bash
-  ssh -o BatchMode=yes termag-<box> 'export PATH=$HOME/.local/bin:$PATH; command -v herdr >/dev/null || curl -fsSL https://herdr.dev/install.sh | sh; herdr --version'
+  V=$(herdr --version | awk '{print $2}')
+  SHA=$(gh release view "v$V" -R herdrdev/herdr --json assets -q '.assets[] | select(.name=="herdr-linux-aarch64") | .digest' | sed 's/^sha256://')
+  ssh -o BatchMode=yes termag-<box> "export PATH=\$HOME/.local/bin:\$PATH; set -e
+  [ \"\$(herdr --version 2>/dev/null | awk '{print \$2}')\" = \"$V\" ] && { echo already $V; exit 0; }
+  tmp=\$(mktemp); curl -fsSL --retry 3 -o \"\$tmp\" https://github.com/herdrdev/herdr/releases/download/v$V/herdr-linux-aarch64
+  echo \"$SHA  \$tmp\" | sha256sum -c --quiet
+  herdr status server 2>/dev/null | grep -q 'status: running' && herdr server stop || true
+  install -m755 \"\$tmp\" \$HOME/.local/bin/herdr; rm -f \"\$tmp\"; herdr --version"
   ```
-  Update an existing install with `herdr update` on the box. (An interactive `herdr --remote` also offers to install it, but a non-interactive one fails instead.)
+  Re-run it after upgrading herdr on the laptop (`brew upgrade herdr`).
 
 ## 5. Reviewing before pushing
 
