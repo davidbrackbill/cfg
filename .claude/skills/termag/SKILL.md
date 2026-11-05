@@ -32,6 +32,8 @@ termag box list        # BOX / STATE / AGENT / PROJECTS
 
 If `termag` is missing or doctor reports failures, do the matching step below, then re-run doctor.
 
+**Expired SSO:** if any termag/ssh call prints ``has an expired AWS SSO session``, run `aws sso login --profile launchdarkly-termag` yourself in the background (it opens the browser and polls; no TTY needed), tell the user to approve it in the browser, and retry once it exits 0. Don't hand the command back to the user.
+
 ## 2. First-time setup (laptop)
 
 Prereq the user must do: approved **"Termag Access"** in Lumos.
