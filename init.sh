@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Usage (on a termag box): git clone -b linux git@github.com:davidbrackbill/cfg.git && bash cfg/init.sh
+# termag's dotfiles claim runs this via main's install.sh, non-interactively.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -7,6 +8,7 @@ mkdir -p "$HOME/.local/bin"
 
 # ── Tools ──────────────────────────────────────────────────────────────────────
 echo "==> Installing tools (apt)..."
+export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -qq
 sudo apt-get install -y -qq \
     bash bash-completion fd-find bat eza zoxide fzf ripgrep jq tmux tree
@@ -18,20 +20,24 @@ fi
 
 # ── Git identity ───────────────────────────────────────────────────────────────
 if [ ! -f "$HOME/.git.env" ]; then
-    git_name="$(git config --global user.name 2>/dev/null || true)"
-    git_email="$(git config --global user.email 2>/dev/null || true)"
+    git_name="${TERMAG_OWNER_NAME:-$(git config --global user.name 2>/dev/null || true)}"
+    git_email="${TERMAG_OWNER_EMAIL:-$(git config --global user.email 2>/dev/null || true)}"
     if [ -z "$git_name" ] || [ -z "$git_email" ]; then
-        read -rp "  Git name:  " git_name
-        read -rp "  Git email: " git_email
+        if [ -t 0 ]; then
+            read -rp "  Git name:  " git_name
+            read -rp "  Git email: " git_email
+        else
+            echo "  No git identity available; skipping ~/.git.env"
+        fi
     fi
-    cat > "$HOME/.git.env" <<EOF
+    [ -n "$git_name" ] && [ -n "$git_email" ] && cat > "$HOME/.git.env" <<EOF
 # Git identity — do not commit
 export GIT_AUTHOR_NAME="$git_name"
 export GIT_AUTHOR_EMAIL="$git_email"
 export GIT_COMMITTER_NAME="\$GIT_AUTHOR_NAME"
 export GIT_COMMITTER_EMAIL="\$GIT_AUTHOR_EMAIL"
 EOF
-    echo "  Saved git identity to ~/.git.env"
+    [ -f "$HOME/.git.env" ] && echo "  Saved git identity to ~/.git.env"
 fi
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
@@ -60,14 +66,16 @@ if ! cfg checkout 2>/dev/null; then
 fi
 
 cfg config status.showUntrackedFiles no
+cfg remote set-url origin git@github.com:davidbrackbill/cfg.git
 
 # ── tmux plugins ───────────────────────────────────────────────────────────────
 "$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null || echo "  tpm plugin install failed; run prefix+I in tmux"
 
 # ── Login shell: bash ──────────────────────────────────────────────────────────
-if [ "$(getent passwd "$USER" | cut -d: -f7)" != "/bin/bash" ]; then
+me="$(id -un)"
+if [ "$(getent passwd "$me" | cut -d: -f7)" != "/bin/bash" ]; then
     echo "==> Switching login shell to bash..."
-    sudo chsh -s /bin/bash "$USER"
+    sudo chsh -s /bin/bash "$me"
 fi
 
 echo ""
