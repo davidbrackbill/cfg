@@ -19,25 +19,18 @@ if ! command -v starship &>/dev/null; then
 fi
 
 # ── Git identity ───────────────────────────────────────────────────────────────
-if [ ! -f "$HOME/.git.env" ]; then
-    git_name="${TERMAG_OWNER_NAME:-$(git config --global user.name 2>/dev/null || true)}"
-    git_email="${TERMAG_OWNER_EMAIL:-$(git config --global user.email 2>/dev/null || true)}"
-    if [ -z "$git_name" ] || [ -z "$git_email" ]; then
-        if [ -t 0 ]; then
-            read -rp "  Git name:  " git_name
-            read -rp "  Git email: " git_email
-        else
-            echo "  No git identity available; skipping ~/.git.env"
-        fi
-    fi
-    [ -n "$git_name" ] && [ -n "$git_email" ] && cat > "$HOME/.git.env" <<EOF
-# Git identity — do not commit
-export GIT_AUTHOR_NAME="$git_name"
-export GIT_AUTHOR_EMAIL="$git_email"
-export GIT_COMMITTER_NAME="\$GIT_AUTHOR_NAME"
-export GIT_COMMITTER_EMAIL="\$GIT_AUTHOR_EMAIL"
-EOF
-    [ -f "$HOME/.git.env" ] && echo "  Saved git identity to ~/.git.env"
+git_name="${TERMAG_OWNER_NAME:-$(git config --global user.name 2>/dev/null || true)}"
+git_email="${TERMAG_OWNER_EMAIL:-$(git config --global user.email 2>/dev/null || true)}"
+if { [ -z "$git_name" ] || [ -z "$git_email" ]; } && [ -t 0 ]; then
+    read -rp "  Git name:  " git_name
+    read -rp "  Git email: " git_email
+fi
+if [ -n "$git_name" ] && [ -n "$git_email" ]; then
+    git config --file "$HOME/.gitconfig-local" user.name "$git_name"
+    git config --file "$HOME/.gitconfig-local" user.email "$git_email"
+    echo "  Saved git identity to ~/.gitconfig-local"
+else
+    echo "  No git identity available; set user.name and user.email in ~/.gitconfig-local"
 fi
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
