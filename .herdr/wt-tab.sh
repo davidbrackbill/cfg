@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # A detached shell command does not inherit the pane's PATH.
-export PATH="/opt/homebrew/bin:$HOME/.local/bin:/usr/bin:/bin:$PATH"
+export PATH="$HOME/.local/bin:/usr/bin:/bin:$PATH"
 
 PANE=$(herdr tab create --label wt --focus | jq -r '.result.root_pane.pane_id')
 [ -n "$PANE" ] && [ "$PANE" != "null" ] || exit 1

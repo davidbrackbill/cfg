@@ -1,5 +1,29 @@
 # Available in all shells
 cfg() { git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"; }
+safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
+
+# [[Env]] — before the interactive guard so `termag ssh box -- cmd` gets it too
+safe_source "$HOME/.zshenv"
+safe_source "$HOME/.cargo/env"
+safe_source "$HOME/.local/bin/env"
+safe_source ~/.git.env
+safe_source ~/.ld.env
+
+case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac
+export PATH="$HOME/bin:$HOME/db/bin:$PATH:$HOME/go/bin"
+
+export NVM_DIR="$HOME/.nvm"
+safe_source "$NVM_DIR/nvm.sh"
+
+export GOENV_ROOT="$HOME/.goenv"
+export PATH="$GOENV_ROOT/bin:$GOENV_ROOT/shims:$PATH"
+export GOTOOLCHAIN=local
+
+export PYENV_ROOT="$HOME/.pyenv"
+[ -d "$PYENV_ROOT" ] && export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
+
+export EDITOR=nvim
+export VISUAL=nvim
 
 # If not running interactively, don't do anything
 case $- in
@@ -21,43 +45,13 @@ PROMPT_DIRTRIM=1
 bind -f ~/.inputrc
 
 # [[Sources]]
-safe_source() { [ "$#" -eq 1 ] && [ -s "$1" ] && source "$1"; }
-
-safe_source /opt/homebrew/opt/fzf/shell/key-bindings.bash
-safe_source "$HOME/.ghcup/env"
-safe_source "$HOME/.cargo/env"
-safe_source ~/.git.env
-safe_source ~/.ld.env
-safe_source ~/.ecrrc
+safe_source /usr/share/doc/fzf/examples/key-bindings.bash
+safe_source /usr/share/bash-completion/bash_completion
 safe_source ~/.bash_aliases
-safe_source ~/.velcro.launchdarklyrc
 
-# [[Exports]]
-export EDITOR=nvim
-export BROWSER="open -a Vivaldi"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# PNPM
-export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-    *":$PNPM_HOME:"*) ;;
-    *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-
-# Go tools
-export PATH="$PATH:$HOME/go/bin"
-
-# libpq (psql for CRDB access) — must come before /opt/homebrew/bin
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-
-# LD dev tools (awslogin, update-aws-config, etc.)
-export PATH="$PATH:$HOME/ld/dev/bin"
-
-# Local project binaries
-export PATH="$HOME/db/bin:$PATH"
-
-# Docker
-export PATH="/Applications/Docker.app/Contents/Resources/bin:$PATH"
+command -v fd &>/dev/null || { command -v fdfind &>/dev/null && alias fd=fdfind; }
 
 # [[FZF]]
 export FZF_DEFAULT_COMMAND='fd --hidden --exclude .git'
@@ -66,37 +60,16 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
 
 # [[Functions]]
 
-# Fuzzy find and open: dirs→yazi, text files→nvim, binary→macOS default
-# After opening a file or aborting, stuffs "f <query>" into the tty input buffer
-# via TIOCSTI so the next readline prompt is prepopulated.
-_exit_with_query() {
-    python3 -c "
-import fcntl, sys
-for c in sys.argv[1]:
-    fcntl.ioctl(sys.stdin, 0x80017472, c.encode())
-" "$1"
-}
-
+# Fuzzy find and open: dirs→yazi, files→nvim
 f() {
-    local out typed_query path
-    out=$(fd --hidden --exclude .git | fzf --tmux 80% --select-1 --query "$*" \
-        --print-query \
-        --bind 'esc:print-query+abort' \
-        --bind 'ctrl-c:print-query+abort')
-    typed_query=$(sed -n '1p' <<< "$out")
-    path=$(sed -n '2p' <<< "$out")
-    if [[ -z "$path" ]]; then
-        _exit_with_query "$typed_query"
-        return
-    fi
+    local path
+    path=$(fd --hidden --exclude .git | fzf --tmux 80% --select-1 --query "$*")
+    [[ -z "$path" ]] && return
     if [[ -d "$path" ]]; then
         yy "$path"
-    elif file --brief --mime "$path" | grep -q '^image/\|^application/pdf'; then
-        open "$path"
     else
         nvim "$path"
     fi
-    _exit_with_query "$typed_query"
 }
 
 # Yazi file manager, cd to exit dir
@@ -140,7 +113,7 @@ cfgl() { lazygit --git-dir="$HOME/.cfg" --work-tree="$HOME"; }
 
 gitfind() {
     local input=$1 url host path pattern dir repo
-    local skip=(Library .Trash go .cache .npm pnpm-store .rustup .goenv .bun .cargo .local)
+    local skip=(go .cache .npm .nvm .pyenv .rustup .goenv .cargo .local .oh-my-zsh)
     local roots=()
 
     url=${input,,}
@@ -173,7 +146,7 @@ gitfind() {
 # [[Bazel cleanup]]
 bazel-orphanage() {
   local dirs=()
-  for dir in /private/var/tmp/_bazel_db/*/; do
+  for dir in "$HOME"/.cache/bazel/_bazel_"$USER"/*/; do
     local ws=$(cat "$dir/DO_NOT_BUILD_HERE" 2>/dev/null | head -1)
     if [[ -n "$ws" && ! -d "$ws" ]]; then
       echo "Orphaned: $ws"
@@ -182,7 +155,7 @@ bazel-orphanage() {
   done
   if [[ ${#dirs[@]} -gt 0 ]]; then
     echo "Removing ${#dirs[@]} orphaned output bases..."
-    sudo rm -rf "${dirs[@]}"
+    chmod -R u+w "${dirs[@]}" && rm -rf "${dirs[@]}"
     echo "Done"
   else
     echo "No orphaned Bazel output bases found"
@@ -190,16 +163,10 @@ bazel-orphanage() {
 }
 
 # Bazel CI tests need aws to be logged in
-alias bazel='aws-check && command bazel'
+command -v aws-check &>/dev/null && alias bazel='aws-check && command bazel'
 
-# [[Mise]] — use shims (faster than eval activate which costs ~1.3s)
-export PATH="$HOME/.local/share/mise/shims:$PATH"
-
-# [[Goenv]]
-export GOENV_ROOT="$HOME/.goenv"
-export PATH="$GOENV_ROOT/versions/1.26.2/bin:$PATH"
-export GOTOOLCHAIN=local
-export GO_BUILD_DEFINITIONS="$GOENV_ROOT/plugins/go-build/share/go-build"
+# [[Goenv]] — shell integration (PATH set above)
+command -v goenv &>/dev/null && eval "$(goenv init -)"
 
 # [[Starship prompt]] — cache init script, invalidate when the binary changes
 if command -v starship &>/dev/null; then
@@ -212,16 +179,9 @@ if command -v starship &>/dev/null; then
     source "$_starship_cache"
     unset _starship_bin _starship_cache
 fi
-[ -n "$TMUX" ] && PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }~/.tmux/plugins/tmux-continuum/scripts/continuum_save.sh"
-
-export PATH="/opt/homebrew/opt/openjdk@11/bin:$PATH"
-. "$HOME/.cargo/env"
 
 # Something setting this can prevent Lazygit amend commit from opening in nvim
 unset GIT_EDITOR
-
-# [[Obsidian]]
-export PATH="/Applications/Obsidian.app/Contents/MacOS:$PATH"
 
 # [[Local .bashrc.local]] — source from root down to current directory
 _source_bashrc_local() {
@@ -249,6 +209,11 @@ if command -v zoxide &>/dev/null; then
     fi
     source "$_zoxide_cache"
     unset _zoxide_bin _zoxide_cache
+fi
+
+# [[termag]] — first-connect setup banner until the box is set up
+if [ ! -f "$HOME/.termag-setup-complete" ] && command -v termag-setup &>/dev/null; then
+  termag-setup --banner
 fi
 
 # ---- Utilities ----

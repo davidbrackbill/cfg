@@ -4,19 +4,19 @@ alias bashup="source ~/.bashrc"
 alias bashrc="nvim ~/.bashrc"
 
 # [[Utils]]
-alias r="rip"
+command -v rip &>/dev/null && alias r="rip"
 alias n="nvim"
 alias cl="clear"
-alias cat="bat"
-alias cd='z'
-alias zz='zi'
-alias csv='csvlens'
+if command -v bat &>/dev/null; then alias cat="bat"; elif command -v batcat &>/dev/null; then alias bat="batcat" cat="batcat"; fi
+command -v zoxide &>/dev/null && alias cd='z'
+command -v zoxide &>/dev/null && alias zz='zi'
+command -v csvlens &>/dev/null && alias csv='csvlens'
 
 # [[Directories]]
 alias cd.="cd .."
 alias cd-="cd -"
 alias cd~="cd ~"
-alias ls="eza"
+command -v eza &>/dev/null && alias ls="eza"
 alias grep="grep --color=auto"
 alias l="yy"
 

@@ -1,10 +1,10 @@
 # Source .bashrc for bash login shells
 if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then
-    source "$HOME/.bashrc"
+    . "$HOME/.bashrc"
 fi
 
-# Local bin
 [ -d "$HOME/bin" ]        && PATH="$HOME/bin:$PATH"
 [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
 export PATH
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"

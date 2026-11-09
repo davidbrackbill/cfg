@@ -1,60 +1,38 @@
 #!/usr/bin/env bash
-# Usage: git clone https://github.com/davidbrackbill/cfg.git && bash cfg/init.sh
+# Usage (on a termag box): git clone -b linux git@github.com:davidbrackbill/cfg.git && bash cfg/init.sh
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-
-# ── Homebrew ───────────────────────────────────────────────────────────────────
-if ! command -v brew &>/dev/null; then
-    echo "==> Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+mkdir -p "$HOME/.local/bin"
 
 # ── Tools ──────────────────────────────────────────────────────────────────────
-echo "==> Installing tools..."
-brew install \
-    bash neovim fd bat eza fzf atuin yazi lazygit zoxide \
-    fish tmux jujutsu rm-improved mise starship \
-    tree-sitter-cli vjeantet/tap/alerter \
-    1password-cli \
-    timg \
-    ankitpokhrel/jira-cli/jira-cli \
-    docker-credential-helper-ecr \
-    go-task \
-    cloc
+echo "==> Installing tools (apt)..."
+sudo apt-get update -qq
+sudo apt-get install -y -qq \
+    bash bash-completion fd-find bat eza zoxide fzf ripgrep jq tmux tree
 
-echo "==> Installing casks..."
-brew tap notwadegrimridge/brew
-brew install --cask \
-    karabiner-elements \
-    raycast \
-    hammerspoon \
-    betterdisplay \
-    session-manager-plugin
+if ! command -v starship &>/dev/null; then
+    echo "==> Installing starship..."
+    curl -fsSL https://starship.rs/install.sh | sh -s -- --yes --bin-dir "$HOME/.local/bin"
+fi
 
-# ── Runtimes (via mise) ────────────────────────────────────────────────────────
-echo "==> Installing runtimes via mise..."
-mise install node@lts pnpm@latest
-mise use -g node@lts pnpm@latest uv@latest
-MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
-eval "$(mise activate bash)"
-pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files
-npx puppeteer browsers install chrome-headless-shell
-
-# ── termag CLI (DevSpeed agent boxes; needs Lumos "Termag Access") ────────────
-echo "==> Installing termag CLI..."
-[ -d "$HOME/ld/termag" ] || git clone git@github.com:launchdarkly/termag.git "$HOME/ld/termag"
-make -C "$HOME/ld/termag" install-cli
-
-# ── pre-commit (linting/formatting hooks for foundation) ─────────────────────
-echo "==> Installing pre-commit..."
-mise use -g pipx:pre-commit
-
-# ── nah (Claude Code permissions hook) ────────────────────────────────────────
-echo "==> Installing nah..."
-mise use -g pipx:nah
-uv pip install pyyaml --python "$(mise where pipx-nah)/nah/bin/python"
+# ── Git identity ───────────────────────────────────────────────────────────────
+if [ ! -f "$HOME/.git.env" ]; then
+    git_name="$(git config --global user.name 2>/dev/null || true)"
+    git_email="$(git config --global user.email 2>/dev/null || true)"
+    if [ -z "$git_name" ] || [ -z "$git_email" ]; then
+        read -rp "  Git name:  " git_name
+        read -rp "  Git email: " git_email
+    fi
+    cat > "$HOME/.git.env" <<EOF
+# Git identity — do not commit
+export GIT_AUTHOR_NAME="$git_name"
+export GIT_AUTHOR_EMAIL="$git_email"
+export GIT_COMMITTER_NAME="\$GIT_AUTHOR_NAME"
+export GIT_COMMITTER_EMAIL="\$GIT_AUTHOR_EMAIL"
+EOF
+    echo "  Saved git identity to ~/.git.env"
+fi
 
 # ── Bare repo ──────────────────────────────────────────────────────────────────
 if [ ! -d "$HOME/.cfg" ]; then
@@ -69,76 +47,29 @@ cfg() { git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"; }
 
 echo "==> Checking out dotfiles to ~..."
 if ! cfg checkout 2>/dev/null; then
-    echo "  Backing up conflicting files to ~/.cfg-bak/..."
-    mkdir -p "$HOME/.cfg-bak"
+    backup="$HOME/.cfg-bak/$(date +%Y%m%d-%H%M%S)"
+    echo "  Backing up conflicting files to $backup/..."
     cfg checkout 2>&1 \
         | grep -E "^\s+\S" \
         | awk '{print $1}' \
         | while read -r f; do
-            mkdir -p "$HOME/.cfg-bak/$(dirname "$f")"
-            mv "$HOME/$f" "$HOME/.cfg-bak/$f"
+            mkdir -p "$backup/$(dirname "$f")"
+            mv "$HOME/$f" "$backup/$f"
         done
     cfg checkout
 fi
 
 cfg config status.showUntrackedFiles no
 
-# ── Git global config ──────────────────────────────────────────────────────────
-git config --global core.excludesfile ~/.gitignore_global
+# ── tmux plugins ───────────────────────────────────────────────────────────────
+"$HOME/.tmux/plugins/tpm/bin/install_plugins" >/dev/null || echo "  tpm plugin install failed; run prefix+I in tmux"
 
-# ── Private env ────────────────────────────────────────────────────────────────
-if [ ! -f "$HOME/.ld.env" ]; then
-    echo "==> Creating ~/.ld.env..."
-    cat > "$HOME/.ld.env" <<'EOF'
-# Private tokens — do not commit
-export GITHUB_TOKEN="$(gh auth token 2>/dev/null)"
-export HOMEBREW_GITHUB_API_TOKEN="$GITHUB_TOKEN"
-EOF
-fi
-
-if [ ! -f "$HOME/.git.env" ]; then
-    echo "==> Setting up git identity (~/.git.env)..."
-    while true; do
-        read -rp "  Git name:  " git_name
-        read -rp "  Git email: " git_email
-        echo ""
-        echo "  Name:  $git_name"
-        echo "  Email: $git_email"
-        read -rp "  Look good? [y/n] " confirm
-        [[ "$confirm" == "y" ]] && break
-    done
-    cat > "$HOME/.git.env" <<EOF
-# Git identity — do not commit
-export GIT_AUTHOR_NAME="$git_name"
-export GIT_AUTHOR_EMAIL="$git_email"
-export GIT_COMMITTER_NAME="\$GIT_AUTHOR_NAME"
-export GIT_COMMITTER_EMAIL="\$GIT_AUTHOR_EMAIL"
-EOF
-    echo "  Saved to ~/.git.env"
-fi
-
-# ── nit (PR review suggestions; its skill is tracked in ~/.cfg) ────────────────
-echo "==> Installing nit..."
-uv tool install git+https://github.com/launchdarkly-labs/nit \
-    || echo "  nit install failed (private repo): run gh auth login, then rerun this step"
-mkdir -p "$HOME/.cursor/skills/nit" && cp "$HOME/.claude/skills/nit/SKILL.md" "$HOME/.cursor/skills/nit/"
-
-# ── Claude Code MCP servers ────────────────────────────────────────────────────
-echo "==> Configuring Claude Code MCP servers..."
-claude mcp add-json --scope user confluence '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-confluence"]}' 2>/dev/null || true
-claude mcp add-json --scope user jira '{"command":"npx","args":["-y","@aashari/mcp-server-atlassian-jira"]}' 2>/dev/null || true
-claude mcp add-json --scope user github '{"command":"npx","args":["-y","@modelcontextprotocol/server-github"]}' 2>/dev/null || true
-claude mcp add --scope user --transport http figma https://mcp.figma.com/mcp 2>/dev/null || true
-
-# ── Homebrew bash ──────────────────────────────────────────────────────────────
-BREW_BASH=/opt/homebrew/bin/bash
-if ! grep -qF "$BREW_BASH" /etc/shells 2>/dev/null; then
-    echo ""
-    echo "To switch to Homebrew bash:"
-    echo "  sudo sh -c 'echo $BREW_BASH >> /etc/shells'"
-    echo "  chsh -s $BREW_BASH"
+# ── Login shell: bash ──────────────────────────────────────────────────────────
+if [ "$(getent passwd "$USER" | cut -d: -f7)" != "/bin/bash" ]; then
+    echo "==> Switching login shell to bash..."
+    sudo chsh -s /bin/bash "$USER"
 fi
 
 echo ""
 echo "Done. Remove the clone: rm -rf $REPO_DIR"
-echo "Then restart your shell."
+echo "New tmux panes and ssh sessions will start bash."

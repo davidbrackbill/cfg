@@ -10,5 +10,5 @@ require('config.lsp')
 require('config.fzf')
 require('config.treesitter')
 
--- flagpls: LD flag lookup (:Flagpls / <leader>fd). Plugin symlinked into lua/flagpls.lua.
-require('flagpls').setup()
+local ok, flagpls = pcall(require, 'flagpls')
+if ok then flagpls.setup() end

@@ -1,16 +1,9 @@
-[credential "https://github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
 [user]
 	# name and email loaded from ~/.git.env via GIT_AUTHOR_*/GIT_COMMITTER_* env vars
 [core]
 	autocrlf = input
 	editor = nvim
-	fsmonitor = true
-	excludesfile = /Users/db/.gitignore_global
-[credential]
-	useHttpPath = true
-	helper = store
+	excludesfile = ~/.gitignore_global
 [init]
 	defaultBranch = main
 [diff]
@@ -18,6 +11,10 @@
 
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
 
 ; Repo-specific maintenance registrations (added by `git maintenance start`)
 ; [maintenance]
@@ -25,6 +22,3 @@
 ; 	repo = /path
 [include]
 	path = ~/.gitconfig-local
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
