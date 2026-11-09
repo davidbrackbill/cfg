@@ -19,8 +19,8 @@ if ! command -v starship &>/dev/null; then
 fi
 
 # ── Git identity ───────────────────────────────────────────────────────────────
-git_name="${TERMAG_OWNER_NAME:-$(git config --global user.name 2>/dev/null || true)}"
-git_email="${TERMAG_OWNER_EMAIL:-$(git config --global user.email 2>/dev/null || true)}"
+git_name="${TERMAG_OWNER_NAME:-$(git config --global --includes user.name 2>/dev/null || true)}"
+git_email="${TERMAG_OWNER_EMAIL:-$(git config --global --includes user.email 2>/dev/null || true)}"
 if { [ -z "$git_name" ] || [ -z "$git_email" ]; } && [ -t 0 ]; then
     read -rp "  Git name:  " git_name
     read -rp "  Git email: " git_email
@@ -43,20 +43,21 @@ else
 fi
 
 cfg() { git --git-dir="$HOME/.cfg" --work-tree="$HOME" "$@"; }
+cd "$HOME"
 
 echo "==> Checking out dotfiles to ~..."
-if ! cfg checkout 2>/dev/null; then
-    backup="$HOME/.cfg-bak/$(date +%Y%m%d-%H%M%S)"
-    echo "  Backing up conflicting files to $backup/..."
-    cfg checkout 2>&1 \
-        | grep -E "^\s+\S" \
-        | awk '{print $1}' \
-        | while read -r f; do
+backup="$HOME/.cfg-bak/$(date +%Y%m%d-%H%M%S)"
+cfg ls-tree -r --name-only HEAD | while read -r f; do
+    if [ -e "$HOME/$f" ] || [ -L "$HOME/$f" ]; then
+        if ! cfg show "HEAD:$f" 2>/dev/null | cmp -s - "$HOME/$f"; then
             mkdir -p "$backup/$(dirname "$f")"
             mv "$HOME/$f" "$backup/$f"
-        done
-    cfg checkout
-fi
+        fi
+    fi
+done
+[ -d "$backup" ] && echo "  Backed up replaced files to $backup/"
+cfg checkout -f HEAD -- ':/'
+cfg reset -q
 
 cfg config status.showUntrackedFiles no
 cfg remote set-url origin git@github.com:davidbrackbill/cfg.git
