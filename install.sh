@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Usage (on a termag box): git clone -b linux git@github.com:davidbrackbill/cfg.git && bash cfg/init.sh
-# termag's dotfiles claim runs this via main's install.sh, non-interactively.
+# Usage (on a termag box): git clone git@github.com:davidbrackbill/cfg.git && bash cfg/install.sh
+# termag's dotfiles claim runs this from ~/.dotfiles, non-interactively.
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"

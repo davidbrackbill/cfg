@@ -6,8 +6,8 @@ Please do explanations as plain prose for a human to read.
 
 ## Dev Setup
 
-- **`~/init.sh`** — termag box bootstrap script (dotfiles + apt installs). Add tools here when setting up work infrastructure that should be replicable on a new box.
-- **`~/.cfg`** — bare git repo tracking dotfiles (including `~/.claude/skills/`; on this branch, `linux`, `~/.claude/settings.json` is box-managed and untracked). Use `git --git-dir=$HOME/.cfg --work-tree=$HOME` to manage, or the `cfg` shell alias.
+- **`~/install.sh`** — termag box bootstrap script (dotfiles + apt installs). Add tools here when setting up work infrastructure that should be replicable on a new box.
+- **`~/.cfg`** — bare git repo tracking dotfiles (including `~/.claude/skills/`; on `main` (Linux), `~/.claude/settings.json` is box-managed and untracked). Use `git --git-dir=$HOME/.cfg --work-tree=$HOME` to manage, or the `cfg` shell alias.
 
 ## Runtime Management
 
