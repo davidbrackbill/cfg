@@ -55,6 +55,7 @@ command = "~/.herdr/wt-tab.sh"
 description = "wt open"
 
 [ui]
+confirm_close = false
 mouse_capture = true
 sidebar_collapsed_mode = "hidden"
 hide_tab_bar_when_single_tab = false
