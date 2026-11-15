@@ -39,7 +39,9 @@ mise install node@lts pnpm@latest
 mise use -g node@lts pnpm@latest uv@latest
 MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
 eval "$(mise activate bash)"
-pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files
+corepack disable pnpm yarn
+mise reshim
+pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files typescript typescript-language-server
 npx puppeteer browsers install chrome-headless-shell
 
 # ── termag CLI (DevSpeed agent boxes; needs Lumos "Termag Access") ────────────
