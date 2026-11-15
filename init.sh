@@ -41,7 +41,7 @@ MISE_PYTHON_PRECOMPILED_FLAVOR=install_only mise use -g python@3.13
 eval "$(mise activate bash)"
 corepack disable pnpm yarn
 mise reshim
-pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files typescript typescript-language-server
+pnpm add -g @mermaid-js/mermaid-cli @aashari/mcp-server-atlassian-confluence sql-formatter tsc-files typescript@5.9.2 typescript-language-server
 npx puppeteer browsers install chrome-headless-shell
 
 # ── termag CLI (DevSpeed agent boxes; needs Lumos "Termag Access") ────────────
