@@ -119,7 +119,8 @@
       "mcp__github__get_copilot_job_status"
     ],
     "deny": [
-      "Agent"
+      "Agent",
+      "Workflow"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
